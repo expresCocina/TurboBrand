@@ -1,0 +1,136 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: 0;                  /* banda integrada */
+  border-radius: 16px;
+  overflow: hidden;        /* recorta separadores y mantiene unidad visual */
+}
+
+/* Card base */
+.card {
+  position: relative;
+  min-height: 170px;       /* más compacto, más premium */
+  padding: 26px 26px 24px; /* respiración sin verse gigante */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  transition: transform 160ms ease, filter 160ms ease;
+
+  /* separador vertical */
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card:last-child {
+  border-right: none;
+}
+
+.subtitle {
+  position: absolute;
+  top: 18px;
+  left: 26px;
+
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 1;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.title {
+  font-family: 'DanubeBold', sans-serif;
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.15;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 22ch;
+}
+
+/* Dark glass */
+.darkCard {
+  background: rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Brand: NO plano. Sigue siendo estrictamente brand,
+   pero con degradado usando ALPHA (permitido) */
+.brandCard {
+  background: linear-gradient(
+    135deg,
+    rgba(158, 0, 96, 0.88) 0%,
+    rgba(158, 0, 96, 0.72) 60%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+  color: var(--white);
+}
+
+.brandCard .subtitle {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.brandCard .title {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+/* Hover sutil (corporativo, no “landing genérica”) */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+  background: radial-gradient(
+    600px 220px at 20% 20%,
+    rgba(255, 255, 255, 0.10),
+    transparent 55%
+  );
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+/* Responsive: 2 columnas */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card:nth-child(2) {
+    border-right: none;
+  }
+
+  .card:nth-child(3) {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: none;
+  }
+}
+
+/* Responsive: 1 columna */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    border-right: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .card:first-child {
+    border-top: none;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+}

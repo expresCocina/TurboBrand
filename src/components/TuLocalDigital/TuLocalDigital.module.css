@@ -1,0 +1,219 @@
+.section {
+    padding: 8rem 0;
+    background: #181818;
+    color: var(--white);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 5rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.intro {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.sectionTitle {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    color: var(--brand);
+}
+
+/* Steps */
+.howItWorks {
+    margin-bottom: 6rem;
+}
+
+.stepsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.stepCard {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem;
+    border-radius: var(--radius-md);
+    position: relative;
+    border-top: 3px solid var(--brand);
+}
+
+.stepNum {
+    background: var(--brand);
+    color: var(--white);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.stepCard h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.stepCard p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.muted {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Details 2 Cols */
+.detailsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 6rem;
+}
+
+.detailCol h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--brand);
+}
+
+.detailCol ul {
+    list-style: none;
+}
+
+.detailCol li {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    position: relative;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.detailCol li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--brand);
+    font-weight: bold;
+}
+
+.highlightText {
+    color: var(--white);
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+/* Offer Grid */
+.offerGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 6rem;
+}
+
+.offerCard {
+    background: var(--brand-alpha);
+    border: 1px solid var(--brand);
+    padding: 2.5rem;
+    border-radius: var(--radius-md);
+}
+
+.offerCard h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.offerCard ul {
+    list-style: none;
+}
+
+.offerCard li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.whyOne {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 6rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 3rem;
+    border-radius: var(--radius-md);
+}
+
+.whyOne h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+}
+
+.whyOne p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.mapContainer {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.mapContainer h3 {
+    margin-bottom: 2rem;
+    letter-spacing: 2px;
+}
+
+.mapImg {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ctaWrapper {
+    text-align: center;
+}
+
+.cta {
+    background: var(--brand);
+    color: var(--white);
+    padding: 1.2rem 3rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: var(--radius-sm);
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.cta:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(158, 0, 96, 0.4);
+}
+
+@media (max-width: 768px) {
+
+    .detailsGrid,
+    .offerGrid {
+        grid-template-columns: 1fr;
+    }
+}

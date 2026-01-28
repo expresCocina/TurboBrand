@@ -1,0 +1,41 @@
+import styles from './Footer.module.css';
+import Link from 'next/link';
+import { Instagram, Facebook } from 'lucide-react';
+
+export default function Footer() {
+    return (
+        <footer className={styles.footer}>
+            <div className="container">
+                <div className={styles.grid}>
+                    <div className={styles.brandCol}>
+                        <h3>TURBO BRAND</h3>
+                        <p style={{ color: 'var(--text-secondary)' }}>
+                            Agencia de Marketing Digital & Growth.
+                            <br />
+                            Impulsada por Inteligencia Artificial.
+                        </p>
+                    </div>
+
+                    <div className={styles.infoCol}>
+                        <h4>Contacto</h4>
+                        <p>Carrera 43 A # 16 sur 245, piso 3, Poblado</p>
+                        <p>Medellín, Colombia</p>
+
+                        <div className={styles.socials}>
+                            <Link href="https://instagram.com/Turbobrandcol" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                                <Instagram size={24} /> @Turbobrandcol
+                            </Link>
+                            <Link href="https://facebook.com/Turbobrandcolombia" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                                <Facebook size={24} /> @Turbobrandcolombia
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.copyright}>
+                    &copy; {new Date().getFullYear()} Turbo Brand. Todos los derechos reservados.
+                </div>
+            </div>
+        </footer>
+    );
+}

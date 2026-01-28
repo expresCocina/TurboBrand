@@ -1,0 +1,82 @@
+.section {
+    padding: 8rem 0;
+    background: var(--bg);
+    text-align: center;
+}
+
+.header {
+    margin-bottom: 4rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.title {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    color: var(--white);
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    color: var(--brand);
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+}
+
+.intro {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 3rem;
+    margin-bottom: 5rem;
+    justify-items: center;
+}
+
+.logoWrapper {
+    width: 180px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    border: 1px solid transparent;
+}
+
+.logoWrapper:hover {
+    opacity: 1;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.categories {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 3rem;
+}
+
+.catTitle {
+    font-size: 1.2rem;
+    color: var(--white);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.catList {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}

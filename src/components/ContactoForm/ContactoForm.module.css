@@ -1,0 +1,123 @@
+.section {
+    padding: 6rem 0;
+    background: var(--bg);
+}
+
+.textContainer {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 4rem;
+}
+
+.textContainer h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+}
+
+.textContainer p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 3rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stepperIndicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+    gap: 1rem;
+    color: var(--text-secondary);
+}
+
+.activeStep {
+    color: var(--brand);
+    font-weight: 700;
+}
+
+.line {
+    width: 50px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.field {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--brand);
+}
+
+.prefix {
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    color: var(--text-secondary);
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--brand);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.submitBtn:hover {
+    background: #bd0073;
+}
+
+.btnGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.backBtn {
+    width: 30%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.successContainer {
+    text-align: center;
+}

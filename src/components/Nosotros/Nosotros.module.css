@@ -1,0 +1,95 @@
+.container {
+    padding: 8rem 1.5rem;
+    background: var(--bg);
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+.header {
+    text-align: left;
+    margin-bottom: 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.title {
+    font-size: 3rem;
+    color: var(--white);
+    line-height: 1.1;
+}
+
+.introText p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    max-width: 900px;
+}
+
+/* Mission & Vision */
+.missionVisionGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 6rem;
+}
+
+.mvCard {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 3rem;
+    border-left: 3px solid var(--brand);
+}
+
+.mvCard h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+}
+
+.mvCard p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+/* Values */
+.valuesTitle {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--white);
+    text-align: left;
+}
+
+.valuesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 3rem;
+}
+
+.valueItem {
+    padding: 0;
+}
+
+.valueItem h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--brand);
+    line-height: 1.4;
+}
+
+.valueItem p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .missionVisionGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .valuesGrid {
+        grid-template-columns: 1fr;
+    }
+}
