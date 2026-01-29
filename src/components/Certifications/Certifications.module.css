@@ -1,0 +1,153 @@
+.certificationsSection {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    padding: 60px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.certificationsSection::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #9E0060, transparent);
+}
+
+.certificationsSection::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #9E0060, transparent);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.title {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.marqueeWrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 20px 0;
+}
+
+.marqueeWrapper::before,
+.marqueeWrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.marqueeWrapper::before {
+    left: 0;
+    background: linear-gradient(to right, #0a0a0a, transparent);
+}
+
+.marqueeWrapper::after {
+    right: 0;
+    background: linear-gradient(to left, #0a0a0a, transparent);
+}
+
+.marquee {
+    display: flex;
+    gap: 60px;
+    animation: scroll 30s linear infinite;
+    width: fit-content;
+}
+
+.marquee:hover {
+    animation-play-state: paused;
+}
+
+.logoItem {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logoBox {
+    width: 180px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.logoBox:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #9E0060;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(158, 0, 96, 0.3);
+}
+
+.logoImage {
+    opacity: 1;
+    filter: brightness(1.2);
+    transition: all 0.3s ease;
+}
+
+.logoBox:hover .logoImage {
+    opacity: 1;
+    filter: brightness(1.3);
+    transform: scale(1.05);
+}
+
+/* Animación de scroll infinito */
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .certificationsSection {
+        padding: 40px 0;
+    }
+
+    .title {
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+
+    .marquee {
+        gap: 40px;
+    }
+
+    .logoBox {
+        width: 140px;
+        height: 70px;
+    }
+}

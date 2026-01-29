@@ -1,5 +1,6 @@
 import Hero from '@/components/Hero/Hero';
 import Nosotros from '@/components/Nosotros/Nosotros';
+import Certifications from '@/components/Certifications/Certifications';
 import Servicios from '@/components/Servicios/Servicios';
 import Clientes from '@/components/Clientes/Clientes';
 import TuLocalDigital from '@/components/TuLocalDigital/TuLocalDigital';
@@ -14,6 +15,8 @@ export default function Home() {
             <SectionWrapper id="nosotros">
                 <Nosotros />
             </SectionWrapper>
+
+            <Certifications />
 
             <SectionWrapper id="servicios">
                 <Servicios />

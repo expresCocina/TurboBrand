@@ -42,12 +42,40 @@
   padding: 40px;
   transition: all 0.4s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Efecto de flotación */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  animation: cardFloat 6s ease-in-out infinite;
+}
+
+.card:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.card:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.card:nth-child(3) {
+  animation-delay: 2s;
+}
+
+.card:nth-child(4) {
+  animation-delay: 0.5s;
+}
+
+.card:nth-child(5) {
+  animation-delay: 1.5s;
+}
+
+.card:nth-child(6) {
+  animation-delay: 2.5s;
 }
 
 .card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 30px 60px rgba(158, 0, 96, 0.15);
+  transform: translate(0, -15px);
+  box-shadow: 0 35px 70px rgba(158, 0, 96, 0.2);
   /* Brillo magenta suave */
+  animation-play-state: paused;
 }
 
 .cardHeader {
@@ -111,4 +139,25 @@
   background: #9E0060;
   gap: 15px;
   /* Efecto flecha se mueve */
+}
+
+/* Animación de flotación para las tarjetas */
+@keyframes cardFloat {
+
+  0%,
+  100% {
+    transform: translate(0px, 0px);
+  }
+
+  25% {
+    transform: translate(3px, -4px);
+  }
+
+  50% {
+    transform: translate(-2px, -8px);
+  }
+
+  75% {
+    transform: translate(2px, -4px);
+  }
 }

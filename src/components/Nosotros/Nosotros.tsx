@@ -9,11 +9,20 @@ export default function Nosotros() {
 
     return (
         <section className={styles.nosotrosSection} id="nosotros">
+            {/* Elementos decorativos animados en el fondo */}
+            <div className={styles.backgroundShapes}>
+                <div className={styles.shape1}></div>
+                <div className={styles.shape2}></div>
+                <div className={styles.shape3}></div>
+                <div className={styles.shape4}></div>
+                <div className={styles.shape5}></div>
+            </div>
+
             <div className={styles.nosotrosContainer}>
                 <div className={styles.nosotrosHeader}>
                     <h2 className={styles.nosotrosTitle}>¿Quiénes Somos?</h2>
                     <p className={styles.nosotrosIntro}>
-                        Turbo Brand es una agencia de marketing digital 5.0 especializada en pauta, 
+                        Turbo Brand es una agencia de marketing digital 5.0 especializada en pauta,
                         diseños web y procesos de alto impacto.
                     </p>
                 </div>
@@ -21,28 +30,28 @@ export default function Nosotros() {
                 {/* ÁREA DE TABS (MISIÓN / VISIÓN) */}
                 <div className={styles.tabsArea}>
                     <div className={styles.tabButtonsRow}>
-                        <button 
+                        <button
                             className={`${styles.tabButton} ${activeTab === 'mision' ? styles.tabButtonActive : ''}`}
                             onClick={() => setActiveTab('mision')}
                         >
                             <Target size={18} /> Nuestra Misión
                         </button>
-                        <button 
+                        <button
                             className={`${styles.tabButton} ${activeTab === 'vision' ? styles.tabButtonActive : ''}`}
                             onClick={() => setActiveTab('vision')}
                         >
                             <Eye size={18} /> Nuestra Visión
                         </button>
                     </div>
-                    
+
                     <div className={styles.tabPanel}>
                         <div className={styles.panelContent}>
                             <div className={styles.verticalBar} />
                             <div>
                                 <h3>{activeTab === 'mision' ? 'Misión' : 'Visión'}</h3>
                                 <p>
-                                    {activeTab === 'mision' 
-                                        ? 'Hacer crecer tu marca mediante estrategias de pauta digital y marketing basado en datos, ayudando a nuestros clientes a tomar decisiones más inteligentes.' 
+                                    {activeTab === 'mision'
+                                        ? 'Hacer crecer tu marca mediante estrategias de pauta digital y marketing basado en datos, ayudando a nuestros clientes a tomar decisiones más inteligentes.'
                                         : 'Ser la agencia reconocida por nuestro enfoque de crecimiento, nuestra transparencia y la claridad con la que demostramos el impacto de cada inversión.'}
                                 </p>
                             </div>
@@ -55,7 +64,7 @@ export default function Nosotros() {
                 <div className={styles.kanbanGrid}>
                     {/* ENFOQUE */}
                     <div className={styles.kanbanCol}>
-                        <div className={styles.colLabel}><TrendingUp size={14}/> ENFOQUE</div>
+                        <div className={styles.colLabel}><TrendingUp size={14} /> ENFOQUE</div>
                         <div className={styles.kanbanCard}>
                             <div className={styles.cardCategory}>ROI</div>
                             <h4>Crecimiento Real</h4>
@@ -65,7 +74,7 @@ export default function Nosotros() {
 
                     {/* EJECUCIÓN */}
                     <div className={styles.kanbanCol}>
-                        <div className={styles.colLabel}><Zap size={14}/> EJECUCIÓN</div>
+                        <div className={styles.colLabel}><Zap size={14} /> EJECUCIÓN</div>
                         <div className={styles.kanbanCard}>
                             <div className={styles.cardCategory}>DATA</div>
                             <h4>Sin Tecnicismos</h4>
@@ -75,7 +84,7 @@ export default function Nosotros() {
 
                     {/* ESCALA */}
                     <div className={styles.kanbanCol}>
-                        <div className={styles.colLabel}><BarChart3 size={14}/> ESCALA</div>
+                        <div className={styles.colLabel}><BarChart3 size={14} /> ESCALA</div>
                         <div className={styles.kanbanCard}>
                             <div className={styles.cardCategory}>TECH</div>
                             <h4>Automatización</h4>

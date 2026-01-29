@@ -1,5 +1,6 @@
 "use client";
 
+import Typewriter from 'typewriter-effect';
 import { Rocket, Target, Code, Megaphone, GraduationCap, Cpu } from 'lucide-react';
 import styles from './Servicios.module.css';
 
@@ -47,7 +48,22 @@ export default function Servicios() {
     <section className={styles.serviciosSection} id="servicios">
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Nuestros productos y servicios</h2>
+          <h2 className={styles.title}>
+            <Typewriter
+              onInit={(typewriter) => {
+                typewriter
+                  .typeString('Nuestros productos y servicios')
+                  .start();
+              }}
+              options={{
+                autoStart: false,
+                loop: false,
+                delay: 50,
+                cursor: '',
+                deleteSpeed: Infinity,
+              }}
+            />
+          </h2>
           <p className={styles.subtitle}>
             Ayudamos a marcas como la tuya a escalar con pauta digital, automatización y activos que generan flujo de compra real.
           </p>
