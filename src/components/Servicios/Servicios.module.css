@@ -1,67 +1,108 @@
-.section {
-    padding: 8rem 0;
-    background: #1e1e1e;
+.serviciosSection {
+  background-color: #050505;
+  padding: 120px 0;
+  color: #fff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .header {
-    text-align: center;
-    margin-bottom: 5rem;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
+  margin-bottom: 70px;
 }
 
 .title {
-    font-size: 2.8rem;
-    margin-bottom: 1.5rem;
-    color: var(--white);
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #fff;
 }
 
-.intro {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    line-height: 1.7;
+.subtitle {
+  font-size: 1.2rem;
+  color: #a0a0a0;
+  max-width: 750px;
+  line-height: 1.6;
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 30px;
 }
 
+/* 🔑 TARJETA AMIGABLE */
 .card {
-    background: var(--bg);
-    padding: 3rem;
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    height: 100%;
+  background: #ffffff; /* Fondo blanco para que los iconos resalten */
+  border-radius: 30px;
+  padding: 40px;
+  transition: all 0.4s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card:hover {
-    transform: translateY(-8px);
-    border-color: var(--brand);
-    background: linear-gradient(to bottom right, var(--bg), rgba(30, 30, 30, 1));
+  transform: translateY(-10px);
+  box-shadow: 0 30px 60px rgba(158, 0, 96, 0.15); /* Brillo magenta suave */
 }
 
-.icon {
-    color: var(--brand);
-    margin-bottom: 1.5rem;
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
 }
 
-.sTitle {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    color: var(--white);
-    font-weight: 700;
-    line-height: 1.3;
+/* 🔑 ICONOS LLAMATIVOS */
+.iconContainer {
+  background: linear-gradient(135deg, #9E0060, #ff009d); /* Degradado Turbo Brand */
+  color: #fff;
+  padding: 18px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(158, 0, 96, 0.3);
 }
 
-.desc {
-    color: var(--text-secondary);
-    font-size: 1rem;
-    line-height: 1.6;
+.cardTag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #9E0060;
+  letter-spacing: 1px;
+  background: rgba(158, 0, 96, 0.08);
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+
+.content h3 {
+  color: #111;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.content p {
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.btnVerMas {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btnVerMas:hover {
+  background: #9E0060;
+  gap: 15px; /* Efecto flecha se mueve */
 }

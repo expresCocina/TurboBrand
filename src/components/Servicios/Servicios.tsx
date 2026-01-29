@@ -1,56 +1,78 @@
 "use client";
-import styles from './Servicios.module.css';
-import { Megaphone, TrendingUp, Monitor, Video, GraduationCap } from 'lucide-react';
 
-const services = [
-    {
-        icon: <Megaphone size={40} />,
-        title: 'Pauta Digital',
-        desc: 'Gestionamos tus campañas de Meta Ads, Google Ads, TikTok y otros canales para que tu presupuesto llegue a las personas que más te pueden comprar, en el momento justo. Nos enfocamos en optimizar cada centavo: segmentaciones, creativos y ajustes constantes para mejorar el ROI y que cada peso traiga resultados reales, no solo clics.'
-    },
-    {
-        icon: <TrendingUp size={40} />,
-        title: 'Consultoría y Acompañamiento Estratégico',
-        desc: 'No solo hacemos campañas, te ayudamos a entender qué está pasando en tu negocio digital. Te acompañamos a sacar aprendizajes de los datos, tomar decisiones claras y alinear tu estrategia de pauta, automatización y contenidos a lo que realmente importa: vender más y crecer con cabeza.'
-    },
-    {
-        icon: <Monitor size={40} />,
-        title: 'Desarrollo Web',
-        desc: 'Creamos páginas web y landings que NO se ven bonitas solas, sino que convierten. Desde el diseño hasta el código, trabajamos pensando en tus objetivos: que cada visitante encuentre lo que necesita y deje datos, compre o agende una cita, sin complicaciones.'
-    },
-    {
-        icon: <Video size={40} />,
-        title: 'Contenidos Digitales',
-        desc: 'Diseñamos contenido que funcione, Estrategia de contenidos, calendarios y piezas que ayudan a posicionar tu marca, darle valor a tu audiencia y generar confianza antes de que llegue a tu pauta, para que todo cierre mejor, modelos UGC y mucho más.'
-    },
-    {
-        icon: <GraduationCap size={40} />,
-        title: 'Clases personalizadas en Meta, Google y TikTok Ads',
-        desc: 'Clases 100 % personalizadas, 100 % para ti. Si eres emprendedor, marca personal o dueño de negocio, te enseñamos paso a paso cómo funciona la pauta digital, desde cero hasta que puedas armar y monitorear tus campañas con claridad, sin misterios ni tecnicismos.'
-    }
+import { Rocket, Target, Code, Megaphone, GraduationCap, Cpu } from 'lucide-react';
+import styles from './Servicios.module.css';
+
+const servicios = [
+  {
+    title: "Pauta Digital",
+    desc: "Gestionamos tus campañas de Meta Ads, Google Ads y TikTok para que tu presupuesto llegue a las personas que realmente compran",
+    icon: <Target className={styles.iconMain} />,
+    tag: "ROI & VENTAS"
+  },
+  {
+    title: "Consultoría Estratégica",
+    desc: "Te ayudamos a entender qué pasa en tu negocio digital para tomar decisiones claras y crecer con cabeza",
+    icon: <Rocket className={styles.iconMain} />,
+    tag: "ESTRATEGIA"
+  },
+  {
+    title: "Ingeniería Web",
+    desc: "Creamos páginas y landings que NO solo se ven bonitas, sino que están hechas para convertir visitantes en clientes",
+    icon: <Code className={styles.iconMain} />,
+    tag: "CONVERSIÓN"
+  },
+  {
+    title: "Contenidos Digitales",
+    desc: "Diseñamos estrategias de contenido, modelos UGC y piezas que generan confianza antes de que llegue la pauta",
+    icon: <Megaphone className={styles.iconMain} />,
+    tag: "REPUTACIÓN"
+  },
+  {
+    title: "Clases Personalizadas",
+    desc: "Aprende paso a paso cómo funciona la pauta digital para monitorear tus campañas con claridad y sin misterios",
+    icon: <GraduationCap className={styles.iconMain} />,
+    tag: "APRENDIZAJE"
+  },
+  {
+    title: "Automatización",
+    desc: "Desarrollamos procesos que automatizan tareas clave para que tu negocio escale sin que tú pases más horas frente al PC",
+    icon: <Cpu className={styles.iconMain} />,
+    tag: "EFICIENCIA"
+  }
 ];
 
 export default function Servicios() {
-    return (
-        <div className={`container ${styles.section}`}>
-            <div className={styles.header}>
-                <h2 className={styles.title}>Nuestros Servicios</h2>
-                <p className={styles.intro}>
-                    En Turbo Brand no vendemos magia ni métricas bonitas: ayudamos a marcas como la tuya a escalar con pauta digital,
-                    automatización y activos que generan flujo de compra real. Nos enfocamos en bajar tus costos de adquisición,
-                    mejorar el ROI de cada campaña y construir procesos que conviertan visitantes en clientes.
-                </p>
-            </div>
-
-            <div className={styles.grid}>
-                {services.map((s, index) => (
-                    <div key={index} className={styles.card}>
-                        <div className={styles.icon}>{s.icon}</div>
-                        <h3 className={styles.sTitle}>{s.title}</h3>
-                        <p className={styles.desc}>{s.desc}</p>
-                    </div>
-                ))}
-            </div>
+  return (
+    <section className={styles.serviciosSection} id="servicios">
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Nuestros productos y servicios</h2>
+          <p className={styles.subtitle}>
+            Ayudamos a marcas como la tuya a escalar con pauta digital, automatización y activos que generan flujo de compra real.
+          </p>
         </div>
-    );
+
+        <div className={styles.grid}>
+          {servicios.map((servicio, index) => (
+            <div key={index} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div className={styles.iconContainer}>
+                  {servicio.icon}
+                </div>
+                <span className={styles.cardTag}>{servicio.tag}</span>
+              </div>
+              <div className={styles.content}>
+                <h3>{servicio.title}</h3>
+                <p>{servicio.desc}</p>
+                <button className={styles.btnVerMas}>
+                  Ver más <span>→</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
