@@ -1,208 +1,142 @@
 .hero {
   position: relative;
   min-height: 100svh;
-  width: 100%;
   overflow: hidden;
-  background: #0b0b0c;
+  background: var(--bg);
   --zigzag-color: var(--bg);
 }
 
-/* Visual derecha: la imagen NO toca el texto */
-.visual {
+/* Imagen fondo */
+.imageBackground {
   position: absolute;
   inset: 0;
   z-index: 1;
 
-  background-color: #000;
   background-image: url("/fondohero.png");
   background-repeat: no-repeat;
-  background-size: contain;
+
+  /* 🔑 AJUSTE PARA ALEJAR: Bajamos el tamaño al 45% o 50% */
+  /* Esto hará que el personaje se vea pequeño como en tu referencia */
+  background-size: 70%;
+
+  /* 🔑 AJUSTE DE POSICIÓN: Lo pegamos al borde derecho y lo centramos verticalmente */
   background-position: right center;
 
-  /* Look premium */
-  filter: saturate(0.95) contrast(1.05) brightness(0.92);
+  /* 🔑 ELIMINACIÓN DE RECUADRO: Aseguramos que el fondo sea negro puro */
+  background-color: #000;
 }
 
-/* Máscara para que la imagen se funda con el fondo (pro) */
-.visual::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
 
-  /* Negro fuerte en izquierda, suave hacia la derecha */
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.92) 0%,
-    rgba(0,0,0,0.85) 26%,
-    rgba(0,0,0,0.55) 46%,
-    rgba(0,0,0,0.20) 70%,
-    rgba(0,0,0,0.05) 100%
-  );
-}
-
-/* Overlay general: ruido + viñeta sutil */
 .overlay {
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: radial-gradient(
-    900px 520px at 18% 40%,
-    rgba(0, 0, 0, 0.55) 0%,
-    rgba(0, 0, 0, 0.18) 55%,
-    rgba(0, 0, 0, 0.06) 100%
-  );
-}
-
-.overlay::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.03;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+
+  /* Oscurece de forma natural SIN recuadro */
+  background: linear-gradient(to right,
+      rgba(0, 0, 0, 0.85) 0%,
+      rgba(0, 0, 0, 0.55) 35%,
+      rgba(0, 0, 0, 0.25) 60%,
+      rgba(0, 0, 0, 0.15) 100%);
 }
 
-.mainContainer {
+
+/* GRID PRINCIPAL */
+.container {
   position: relative;
   z-index: 3;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 110px 24px 64px;
-  min-height: 100svh;
-
+  padding: 96px 24px 64px;
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr; /* izq texto, der “aire” */
-  gap: 24px;
-  align-items: end;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
 }
 
+/* IZQUIERDA */
 .left {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: calc(100svh - 110px - 64px);
 }
 
+/* DERECHA solo respira */
 .right {
-  /* vacío: solo mantiene layout para que la visual respire */
+  pointer-events: none;
 }
 
+/* TEXTO */
 .textWrapper {
   max-width: 720px;
-  padding-top: 6px;
 }
 
 .eyebrow {
-  margin: 0 0 14px;
-  font-size: 0.78rem;
-  letter-spacing: 0.28em;
+  margin-bottom: 14px;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .headline {
   font-family: "DanubeBold", sans-serif;
-  margin: 0 0 12px;
+  font-size: clamp(2.8rem, 5vw, 4.8rem);
+  line-height: 1;
   color: var(--white);
-  line-height: 0.95;
-  font-size: clamp(2.8rem, 5.2vw, 4.8rem);
-  text-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+  margin-bottom: 14px;
 }
 
 .lead {
-  margin: 0;
-  font-size: clamp(1.05rem, 1.4vw, 1.22rem);
+  max-width: 52ch;
+  font-size: 1.1rem;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.90);
-  max-width: 54ch;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-/* Cards */
+/* CARDS */
 .cardsWrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 18px;
+  margin-top: 32px;
 }
 
-/* Base glass pro */
-.cardsWrapper::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: -18px;
-
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 18px;
-
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-
-  box-shadow:
-    0 18px 70px rgba(0, 0, 0, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  z-index: 0;
-}
-
-.cardsWrapper > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Zigzag */
+/* ZIGZAG */
 .divider {
   position: absolute;
   bottom: -1px;
-  left: 0;
   width: 100%;
-  line-height: 0;
-  z-index: 4;
   color: var(--zigzag-color);
+  z-index: 4;
 }
 
 .divider svg {
   display: block;
   width: 100%;
   height: 56px;
-  filter: drop-shadow(0 -10px 20px rgba(0, 0, 0, 0.18));
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .mainContainer {
+/* MOBILE */
+@media (max-width: 900px) {
+  .container {
     grid-template-columns: 1fr;
-    gap: 18px;
   }
 
-  .left {
-    min-height: auto;
-  }
-
-  .visual {
-    background-position: 70% 50%;
-    background-size: cover; /* mejor en pantallas chicas */
-  }
-
-  .visual::after {
-    background: linear-gradient(
-      to bottom,
-      rgba(0,0,0,0.70) 0%,
-      rgba(0,0,0,0.32) 45%,
-      rgba(0,0,0,0.70) 100%
-    );
+  .right {
+    display: none;
   }
 }
 
-@media (max-width: 768px) {
-  .mainContainer {
-    padding: 96px 18px 48px;
-  }
+.headline {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 1.5rem;
+  min-height: 120px;
+  /* Evita que el contenido "salte" mientras se escribe */
+}
 
-  .eyebrow {
-    letter-spacing: 0.22em;
-  }
+/* Estilo para el cursor de escritura */
+.typewriterWrapper :global(.Typewriter__cursor) {
+  color: #9E0060;
+  /* El color magenta de tu marca */
+  font-weight: 200;
 }

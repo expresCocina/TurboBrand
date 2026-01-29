@@ -1,41 +1,141 @@
 "use client";
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import styles from './Navbar.module.css';
+
+import { useEffect, useMemo, useState, useCallback } from "react";
+import Link from "next/link";
+import styles from "./Navbar.module.css";
+
+type NavItem = { label: string; href: string };
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const items: NavItem[] = useMemo(
+    () => [
+      { label: "Nosotros", href: "#nosotros" },
+      { label: "Servicios", href: "#servicios" },
+      { label: "Clientes", href: "#clientes" },
+      { label: "Tu Local Digital", href: "#tu-local-digital" },
+    ],
+    []
+  );
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 900) setMobileOpen(false);
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
+  const scrollToAnchor = useCallback((href: string) => {
+    const id = href.replace("#", "");
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setMobileOpen(false);
+  }, []);
+
+  const handleAnchor = (href: string) => (e: React.MouseEvent) => {
+    if (!href.startsWith("#")) return;
+    e.preventDefault();
+    scrollToAnchor(href);
+  };
+
   return (
-    <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
+    <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ""}`}>
       <div className={styles.navContainer}>
-        {/* Logo Area */}
-        <Link href="/" className={styles.logoWrapper}>
-          <div className={styles.logoTextPlaceholder}>
-            TURBO <span style={{ color: 'var(--brand)' }}>BRAND</span>
+        <Link
+          href="#home"
+          onClick={handleAnchor("#home")}
+          className={styles.logoWrapper}
+          aria-label="Ir al inicio"
+        >
+          <div className={styles.logoText}>
+            TURBO <span className={styles.logoAccent}>BRAND</span>
           </div>
         </Link>
 
-        {/* Desktop Links */}
-        <div className={styles.links}>
-          <Link href="#nosotros" className={styles.link}>Nosotros</Link>
-          <Link href="#servicios" className={styles.link}>Servicios</Link>
-          <Link href="#clientes" className={styles.link}>Clientes</Link>
-          <Link href="#contacto" className={styles.cta}>Contacto</Link>
+        <div className={styles.links} aria-label="Navegación principal">
+          {items.map((it) => (
+            <Link
+              key={it.href}
+              href={it.href}
+              onClick={handleAnchor(it.href)}
+              className={styles.link}
+            >
+              {it.label}
+            </Link>
+          ))}
+          <Link
+            href="#contacto"
+            onClick={handleAnchor("#contacto")}
+            className={styles.cta}
+          >
+            Contacto
+          </Link>
         </div>
 
-        {/* Mobile Menu Button - Hidden on Desktop handled by CSS */}
-        <button className={styles.menuBtn}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <button
+          className={styles.menuBtn}
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-menu"
+          type="button"
+        >
+          <span className={styles.menuIcon} aria-hidden="true" />
         </button>
+      </div>
+
+      <div
+        id="mobile-menu"
+        className={`${styles.mobileMenu} ${
+          mobileOpen ? styles.mobileOpen : ""
+        }`}
+        role="dialog"
+        aria-label="Menú móvil"
+        aria-modal="true"
+        onClick={() => setMobileOpen(false)}
+      >
+        <div
+          className={styles.mobilePanel}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {items.map((it) => (
+            <Link
+              key={it.href}
+              href={it.href}
+              onClick={handleAnchor(it.href)}
+              className={styles.mobileLink}
+            >
+              {it.label}
+            </Link>
+          ))}
+          <Link
+            href="#contacto"
+            onClick={handleAnchor("#contacto")}
+            className={styles.mobileCta}
+          >
+            Contacto
+          </Link>
+        </div>
       </div>
     </nav>
   );

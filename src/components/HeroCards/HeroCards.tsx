@@ -1,35 +1,28 @@
-import styles from './HeroCards.module.css';
+import styles from "./HeroCards.module.css";
 
 export default function HeroCards() {
-    const cards = [
-        {
-            subtitle: "GROWING TOGETHER",
-            title: "Aumenta las ventas de tu tienda en línea",
-            type: "dark"
-        },
-        {
-            subtitle: "GROWING TOGETHER",
-            title: "Posiciona tu marca en canales digitales",
-            type: "dark"
-        },
-        {
-            subtitle: "SOCIAL MEDIA",
-            title: "Crea una comunidad digital",
-            type: "brand"
-        }
-    ];
-
-    return (
-        <div className={styles.grid}>
-            {cards.map((card, index) => (
-                <div
-                    key={index}
-                    className={`${styles.card} ${card.type === 'brand' ? styles.brandCard : styles.darkCard}`}
-                >
-                    <span className={styles.subtitle}>{card.subtitle}</span>
-                    <h3 className={styles.title}>{card.title}</h3>
-                </div>
-            ))}
+  return (
+    <div className={styles.cardsGrid}>
+      {/* Columna izquierda con servicios principales */}
+      <div className={styles.left}>
+        <div className={styles.card}>
+          <span className={styles.tag}>GROWING TOGETHER</span>
+          <h3>Aumenta las ventas de tu tienda en línea</h3>
         </div>
-    );
+
+        <div className={styles.card}>
+          <span className={styles.tag}>GROWING TOGETHER</span>
+          <h3>Posiciona tu marca en canales digitales</h3>
+        </div>
+      </div>
+
+      {/* Columna derecha destacada (Social Media) */}
+      <div className={styles.right}>
+        <div className={`${styles.card} ${styles.highlight}`}>
+          <span className={styles.tag}>SOCIAL MEDIA</span>
+          <h3>Crea una comunidad digital</h3>
+        </div>
+      </div>
+    </div>
+  );
 }
