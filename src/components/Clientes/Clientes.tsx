@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import Typewriter from 'typewriter-effect';
 import { TrendingUp, Users, Award, Target, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from './Clientes.module.css';
 
@@ -173,7 +172,7 @@ export default function Clientes() {
                     }
                 });
             },
-            { threshold: 0.3 }
+            { threshold: 0.1 } // Faster trigger
         );
 
         if (statsRef.current) {
@@ -191,20 +190,7 @@ export default function Clientes() {
         <div className={`container ${styles.section}`}>
             <div className={styles.header}>
                 <h2 className={styles.title}>
-                    <Typewriter
-                        onInit={(typewriter) => {
-                            typewriter
-                                .typeString('Casos de éxito reales')
-                                .start();
-                        }}
-                        options={{
-                            autoStart: false,
-                            loop: false,
-                            delay: 40,
-                            cursor: '',
-                            deleteSpeed: Infinity,
-                        }}
-                    />
+                    Casos de éxito reales
                 </h2>
                 <p className={styles.intro}>
                     Conoce cómo ayudamos a diferentes marcas a escalar con estrategias de marketing digital,

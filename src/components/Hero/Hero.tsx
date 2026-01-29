@@ -35,7 +35,7 @@ export default function Hero() {
                                 options={{
                                     autoStart: true,
                                     loop: false,
-                                    delay: 40,
+                                    delay: 30,
                                     cursor: "|",
                                     wrapperClassName: styles.typewriterWrapper,
                                 }}

@@ -191,6 +191,15 @@
     gap: 32px;
   }
 
+  /* Fix for Next.js Image on mobile */
+  .heroImage {
+    object-fit: cover !important;
+    object-position: center !important;
+    width: 100% !important;
+    left: 0 !important;
+    opacity: 0.4;
+  }
+
   .eyebrow {
     font-size: 0.7rem;
     margin-bottom: 10px;
@@ -204,11 +213,5 @@
   .lead {
     font-size: 0.95rem;
     line-height: 1.5;
-  }
-
-  .imageBackground {
-    background-position: center;
-    background-size: cover;
-    opacity: 0.4;
   }
 }
