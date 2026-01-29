@@ -1,0 +1,234 @@
+.mapWrapper {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(0, 255, 136, 0.2);
+    border: 2px solid rgba(0, 255, 136, 0.3);
+}
+
+/* Reduce height on mobile for better performance */
+@media (max-width: 768px) {
+    .mapWrapper {
+        height: 450px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mapWrapper {
+        height: 400px;
+    }
+}
+
+.mapPlaceholder {
+    width: 100%;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border-radius: 20px;
+    color: #00ff88;
+    font-size: 1.2rem;
+}
+
+.leafletMap {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Custom Popup Styles */
+:global(.leaflet-popup-content-wrapper) {
+    background: rgba(10, 10, 10, 0.95) !important;
+    border: 2px solid #00ff88 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+:global(.leaflet-popup-tip) {
+    background: rgba(10, 10, 10, 0.95) !important;
+    border: 2px solid #00ff88 !important;
+}
+
+:global(.leaflet-popup-close-button) {
+    color: #00ff88 !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+}
+
+:global(.leaflet-popup-close-button):hover {
+    color: #fff !important;
+}
+
+.popupContent {
+    padding: 0.5rem;
+    min-width: 250px;
+}
+
+.popupContent h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.1rem;
+    color: #00ff88;
+    font-weight: 700;
+}
+
+.zoneType {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+.statusBadge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.available .statusBadge {
+    background: rgba(0, 255, 136, 0.2);
+    border: 1px solid #00ff88;
+    color: #00ff88;
+}
+
+.occupied .statusBadge {
+    background: rgba(158, 0, 96, 0.2);
+    border: 1px solid #9E0060;
+    color: #ff6b9d;
+}
+
+.statusText {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin: 0.75rem 0;
+}
+
+.businessName {
+    font-size: 0.95rem;
+    color: #fff;
+    margin: 0.75rem 0;
+}
+
+.businessName strong {
+    color: #ff6b9d;
+}
+
+.reserveBtn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.reserveBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
+}
+
+/* Info Panel */
+.infoPanel {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid rgba(0, 255, 136, 0.5);
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.stats {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.statNumber {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #00ff88;
+    line-height: 1;
+}
+
+.statLabel {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .infoPanel {
+        bottom: 10px;
+        padding: 0.75rem 1rem;
+    }
+
+    .stats {
+        gap: 1.5rem;
+    }
+
+    .statNumber {
+        font-size: 1.5rem;
+    }
+
+    .statLabel {
+        font-size: 0.65rem;
+    }
+
+    .popupContent {
+        min-width: 200px;
+    }
+
+    .popupContent h3 {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .infoPanel {
+        width: calc(100% - 40px);
+        left: 20px;
+        transform: none;
+    }
+
+    .stats {
+        gap: 1rem;
+        justify-content: space-around;
+    }
+
+    .statNumber {
+        font-size: 1.25rem;
+    }
+
+    .statLabel {
+        font-size: 0.6rem;
+    }
+}

@@ -1,0 +1,119 @@
+.mapContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    border-radius: 20px;
+    border: 2px solid rgba(158, 0, 96, 0.3);
+    overflow: hidden;
+}
+
+.mapContainer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(158, 0, 96, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.canvas {
+    max-width: 100%;
+    height: auto;
+    cursor: pointer;
+    border-radius: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.tooltip {
+    position: fixed;
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid #00ff88;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    min-width: 250px;
+    box-shadow:
+        0 10px 40px rgba(0, 255, 136, 0.3),
+        0 0 20px rgba(0, 255, 136, 0.2);
+    pointer-events: none;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tooltip h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: #00ff88;
+    font-weight: 700;
+}
+
+.status {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.business {
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+    color: #ff6b9d;
+    font-style: italic;
+}
+
+.neighborhoods {
+    margin: 0.75rem 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+
+.action {
+    margin: 0.75rem 0 0 0;
+    font-size: 0.8rem;
+    color: #00ff88;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mapContainer {
+        padding: 1rem;
+    }
+
+    .canvas {
+        width: 100%;
+        height: auto;
+    }
+
+    .tooltip {
+        min-width: 200px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .tooltip h4 {
+        font-size: 1rem;
+    }
+}
