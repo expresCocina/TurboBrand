@@ -158,6 +158,82 @@
   }
 
   75% {
-    transform: translate(2px, -4px);
+    transform: translate(2px, 3px);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .serviciosSection {
+    padding: 100px 0;
+  }
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .serviciosSection {
+    padding: 80px 0;
+  }
+
+  .header {
+    margin-bottom: 50px;
+    text-align: center;
+  }
+
+  .subtitle {
+    margin: 0 auto;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .card {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .serviciosSection {
+    padding: 60px 0;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .card {
+    padding: 24px;
+  }
+
+  .cardHeader {
+    margin-bottom: 20px;
+  }
+
+  .content h3 {
+    font-size: 1.4rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    /* Ensure cards take full width but handle small screens */
+    display: flex;
+    flex-direction: column;
   }
 }

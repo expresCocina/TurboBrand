@@ -314,17 +314,158 @@
     line-height: 1.8;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* Responsive Design - Mobile First */
+
+/* Small Mobile (320px - 480px) */
+@media (max-width: 480px) {
+    .section {
+        padding: 3rem 1rem;
+    }
+
+    .header {
+        margin-bottom: 2.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .title {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .intro {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    /* Stats Grid - 1 column on very small screens */
+    .statsGrid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .statCard {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .statIcon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .statValue {
+        font-size: 1.875rem;
+    }
+
+    .statLabel {
+        font-size: 0.85rem;
+    }
+
+    /* Case Cards */
     .kanbanGrid {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 2rem;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 3rem;
+    }
+
+    .caseCard {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .cardHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.875rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
+    }
+
+    .companyLogo {
+        max-width: 110px;
+    }
+
+    .industryBadge {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.75rem;
+    }
+
+    /* Metrics */
+    .metricsGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.625rem;
+        padding: 1rem 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .metricValue {
+        font-size: 1.25rem;
+    }
+
+    .metricLabel {
+        font-size: 0.625rem;
+    }
+
+    /* Toggle Button - Larger for touch */
+    .toggleButton {
+        padding: 1rem 1.25rem;
+        font-size: 0.875rem;
+        min-height: 48px;
+        /* Touch target */
+    }
+
+    /* Expanded Content */
+    .cardContent {
+        margin-bottom: 1.25rem;
+    }
+
+    .section {
+        margin-bottom: 1rem;
+    }
+
+    .sectionLabel {
+        font-size: 0.7rem;
+    }
+
+    .sectionText {
+        font-size: 0.875rem;
+    }
+
+    .testimonial {
+        padding: 1rem;
+    }
+
+    .testimonialText {
+        font-size: 0.875rem;
+    }
+
+    .testimonialAuthor strong {
+        font-size: 0.85rem;
+    }
+
+    .testimonialAuthor span {
+        font-size: 0.8rem;
+    }
+
+    /* Categories */
+    .categories {
+        padding-top: 2rem;
+    }
+
+    .catTitle {
+        font-size: 1rem;
+    }
+
+    .catList {
+        font-size: 0.9rem;
     }
 }
 
-@media (max-width: 768px) {
+/* Mobile (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
     .section {
-        padding: 5rem 0;
+        padding: 4rem 1.5rem;
     }
 
     .title {
@@ -335,6 +476,7 @@
         font-size: 1rem;
     }
 
+    /* Stats Grid - 2 columns */
     .statsGrid {
         grid-template-columns: repeat(2, 1fr);
         gap: 1.5rem;
@@ -351,37 +493,125 @@
     }
 
     .metricsGrid {
-        grid-template-columns: repeat(3, 1fr);
         gap: 0.75rem;
-        padding: 1rem;
+        padding: 1.25rem;
     }
 
     .metricValue {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
     }
 
     .metricLabel {
-        font-size: 0.65rem;
-    }
-
-    .companyName {
-        font-size: 1.25rem;
-    }
-
-    .industryBadge {
         font-size: 0.7rem;
-        padding: 0.4rem 0.8rem;
+    }
+
+    .toggleButton {
+        min-height: 48px;
     }
 }
 
-@media (max-width: 480px) {
-    .statsGrid {
-        grid-template-columns: 1fr;
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .section {
+        padding: 6rem 2rem;
     }
 
-    .cardHeader {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
+    .title {
+        font-size: 2.5rem;
+    }
+
+    .intro {
+        font-size: 1.1rem;
+    }
+
+    /* Stats Grid - 4 columns */
+    .statsGrid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.75rem;
+        margin-bottom: 4rem;
+    }
+
+    .statValue {
+        font-size: 2.25rem;
+    }
+
+    /* Case Cards - 2 columns */
+    .kanbanGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .caseCard {
+        padding: 1.75rem;
+    }
+
+    .metricsGrid {
+        gap: 0.875rem;
+        padding: 1.5rem;
+    }
+
+    .metricValue {
+        font-size: 1.625rem;
+    }
+
+    .metricLabel {
+        font-size: 0.7rem;
+    }
+}
+
+/* Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .kanbanGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.25rem;
+    }
+}
+
+/* Large Desktop (1440px+) */
+@media (min-width: 1440px) {
+    .section {
+        padding: 10rem 0;
+    }
+
+    .title {
+        font-size: 3.5rem;
+    }
+
+    .intro {
+        font-size: 1.2rem;
+    }
+
+    .statsGrid {
+        gap: 2.5rem;
+        margin-bottom: 6rem;
+    }
+
+    .statValue {
+        font-size: 3rem;
+    }
+
+    .kanbanGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3rem;
+    }
+
+    .caseCard {
+        padding: 2.5rem;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .toggleButton {
+        min-height: 48px;
+        padding: 1rem 1.5rem;
+    }
+
+    .statCard:hover {
+        transform: none;
+    }
+
+    .caseCard:hover {
+        transform: none;
     }
 }

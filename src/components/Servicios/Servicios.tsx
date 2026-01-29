@@ -56,9 +56,9 @@ export default function Servicios() {
                   .start();
               }}
               options={{
-                autoStart: false,
+                autoStart: true,
                 loop: false,
-                delay: 50,
+                delay: 40,
                 cursor: '',
                 deleteSpeed: Infinity,
               }}

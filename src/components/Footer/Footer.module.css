@@ -67,6 +67,7 @@
     .grid {
         grid-template-columns: 1fr;
         text-align: center;
+        gap: 2rem;
     }
 
     .infoCol {
@@ -74,6 +75,12 @@
     }
 
     .socials {
-        justify-content: center;
+        align-items: center;
+        /* Fix alignment on mobile */
+        margin-top: 2rem;
+    }
+
+    .brandCol h3 {
+        margin-bottom: 0.5rem;
     }
 }

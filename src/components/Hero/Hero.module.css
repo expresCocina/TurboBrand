@@ -7,23 +7,29 @@
 }
 
 /* Imagen fondo */
+/* Imagen fondo */
 .imageBackground {
   position: absolute;
   inset: 0;
   z-index: 1;
-
-  background-image: url("/fondohero.png");
-  background-repeat: no-repeat;
-
-  /* 🔑 AJUSTE PARA ALEJAR: Bajamos el tamaño al 45% o 50% */
-  /* Esto hará que el personaje se vea pequeño como en tu referencia */
-  background-size: 70%;
-
-  /* 🔑 AJUSTE DE POSICIÓN: Lo pegamos al borde derecho y lo centramos verticalmente */
-  background-position: right center;
-
-  /* 🔑 ELIMINACIÓN DE RECUADRO: Aseguramos que el fondo sea negro puro */
   background-color: #000;
+}
+
+.heroImage {
+  object-fit: contain;
+  /* Mantiene la proporción */
+  object-position: right center;
+  /* Posición original */
+}
+
+/* Ajuste específico para mantener el tamaño visual (70% que tenía antes) */
+@media (min-width: 901px) {
+  .heroImage {
+    width: 70% !important;
+    /* Forzar ancho visual */
+    left: 30% !important;
+    /* Mover a la derecha */
+  }
 }
 
 
@@ -114,29 +120,95 @@
   height: 56px;
 }
 
-/* MOBILE */
-@media (max-width: 900px) {
-  .container {
-    grid-template-columns: 1fr;
-  }
-
-  .right {
-    display: none;
-  }
-}
-
 .headline {
-  font-size: 4rem;
+  font-family: "DanubeBold", sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4.8rem);
   font-weight: 800;
-  color: #fff;
-  margin-bottom: 1.5rem;
+  line-height: 1.1;
+  color: var(--white);
+  margin-bottom: 24px;
   min-height: 120px;
-  /* Evita que el contenido "salte" mientras se escribe */
+  /* Prevents layout shift */
 }
 
 /* Estilo para el cursor de escritura */
 .typewriterWrapper :global(.Typewriter__cursor) {
   color: #9E0060;
-  /* El color magenta de tu marca */
   font-weight: 200;
+}
+
+/* Tablet (max-width: 900px) */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: 120px 24px 64px;
+    text-align: center;
+  }
+
+  .left {
+    align-items: center;
+  }
+
+  .textWrapper {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .right {
+    display: none;
+  }
+
+  .headline {
+    font-size: 3.5rem;
+    min-height: auto;
+    /* Let it grow if needed */
+  }
+
+  .lead {
+    margin: 0 auto;
+    font-size: 1rem;
+  }
+
+  .cardsWrapper {
+    width: 100%;
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .hero {
+    min-height: auto;
+    /* Allow scrolling */
+  }
+
+  .container {
+    padding: 100px 20px 60px;
+    gap: 32px;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    margin-bottom: 10px;
+  }
+
+  .headline {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+  }
+
+  .lead {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .imageBackground {
+    background-position: center;
+    background-size: cover;
+    opacity: 0.4;
+  }
 }

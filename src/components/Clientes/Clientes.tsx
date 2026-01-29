@@ -200,7 +200,7 @@ export default function Clientes() {
                         options={{
                             autoStart: false,
                             loop: false,
-                            delay: 50,
+                            delay: 40,
                             cursor: '',
                             deleteSpeed: Infinity,
                         }}

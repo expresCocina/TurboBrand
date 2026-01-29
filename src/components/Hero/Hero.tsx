@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Typewriter from 'typewriter-effect';
 import styles from "./Hero.module.css";
 import HeroCards from "../HeroCards/HeroCards";
@@ -7,7 +8,16 @@ import HeroCards from "../HeroCards/HeroCards";
 export default function Hero() {
     return (
         <section id="home" className={styles.hero}>
-            <div className={styles.imageBackground} />
+            <div className={styles.imageBackground}>
+                <Image
+                    src="/fondohero.png"
+                    alt="Background Turbo Brand"
+                    fill
+                    priority
+                    quality={90}
+                    className={styles.heroImage}
+                />
+            </div>
             <div className={styles.overlay} />
 
             <div className={styles.container}>
@@ -25,7 +35,7 @@ export default function Hero() {
                                 options={{
                                     autoStart: true,
                                     loop: false,
-                                    delay: 60,
+                                    delay: 40,
                                     cursor: "|",
                                     wrapperClassName: styles.typewriterWrapper,
                                 }}

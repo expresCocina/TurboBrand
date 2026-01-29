@@ -149,5 +149,23 @@
     .logoBox {
         width: 140px;
         height: 70px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logoBox {
+        width: 120px;
+        height: 60px;
+        padding: 10px;
+    }
+
+    .marquee {
+        gap: 25px;
+    }
+
+    .title {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
     }
 }
