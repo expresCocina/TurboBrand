@@ -1,6 +1,6 @@
 .nosotrosSection {
     background-color: #050505;
-    padding: 100px 0;
+    padding: 120px 0;
     color: #ffffff;
 }
 
@@ -52,7 +52,8 @@
 }
 
 .tabButtonActive {
-    background: #9E0060; /* Magenta del manual */
+    background: #9E0060;
+    /* Magenta del manual */
     color: #fff;
     border-color: #9E0060;
 }
@@ -111,7 +112,8 @@
 }
 
 .kanbanCard {
-    background: #252525; /* Gris oscuro del manual */
+    background: #252525;
+    /* Gris oscuro del manual */
     padding: 20px;
     border-radius: 12px;
     border: 1px solid #333;
@@ -145,5 +147,7 @@
 }
 
 @media (max-width: 900px) {
-    .kanbanGrid { grid-template-columns: 1fr; }
+    .kanbanGrid {
+        grid-template-columns: 1fr;
+    }
 }

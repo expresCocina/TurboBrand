@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
+import styles from "./SectionWrapper.module.css";
 
 interface Props {
     id: string;
@@ -10,7 +11,7 @@ interface Props {
 
 export default function SectionWrapper({ id, children, className = "" }: Props) {
     return (
-        <section id={id} className={className} style={{ position: 'relative' }}>
+        <section id={id} className={`${styles.section} ${className}`}>
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}

@@ -65,9 +65,14 @@ export default function Servicios() {
               <div className={styles.content}>
                 <h3>{servicio.title}</h3>
                 <p>{servicio.desc}</p>
-                <button className={styles.btnVerMas}>
-                  Ver más <span>→</span>
-                </button>
+                <a
+                  href={`https://wa.me/573001234567?text=Hola, me interesa obtener más información sobre ${servicio.title}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.btnVerMas}
+                >
+                  Más info <span>→</span>
+                </a>
               </div>
             </div>
           ))}

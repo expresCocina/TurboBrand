@@ -1,6 +1,6 @@
 .serviciosSection {
   background-color: #050505;
-  padding: 120px 0;
+  padding: 140px 0;
   color: #fff;
 }
 
@@ -36,7 +36,8 @@
 
 /* 🔑 TARJETA AMIGABLE */
 .card {
-  background: #ffffff; /* Fondo blanco para que los iconos resalten */
+  background: #ffffff;
+  /* Fondo blanco para que los iconos resalten */
   border-radius: 30px;
   padding: 40px;
   transition: all 0.4s ease;
@@ -45,7 +46,8 @@
 
 .card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 30px 60px rgba(158, 0, 96, 0.15); /* Brillo magenta suave */
+  box-shadow: 0 30px 60px rgba(158, 0, 96, 0.15);
+  /* Brillo magenta suave */
 }
 
 .cardHeader {
@@ -57,7 +59,8 @@
 
 /* 🔑 ICONOS LLAMATIVOS */
 .iconContainer {
-  background: linear-gradient(135deg, #9E0060, #ff009d); /* Degradado Turbo Brand */
+  background: linear-gradient(135deg, #9E0060, #ff009d);
+  /* Degradado Turbo Brand */
   color: #fff;
   padding: 18px;
   border-radius: 20px;
@@ -100,9 +103,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
+  width: fit-content;
 }
 
 .btnVerMas:hover {
   background: #9E0060;
-  gap: 15px; /* Efecto flecha se mueve */
+  gap: 15px;
+  /* Efecto flecha se mueve */
 }
