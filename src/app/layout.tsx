@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/medellin-night.png',
+        url: '/LogoTurboBrand.webp',
         width: 1200,
         height: 630,
         alt: 'Turbo Brand Agencia Digital'
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Turbo Brand | Marketing Digital 5.0',
     description: 'Agencia líder en crecimiento digital en Medellín. Descubre el poder del Marketing 5.0.',
-    images: ['/images/medellin-night.png'],
+    images: ['/LogoTurboBrand.webp'],
     creator: '@turbobrandcol',
   },
   robots: {
@@ -109,6 +109,9 @@ const jsonLd = {
 
 import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
+import WhatsAppButton from '@/components/WhatsAppButton/WhatsAppButton';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
+import Script from 'next/script';
 
 export default function RootLayout({
   children,
@@ -124,7 +127,37 @@ export default function RootLayout({
         />
         <Navbar />
         {children}
+        <WhatsAppButton />
         <Footer />
+        <GoogleAnalytics gaId="G-XYZ1234567" />
+        <GoogleTagManager gtmId="GTM-XYZ12345" />
+        <Script
+          id="fb-pixel"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '1234567890');
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
+        <Script
+          id="google-site-verification"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+                // Google Search Console Verification Script (if needed via JS, though meta tag is better)
+              `
+          }}
+        />
       </body>
     </html>
   );
