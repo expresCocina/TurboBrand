@@ -22,13 +22,9 @@ export default function Home() {
                 <Servicios />
             </SectionWrapper>
 
-            <SectionWrapper id="clientes">
-                <Clientes />
-            </SectionWrapper>
+            <Clientes />
 
-            <SectionWrapper id="tu-local-digital">
-                <TuLocalDigital />
-            </SectionWrapper>
+            <TuLocalDigital />
 
             <SectionWrapper id="contacto">
                 <ContactoForm />

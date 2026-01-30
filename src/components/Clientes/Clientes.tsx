@@ -187,131 +187,133 @@ export default function Clientes() {
     }, [hasAnimated]);
 
     return (
-        <div className={`container ${styles.section}`}>
-            <div className={styles.header}>
-                <h2 className={styles.title}>
-                    Casos de éxito reales
-                </h2>
-                <p className={styles.intro}>
-                    Conoce cómo ayudamos a diferentes marcas a escalar con estrategias de marketing digital,
-                    generando resultados medibles y alcanzando sus objetivos de negocio.
-                </p>
-            </div>
-
-            {/* Global Stats */}
-            <div ref={statsRef} className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                    <Users className={styles.statIcon} />
-                    <div className={styles.statValue}>{counters.clients}+</div>
-                    <div className={styles.statLabel}>Clientes Activos</div>
+        <section className={styles.section} id="clientes">
+            <div className="container">
+                <div className={styles.header}>
+                    <h2 className={styles.title}>
+                        Casos de éxito reales
+                    </h2>
+                    <p className={styles.intro}>
+                        Conoce cómo ayudamos a diferentes marcas a escalar con estrategias de marketing digital,
+                        generando resultados medibles y alcanzando sus objetivos de negocio.
+                    </p>
                 </div>
-                <div className={styles.statCard}>
-                    <TrendingUp className={styles.statIcon} />
-                    <div className={styles.statValue}>{counters.roi}x</div>
-                    <div className={styles.statLabel}>ROI Promedio</div>
-                </div>
-                <div className={styles.statCard}>
-                    <Award className={styles.statIcon} />
-                    <div className={styles.statValue}>{counters.years}+</div>
-                    <div className={styles.statLabel}>Años de Experiencia</div>
-                </div>
-                <div className={styles.statCard}>
-                    <Target className={styles.statIcon} />
-                    <div className={styles.statValue}>{counters.projects}+</div>
-                    <div className={styles.statLabel}>Proyectos Completados</div>
-                </div>
-            </div>
 
-            {/* Kanban-style Case Studies */}
-            <div className={styles.kanbanGrid}>
-                {caseStudies.map((study, index) => (
-                    <div key={index} className={styles.caseCard}>
-                        {/* Header with company and industry */}
-                        <div className={styles.cardHeader}>
-                            <div className={styles.companyInfo}>
-                                <Image
-                                    src={study.logo}
-                                    alt={study.company}
-                                    width={120}
-                                    height={48}
-                                    className={styles.companyLogo}
-                                />
-                            </div>
-                            <div
-                                className={styles.industryBadge}
-                                style={{ backgroundColor: `${study.color}20`, color: study.color }}
-                            >
-                                {study.industry}
-                            </div>
-                        </div>
-
-                        {/* Results Metrics - Always visible */}
-                        <div className={styles.metricsGrid}>
-                            {study.results.map((result, idx) => (
-                                <div key={idx} className={styles.metric}>
-                                    <div className={styles.metricValue} style={{ color: study.color }}>
-                                        {result.value}
-                                    </div>
-                                    <div className={styles.metricLabel}>{result.label}</div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Toggle Button */}
-                        <button
-                            className={styles.toggleButton}
-                            onClick={() => toggleCard(index)}
-                            style={{ borderColor: study.color }}
-                        >
-                            {expandedCards.includes(index) ? (
-                                <>
-                                    Ocultar detalles
-                                    <ChevronUp size={18} />
-                                </>
-                            ) : (
-                                <>
-                                    Ver caso completo
-                                    <ChevronDown size={18} />
-                                </>
-                            )}
-                        </button>
-
-                        {/* Collapsible Content */}
-                        {expandedCards.includes(index) && (
-                            <div className={styles.expandedContent}>
-                                {/* Challenge & Solution */}
-                                <div className={styles.cardContent}>
-                                    <div className={styles.section}>
-                                        <div className={styles.sectionLabel}>Desafío</div>
-                                        <p className={styles.sectionText}>{study.challenge}</p>
-                                    </div>
-                                    <div className={styles.section}>
-                                        <div className={styles.sectionLabel}>Solución</div>
-                                        <p className={styles.sectionText}>{study.solution}</p>
-                                    </div>
-                                </div>
-
-                                {/* Testimonial */}
-                                <div className={styles.testimonial}>
-                                    <p className={styles.testimonialText}>"{study.testimonial.text}"</p>
-                                    <div className={styles.testimonialAuthor}>
-                                        <strong>{study.testimonial.author}</strong>
-                                        <span>{study.testimonial.position}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                {/* Global Stats */}
+                <div ref={statsRef} className={styles.statsGrid}>
+                    <div className={styles.statCard}>
+                        <Users className={styles.statIcon} />
+                        <div className={styles.statValue}>{counters.clients}+</div>
+                        <div className={styles.statLabel}>Clientes Activos</div>
                     </div>
-                ))}
-            </div>
+                    <div className={styles.statCard}>
+                        <TrendingUp className={styles.statIcon} />
+                        <div className={styles.statValue}>{counters.roi}x</div>
+                        <div className={styles.statLabel}>ROI Promedio</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <Award className={styles.statIcon} />
+                        <div className={styles.statValue}>{counters.years}+</div>
+                        <div className={styles.statLabel}>Años de Experiencia</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <Target className={styles.statIcon} />
+                        <div className={styles.statValue}>{counters.projects}+</div>
+                        <div className={styles.statLabel}>Proyectos Completados</div>
+                    </div>
+                </div>
 
-            {/* Categories */}
-            <div className={styles.categories}>
-                <h4 className={styles.catTitle}>Servicios Implementados:</h4>
-                <p className={styles.catList}>
-                    Pauta Digital • Estrategia • Contenido UGC • SEO • Automatización • Email Marketing • Branding • Analytics
-                </p>
+                {/* Kanban-style Case Studies */}
+                <div className={styles.kanbanGrid}>
+                    {caseStudies.map((study, index) => (
+                        <div key={index} className={styles.caseCard}>
+                            {/* Header with company and industry */}
+                            <div className={styles.cardHeader}>
+                                <div className={styles.companyInfo}>
+                                    <Image
+                                        src={study.logo}
+                                        alt={study.company}
+                                        width={120}
+                                        height={48}
+                                        className={styles.companyLogo}
+                                    />
+                                </div>
+                                <div
+                                    className={styles.industryBadge}
+                                    style={{ backgroundColor: `${study.color}20`, color: study.color }}
+                                >
+                                    {study.industry}
+                                </div>
+                            </div>
+
+                            {/* Results Metrics - Always visible */}
+                            <div className={styles.metricsGrid}>
+                                {study.results.map((result, idx) => (
+                                    <div key={idx} className={styles.metric}>
+                                        <div className={styles.metricValue} style={{ color: study.color }}>
+                                            {result.value}
+                                        </div>
+                                        <div className={styles.metricLabel}>{result.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Toggle Button */}
+                            <button
+                                className={styles.toggleButton}
+                                onClick={() => toggleCard(index)}
+                                style={{ borderColor: study.color }}
+                            >
+                                {expandedCards.includes(index) ? (
+                                    <>
+                                        Ocultar detalles
+                                        <ChevronUp size={18} />
+                                    </>
+                                ) : (
+                                    <>
+                                        Ver caso completo
+                                        <ChevronDown size={18} />
+                                    </>
+                                )}
+                            </button>
+
+                            {/* Collapsible Content */}
+                            {expandedCards.includes(index) && (
+                                <div className={styles.expandedContent}>
+                                    {/* Challenge & Solution */}
+                                    <div className={styles.cardContent}>
+                                        <div className={styles.section}>
+                                            <div className={styles.sectionLabel}>Desafío</div>
+                                            <p className={styles.sectionText}>{study.challenge}</p>
+                                        </div>
+                                        <div className={styles.section}>
+                                            <div className={styles.sectionLabel}>Solución</div>
+                                            <p className={styles.sectionText}>{study.solution}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Testimonial */}
+                                    <div className={styles.testimonial}>
+                                        <p className={styles.testimonialText}>"{study.testimonial.text}"</p>
+                                        <div className={styles.testimonialAuthor}>
+                                            <strong>{study.testimonial.author}</strong>
+                                            <span>{study.testimonial.position}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Categories */}
+                <div className={styles.categories}>
+                    <h4 className={styles.catTitle}>Servicios Implementados:</h4>
+                    <p className={styles.catList}>
+                        Pauta Digital • Estrategia • Contenido UGC • SEO • Automatización • Email Marketing • Branding • Analytics
+                    </p>
+                </div>
             </div>
-        </div>
+        </section>
     );
 }
