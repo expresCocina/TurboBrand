@@ -37,6 +37,7 @@ html {
   scroll-behavior: smooth;
   /* Prevent viewport resize on mobile keyboard */
   height: 100%;
+  height: -webkit-fill-available;
   overflow-x: hidden;
 }
 
@@ -51,6 +52,35 @@ body {
   min-height: -webkit-fill-available;
   /* Applied explicitly to whole site as requested */
   -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent layout shift when keyboard opens */
+@supports (-webkit-touch-callout: none) {
+
+  html,
+  body {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Fix for mobile keyboard */
+@media screen and (max-width: 768px) {
+
+  html,
+  body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+    /* Prevents iOS zoom on focus */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
 }
 
 html,

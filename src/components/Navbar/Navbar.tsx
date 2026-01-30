@@ -127,6 +127,7 @@ export default function Navbar() {
           aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={mobileOpen}
           type="button"
+          style={{ display: mobileOpen ? 'none' : undefined }}
         >
           <span className={styles.menuIcon} aria-hidden="true" />
         </button>
