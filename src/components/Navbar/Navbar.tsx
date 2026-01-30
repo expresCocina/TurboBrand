@@ -130,23 +130,45 @@ export default function Navbar() {
           className={styles.mobilePanel}
           onClick={(e) => e.stopPropagation()}
         >
-          {items.map((it) => (
-            <Link
-              key={it.href}
-              href={it.href}
-              onClick={handleAnchor(it.href)}
-              className={styles.mobileLink}
+          <div className={styles.mobileHeader}>
+            <Image
+              src="/LogoTurboBrand.webp"
+              alt="Turbo Brand"
+              width={150}
+              height={50}
+              className={styles.mobileLogo}
+            />
+            <button
+              className={styles.closeBtn}
+              onClick={() => setMobileOpen(false)}
+              aria-label="Cerrar menú"
+              type="button"
             >
-              {it.label}
+              <span className={styles.closeIcon}></span>
+            </button>
+          </div>
+
+          <nav className={styles.mobileNav}>
+            {items.map((it, index) => (
+              <Link
+                key={it.href}
+                href={it.href}
+                onClick={handleAnchor(it.href)}
+                className={styles.mobileLink}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {it.label}
+              </Link>
+            ))}
+            <Link
+              href="#contacto"
+              onClick={handleAnchor("#contacto")}
+              className={styles.mobileCta}
+              style={{ animationDelay: `${items.length * 0.1}s` }}
+            >
+              Contacto
             </Link>
-          ))}
-          <Link
-            href="#contacto"
-            onClick={handleAnchor("#contacto")}
-            className={styles.mobileCta}
-          >
-            Contacto
-          </Link>
+          </nav>
         </div>
       </div>
     </nav>
