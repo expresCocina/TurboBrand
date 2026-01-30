@@ -7,6 +7,60 @@ import styles from './Clientes.module.css';
 
 const caseStudies = [
     {
+        company: "Sell House",
+        logo: "/clients/sellhouse.svg",
+        industry: "Real Estate",
+        color: "#06b6d4",
+        challenge: "Baja conversión en landing pages de propiedades premium",
+        solution: "Rediseño de experiencia de usuario + pauta segmentada en Meta Ads + Google Ads",
+        results: [
+            { label: "ROI", value: "+320%" },
+            { label: "Conversiones", value: "4.2x" },
+            { label: "CAC", value: "-45%" }
+        ],
+        testimonial: {
+            text: "Turbo Brand transformó nuestra presencia digital. En 3 meses triplicamos las ventas de propiedades.",
+            author: "María González",
+            position: "CEO, Sell House"
+        }
+    },
+    {
+        company: "Contenedor de Lujo",
+        logo: "/clients/contenedordelujo.svg",
+        industry: "Importaciones USA & Europa",
+        color: "#f59e0b",
+        challenge: "Necesitaban escalar adquisición de clientes para productos importados",
+        solution: "Estrategia de contenido + Meta Ads + LinkedIn Ads + automatización de leads",
+        results: [
+            { label: "Leads", value: "+580%" },
+            { label: "Costo/Lead", value: "-62%" },
+            { label: "Cierre", value: "35%" }
+        ],
+        testimonial: {
+            text: "El equipo de Turbo Brand entiende el mercado de importaciones. Resultados medibles desde el primer mes.",
+            author: "Carlos Ruiz",
+            position: "Director, Contenedor de Lujo"
+        }
+    },
+    {
+        company: "Tickets Premium",
+        logo: "/clients/ticketspremium.svg",
+        industry: "Eventos Masivos",
+        color: "#8b5cf6",
+        challenge: "Alto costo de adquisición en venta de boletos para conciertos masivos",
+        solution: "Funnel de contenido viral + TikTok Ads + Meta Ads + remarketing estratégico",
+        results: [
+            { label: "Ventas", value: "+425%" },
+            { label: "ROI", value: "6.8x" },
+            { label: "Retención", value: "+78%" }
+        ],
+        testimonial: {
+            text: "Pasamos de vender 500 a 2,000 boletos por evento. Su estrategia de contenido fue clave.",
+            author: "Ana Martínez",
+            position: "Fundadora, Tickets Premium"
+        }
+    },
+    {
         company: "VitaHealth",
         logo: "/clients/vitahealth.svg",
         industry: "Salud y Bienestar",
@@ -14,13 +68,13 @@ const caseStudies = [
         challenge: "Baja conversión en landing pages de productos naturales",
         solution: "Rediseño de experiencia de usuario + pauta segmentada en Meta Ads",
         results: [
-            { label: "ROI", value: "+320%" },
-            { label: "Conversiones", value: "4.2x" },
-            { label: "CAC", value: "-45%" }
+            { label: "ROI", value: "+280%" },
+            { label: "Conversiones", value: "3.8x" },
+            { label: "CAC", value: "-38%" }
         ],
         testimonial: {
-            text: "Turbo Brand transformó nuestra presencia digital. En 3 meses triplicamos las ventas online.",
-            author: "María González",
+            text: "Turbo Brand transformó nuestra presencia digital. En 3 meses duplicamos las ventas online.",
+            author: "Laura Pérez",
             position: "CEO, VitaHealth"
         }
     },
@@ -32,13 +86,13 @@ const caseStudies = [
         challenge: "Necesitaban escalar adquisición de clientes B2B",
         solution: "Estrategia de contenido + LinkedIn Ads + automatización de leads",
         results: [
-            { label: "Leads", value: "+580%" },
-            { label: "Costo/Lead", value: "-62%" },
-            { label: "Cierre", value: "35%" }
+            { label: "Leads", value: "+450%" },
+            { label: "Costo/Lead", value: "-55%" },
+            { label: "Cierre", value: "32%" }
         ],
         testimonial: {
             text: "El equipo de Turbo Brand entiende el mercado B2B. Resultados medibles desde el primer mes.",
-            author: "Carlos Ruiz",
+            author: "Roberto Silva",
             position: "CMO, TechFlow"
         }
     },
@@ -50,68 +104,14 @@ const caseStudies = [
         challenge: "Alto costo de adquisición en cursos digitales",
         solution: "Funnel de contenido educativo + TikTok Ads + remarketing estratégico",
         results: [
-            { label: "Inscripciones", value: "+425%" },
-            { label: "ROI", value: "6.8x" },
-            { label: "Retención", value: "+78%" }
+            { label: "Inscripciones", value: "+380%" },
+            { label: "ROI", value: "5.2x" },
+            { label: "Retención", value: "+65%" }
         ],
         testimonial: {
-            text: "Pasamos de 50 a 300 estudiantes mensuales. Su estrategia de contenido fue clave.",
-            author: "Ana Martínez",
-            position: "Fundadora, EduPro"
-        }
-    },
-    {
-        company: "FitZone",
-        logo: "/clients/fitzone.svg",
-        industry: "Fitness & Gym",
-        color: "#ef4444",
-        challenge: "Competencia alta en mercado local de gimnasios",
-        solution: "Branding local + Google Ads + contenido UGC en redes",
-        results: [
-            { label: "Membresías", value: "+250%" },
-            { label: "Engagement", value: "12x" },
-            { label: "Retención", value: "89%" }
-        ],
-        testimonial: {
-            text: "Nos posicionaron como el gym #1 de la zona. El contenido UGC generó confianza real.",
-            author: "Roberto Silva",
-            position: "Dueño, FitZone"
-        }
-    },
-    {
-        company: "GourmetBox",
-        logo: "/clients/gourmetbox.svg",
-        industry: "E-commerce Food",
-        color: "#8b5cf6",
-        challenge: "Carrito abandonado del 78% en tienda online",
-        solution: "Optimización de checkout + email automation + retargeting",
-        results: [
-            { label: "Ventas", value: "+380%" },
-            { label: "Abandono", value: "-52%" },
-            { label: "Ticket", value: "+35%" }
-        ],
-        testimonial: {
-            text: "La automatización de emails recuperó miles de ventas perdidas. ROI impresionante.",
-            author: "Laura Pérez",
-            position: "Co-founder, GourmetBox"
-        }
-    },
-    {
-        company: "PropTech",
-        logo: "/clients/proptech.svg",
-        industry: "Real Estate Tech",
-        color: "#06b6d4",
-        challenge: "Generar leads calificados para propiedades premium",
-        solution: "Landing pages optimizadas + Facebook Lead Ads + CRM integration",
-        results: [
-            { label: "Leads", value: "+490%" },
-            { label: "Calidad", value: "92%" },
-            { label: "Cierre", value: "28%" }
-        ],
-        testimonial: {
-            text: "Generamos 150+ leads calificados al mes. Su sistema de calificación es excelente.",
+            text: "Pasamos de 50 a 250 estudiantes mensuales. Su estrategia de contenido fue clave.",
             author: "Diego Morales",
-            position: "Director, PropTech"
+            position: "Fundador, EduPro"
         }
     }
 ];
@@ -123,7 +123,8 @@ export default function Clientes() {
         clients: 0,
         roi: 0,
         years: 0,
-        projects: 0
+        projects: 0,
+        investment: 0
     });
     const statsRef = useRef<HTMLDivElement>(null);
 
@@ -153,19 +154,21 @@ export default function Clientes() {
                             const progress = currentStep / steps;
 
                             setCounters({
-                                clients: Math.floor(50 * progress),
-                                roi: parseFloat((4.2 * progress).toFixed(1)),
+                                clients: Math.floor(30 * progress),
+                                roi: parseFloat((5.5 * progress).toFixed(1)),
                                 years: Math.floor(8 * progress),
-                                projects: Math.floor(200 * progress)
+                                projects: Math.floor(200 * progress),
+                                investment: Math.floor(1000 * progress)
                             });
 
                             if (currentStep >= steps) {
                                 clearInterval(timer);
                                 setCounters({
-                                    clients: 50,
-                                    roi: 4.2,
+                                    clients: 30,
+                                    roi: 5.5,
                                     years: 8,
-                                    projects: 200
+                                    projects: 200,
+                                    investment: 1000
                                 });
                             }
                         }, interval);
@@ -220,6 +223,11 @@ export default function Clientes() {
                         <Target className={styles.statIcon} />
                         <div className={styles.statValue}>{counters.projects}+</div>
                         <div className={styles.statLabel}>Proyectos Completados</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <TrendingUp className={styles.statIcon} />
+                        <div className={styles.statValue}>+${counters.investment}M</div>
+                        <div className={styles.statLabel}>Invertidos en Pauta</div>
                     </div>
                 </div>
 

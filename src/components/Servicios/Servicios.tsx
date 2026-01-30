@@ -11,10 +11,10 @@ const servicios = [
     tag: "ROI & VENTAS"
   },
   {
-    title: "Consultoría Estratégica",
-    desc: "Te ayudamos a entender qué pasa en tu negocio digital para tomar decisiones claras y crecer con cabeza",
-    icon: <Rocket className={styles.iconMain} />,
-    tag: "ESTRATEGIA"
+    title: "Clases Personalizadas",
+    desc: "Aprende paso a paso cómo funciona la pauta digital para monitorear tus campañas con claridad y sin misterios",
+    icon: <GraduationCap className={styles.iconMain} />,
+    tag: "APRENDIZAJE"
   },
   {
     title: "Ingeniería Web",
@@ -29,10 +29,10 @@ const servicios = [
     tag: "REPUTACIÓN"
   },
   {
-    title: "Clases Personalizadas",
-    desc: "Aprende paso a paso cómo funciona la pauta digital para monitorear tus campañas con claridad y sin misterios",
-    icon: <GraduationCap className={styles.iconMain} />,
-    tag: "APRENDIZAJE"
+    title: "Consultoría Estratégica",
+    desc: "Te ayudamos a entender qué pasa en tu negocio digital para tomar decisiones claras y crecer con cabeza",
+    icon: <Rocket className={styles.iconMain} />,
+    tag: "ESTRATEGIA"
   },
   {
     title: "Automatización",

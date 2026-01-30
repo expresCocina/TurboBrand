@@ -1,0 +1,18 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sellhouseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- House Icon -->
+  <path d="M 15 35 L 25 25 L 35 35 L 35 45 L 15 45 Z" fill="url(#sellhouseGrad)"/>
+  <rect x="20" y="37" width="5" height="8" fill="#0891b2"/>
+  <path d="M 25 20 L 40 30 L 40 48 L 38 48 L 38 32 L 25 22 Z" fill="#06b6d4" opacity="0.6"/>
+  
+  <!-- Text -->
+  <text x="50" y="32" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#06b6d4">Sell</text>
+  <text x="80" y="32" font-family="Arial, sans-serif" font-size="18" font-weight="300" fill="#0891b2">House</text>
+  <text x="50" y="45" font-family="Arial, sans-serif" font-size="8" font-weight="400" fill="#6b7280" letter-spacing="1.5">REAL ESTATE</text>
+</svg>

@@ -35,10 +35,10 @@
 /* Global Stats Grid */
 .statsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
     margin-bottom: 5rem;
-    max-width: 1000px;
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -100,6 +100,8 @@
     text-align: left;
     position: relative;
     overflow: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .caseCard::before {
@@ -136,6 +138,8 @@
 
 .companyInfo {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .companyLogo {
@@ -149,6 +153,10 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--white);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .industryBadge {
@@ -200,6 +208,8 @@
 
 .metric {
     text-align: center;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .metricValue {
@@ -207,6 +217,7 @@
     font-weight: 800;
     margin-bottom: 0.25rem;
     line-height: 1;
+    word-break: break-word;
 }
 
 .metricLabel {
@@ -215,6 +226,9 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Toggle Button */
@@ -394,8 +408,8 @@
 
     /* Metrics */
     .metricsGrid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.625rem;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
         padding: 1rem 0.75rem;
         margin-bottom: 1.25rem;
     }
@@ -477,11 +491,18 @@
         font-size: 1rem;
     }
 
-    /* Stats Grid - 2 columns */
+    /* Stats Grid - 2 columns on mobile, 3rd card spans full width */
     .statsGrid {
         grid-template-columns: repeat(2, 1fr);
         gap: 1.5rem;
         margin-bottom: 3rem;
+    }
+
+    .statsGrid .statCard:nth-child(5) {
+        grid-column: 1 / -1;
+        max-width: 300px;
+        margin: 0 auto;
+        width: 100%;
     }
 
     .statValue {
@@ -525,11 +546,15 @@
         font-size: 1.1rem;
     }
 
-    /* Stats Grid - 4 columns */
+    /* Stats Grid - 3 columns on tablet, 5th card centered */
     .statsGrid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 1.75rem;
         margin-bottom: 4rem;
+    }
+
+    .statsGrid .statCard:nth-child(5) {
+        grid-column: 2 / 3;
     }
 
     .statValue {
