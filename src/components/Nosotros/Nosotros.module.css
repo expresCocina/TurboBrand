@@ -1,5 +1,5 @@
 .nosotrosSection {
-    background-color: #050505;
+    background: var(--bg);
     padding: 120px 0;
     color: #ffffff;
     position: relative;
@@ -72,6 +72,13 @@
 .panelContent {
     display: flex;
     gap: 25px;
+}
+
+.section {
+    padding: 6rem 0;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
 }
 
 .verticalBar {

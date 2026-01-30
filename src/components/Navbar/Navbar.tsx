@@ -12,11 +12,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Hide navbar on admin routes
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
-
   const items: NavItem[] = useMemo(
     () => [
       { label: "Nosotros", href: "#nosotros" },
@@ -65,8 +60,13 @@ export default function Navbar() {
     scrollToAnchor(href);
   };
 
+  const isAdminRoute = pathname?.startsWith('/admin');
+
   return (
-    <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ""}`}>
+    <nav
+      className={`${styles.navbar} ${scrolled ? styles.scrolled : ""}`}
+      style={{ display: isAdminRoute ? 'none' : 'block' }}
+    >
       <div className={styles.navContainer}>
         <Link
           href="#home"

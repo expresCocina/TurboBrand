@@ -1,6 +1,6 @@
 .section {
-    padding: 10rem 0;
-    background: linear-gradient(180deg, #0a0a0a 0%, #181818 50%, #0a0a0a 100%);
+    padding: 8rem 0;
+    background: var(--bg);
     color: var(--white);
     position: relative;
     overflow: hidden;
