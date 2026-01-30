@@ -61,9 +61,14 @@ export default function Footer() {
 
                 <div className={styles.copyright}>
                     &copy; {new Date().getFullYear()} Turbo Brand. Todos los derechos reservados.
-                    <Link href="/admin/login" className={styles.adminLink}>
-                        🔐 Admin
-                    </Link>
+                    <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '10px' }}>
+                        <Link href="/politicas" className={styles.adminLink}>
+                            Políticas y Términos
+                        </Link>
+                        <Link href="/admin/login" className={styles.adminLink}>
+                            🔐 Admin
+                        </Link>
+                    </div>
                 </div>
             </div>
         </footer>
