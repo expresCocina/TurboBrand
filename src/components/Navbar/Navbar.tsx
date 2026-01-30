@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./Navbar.module.css";
 
 type NavItem = { label: string; href: string };
@@ -74,9 +75,14 @@ export default function Navbar() {
           className={styles.logoWrapper}
           aria-label="Ir al inicio"
         >
-          <div className={styles.logoText}>
-            TURBO <span className={styles.logoAccent}>BRAND</span>
-          </div>
+          <Image
+            src="/LogoTurboBrand.webp"
+            alt="Turbo Brand Logo"
+            width={180}
+            height={60}
+            priority
+            className={styles.logoImage}
+          />
         </Link>
 
         <div className={styles.links} aria-label="Navegación principal">

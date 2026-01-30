@@ -4,13 +4,13 @@
   left: 0;
   width: 100%;
   z-index: 1000;
-  padding: 12px 0;
+  padding: 4px 0;
   background: transparent;
   transition: background 220ms ease, padding 220ms ease, border-color 220ms ease;
 }
 
 .scrolled {
-  padding: 10px 0;
+  padding: 4px 0;
   background: rgba(37, 37, 37, 0.82);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -21,7 +21,7 @@
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -46,6 +46,40 @@
 
 .logoAccent {
   color: var(--brand);
+}
+
+.logoImage {
+  height: auto;
+  width: auto;
+  max-height: 55px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  animation: logoWave 3s ease-in-out infinite;
+}
+
+.logoImage:hover {
+  transform: scale(1.05);
+  animation-play-state: paused;
+}
+
+@keyframes logoWave {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  75% {
+    transform: translateY(3px) rotate(-1deg);
+  }
 }
 
 /* Wave Animation - Moves from right to left smoothly */

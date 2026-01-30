@@ -2,6 +2,7 @@
 
 import styles from './Footer.module.css';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Instagram, Facebook } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -15,7 +16,13 @@ export default function Footer() {
                 <div className={styles.grid}>
                     <div className={styles.brandCol}>
                         <div className={styles.footerLogo}>
-                            TURBO <span className={styles.logoAccent}>BRAND</span>
+                            <Image
+                                src="/LogoTurboBrand.webp"
+                                alt="Turbo Brand Logo"
+                                width={200}
+                                height={67}
+                                className={styles.logoImage}
+                            />
                         </div>
                         <p style={{ color: 'var(--text-secondary)' }}>
                             Agencia de Marketing Digital & Growth.

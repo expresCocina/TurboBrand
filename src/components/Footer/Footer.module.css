@@ -58,6 +58,14 @@
     color: var(--brand);
 }
 
+.footerLogo .logoImage {
+    height: auto;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    filter: brightness(1.1);
+}
+
 .brandCol h3 {
     font-size: 1.8rem;
     margin-bottom: 1rem;
