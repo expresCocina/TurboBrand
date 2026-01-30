@@ -4,13 +4,13 @@
   left: 0;
   width: 100%;
   z-index: 1000;
-  padding: 18px 0;
+  padding: 12px 0;
   background: transparent;
   transition: background 220ms ease, padding 220ms ease, border-color 220ms ease;
 }
 
 .scrolled {
-  padding: 14px 0;
+  padding: 10px 0;
   background: rgba(37, 37, 37, 0.82);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -36,31 +36,46 @@
 
 .logoText {
   font-family: "DanubeBold", sans-serif;
-  font-size: 1.6rem;
+  font-size: 1.35rem;
   letter-spacing: 0.02em;
   color: var(--white);
   line-height: 1;
+  animation: waveMove 3s ease-in-out infinite;
+  display: inline-block;
 }
 
 .logoAccent {
   color: var(--brand);
 }
 
+/* Wave Animation - Moves from right to left smoothly */
+@keyframes waveMove {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(-8px);
+  }
+}
+
 .links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 22px;
 }
 
 .link {
   position: relative;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   transition: color 160ms ease;
-  padding: 10px 8px;
+  padding: 8px 6px;
 }
 
 .link:hover {
@@ -92,10 +107,10 @@
   justify-content: center;
   background: var(--brand);
   color: var(--white);
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   border: 1px solid rgba(158, 0, 96, 0.85);
   transition: filter 160ms ease, background 160ms ease, border-color 160ms ease;
 }
@@ -103,6 +118,149 @@
 .cta:hover {
   filter: brightness(1.03);
   border-color: rgba(158, 0, 96, 1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .navContainer {
+    padding: 0 30px;
+  }
+
+  .links {
+    gap: 20px;
+  }
+
+  .link {
+    font-size: 1rem;
+  }
+
+  .ctaButton {
+    padding: 11px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 14px 0;
+  }
+
+  .scrolled {
+    padding: 12px 0;
+  }
+
+  .navContainer {
+    padding: 0 20px;
+  }
+
+  .logoText {
+    font-size: 1.4rem;
+  }
+
+  .links {
+    gap: 16px;
+  }
+
+  .link {
+    font-size: 0.95rem;
+    padding: 8px 6px;
+  }
+
+  .ctaButton {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .navContainer {
+    padding: 0 16px;
+  }
+
+  .logoText {
+    font-size: 1.25rem;
+  }
+
+  .links {
+    display: none;
+  }
+
+  .mobileMenuButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .mobileMenuButton:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .mobileMenu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(20, 20, 20, 0.98);
+    backdrop-filter: blur(20px);
+    padding: 80px 30px 30px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mobileMenu.open {
+    transform: translateX(0);
+  }
+
+  .mobileLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .mobileLink {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: color 0.2s ease;
+  }
+
+  .mobileLink:hover {
+    color: #fff;
+  }
+
+  .mobileCta {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navContainer {
+    padding: 0 12px;
+  }
+
+  .logoText {
+    font-size: 1.1rem;
+  }
+
+  .mobileMenu {
+    width: 100%;
+  }
 }
 
 .link:focus-visible,

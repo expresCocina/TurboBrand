@@ -1,6 +1,6 @@
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: 85vh;
   overflow: hidden;
   background: var(--bg);
   --zigzag-color: var(--bg);
@@ -54,10 +54,10 @@
   z-index: 3;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 96px 24px 64px;
+  padding: 80px 24px 48px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 48px;
+  gap: 40px;
 }
 
 /* IZQUIERDA */
@@ -87,22 +87,22 @@
 
 .headline {
   font-family: "DanubeBold", sans-serif;
-  font-size: clamp(2.8rem, 5vw, 4.8rem);
-  line-height: 1;
+  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+  line-height: 1.05;
   color: var(--white);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .lead {
   max-width: 52ch;
-  font-size: 1.1rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.5;
   color: rgba(255, 255, 255, 0.9);
 }
 
 /* CARDS */
 .cardsWrapper {
-  margin-top: 32px;
+  margin-top: 24px;
 }
 
 /* ZIGZAG */

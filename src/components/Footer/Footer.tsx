@@ -1,8 +1,18 @@
+"use client";
+
 import styles from './Footer.module.css';
 import Link from 'next/link';
 import { Instagram, Facebook } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
+    const pathname = usePathname();
+
+    // Hide footer on admin routes
+    if (pathname?.startsWith('/admin')) {
+        return null;
+    }
+
     return (
         <footer className={styles.footer}>
             <div className="container">

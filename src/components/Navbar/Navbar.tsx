@@ -1,14 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import styles from "./Navbar.module.css";
 
 type NavItem = { label: string; href: string };
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Hide navbar on admin routes
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   const items: NavItem[] = useMemo(
     () => [
@@ -106,9 +113,8 @@ export default function Navbar() {
 
       <div
         id="mobile-menu"
-        className={`${styles.mobileMenu} ${
-          mobileOpen ? styles.mobileOpen : ""
-        }`}
+        className={`${styles.mobileMenu} ${mobileOpen ? styles.mobileOpen : ""
+          }`}
         role="dialog"
         aria-label="Menú móvil"
         aria-modal="true"

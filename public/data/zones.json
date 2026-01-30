@@ -1,0 +1,327 @@
+[
+  {
+    "id": "comuna-1",
+    "name": "Comuna 1 - Popular",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2950, -75.5650],
+      [6.3050, -75.5550],
+      [6.2980, -75.5500],
+      [6.2900, -75.5600],
+      [6.2950, -75.5650]
+    ]]
+  },
+  {
+    "id": "comuna-2",
+    "name": "Comuna 2 - Santa Cruz",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2850, -75.5750],
+      [6.2950, -75.5650],
+      [6.2900, -75.5600],
+      [6.2800, -75.5700],
+      [6.2850, -75.5750]
+    ]]
+  },
+  {
+    "id": "comuna-3",
+    "name": "Comuna 3 - Manrique",
+    "type": "comuna",
+    "status": "occupied",
+    "coordinates": [[
+      [6.2750, -75.5550],
+      [6.2850, -75.5450],
+      [6.2780, -75.5400],
+      [6.2680, -75.5500],
+      [6.2750, -75.5550]
+    ]]
+  },
+  {
+    "id": "comuna-4",
+    "name": "Comuna 4 - Aranjuez",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2680, -75.5500],
+      [6.2780, -75.5400],
+      [6.2710, -75.5350],
+      [6.2610, -75.5450],
+      [6.2680, -75.5500]
+    ]]
+  },
+  {
+    "id": "comuna-5",
+    "name": "Comuna 5 - Castilla",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2800, -75.5900],
+      [6.2900, -75.5800],
+      [6.2830, -75.5750],
+      [6.2730, -75.5850],
+      [6.2800, -75.5900]
+    ]]
+  },
+  {
+    "id": "comuna-6",
+    "name": "Comuna 6 - Doce de Octubre",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2730, -75.5850],
+      [6.2830, -75.5750],
+      [6.2760, -75.5700],
+      [6.2660, -75.5800],
+      [6.2730, -75.5850]
+    ]]
+  },
+  {
+    "id": "comuna-7",
+    "name": "Comuna 7 - Robledo",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2660, -75.6050],
+      [6.2760, -75.5950],
+      [6.2690, -75.5900],
+      [6.2590, -75.6000],
+      [6.2660, -75.6050]
+    ]]
+  },
+  {
+    "id": "comuna-8",
+    "name": "Comuna 8 - Villa Hermosa",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2450, -75.5450],
+      [6.2550, -75.5350],
+      [6.2480, -75.5300],
+      [6.2380, -75.5400],
+      [6.2450, -75.5450]
+    ]]
+  },
+  {
+    "id": "comuna-9",
+    "name": "Comuna 9 - Buenos Aires",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2380, -75.5400],
+      [6.2480, -75.5300],
+      [6.2410, -75.5250],
+      [6.2310, -75.5350],
+      [6.2380, -75.5400]
+    ]]
+  },
+  {
+    "id": "comuna-10",
+    "name": "Comuna 10 - La Candelaria (Centro)",
+    "type": "comuna",
+    "status": "occupied",
+    "coordinates": [[
+      [6.2500, -75.5700],
+      [6.2600, -75.5600],
+      [6.2530, -75.5550],
+      [6.2430, -75.5650],
+      [6.2500, -75.5700]
+    ]]
+  },
+  {
+    "id": "comuna-11",
+    "name": "Comuna 11 - Laureles - Estadio",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2430, -75.5950],
+      [6.2530, -75.5850],
+      [6.2460, -75.5800],
+      [6.2360, -75.5900],
+      [6.2430, -75.5950]
+    ]]
+  },
+  {
+    "id": "comuna-12",
+    "name": "Comuna 12 - La América",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2360, -75.5900],
+      [6.2460, -75.5800],
+      [6.2390, -75.5750],
+      [6.2290, -75.5850],
+      [6.2360, -75.5900]
+    ]]
+  },
+  {
+    "id": "comuna-13",
+    "name": "Comuna 13 - San Javier",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2290, -75.6100],
+      [6.2390, -75.6000],
+      [6.2320, -75.5950],
+      [6.2220, -75.6050],
+      [6.2290, -75.6100]
+    ]]
+  },
+  {
+    "id": "comuna-14",
+    "name": "Comuna 14 - El Poblado",
+    "type": "comuna",
+    "status": "occupied",
+    "coordinates": [[
+      [6.2100, -75.5700],
+      [6.2200, -75.5600],
+      [6.2130, -75.5550],
+      [6.2030, -75.5650],
+      [6.2100, -75.5700]
+    ]]
+  },
+  {
+    "id": "comuna-15",
+    "name": "Comuna 15 - Guayabal",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2200, -75.5850],
+      [6.2300, -75.5750],
+      [6.2230, -75.5700],
+      [6.2130, -75.5800],
+      [6.2200, -75.5850]
+    ]]
+  },
+  {
+    "id": "comuna-16",
+    "name": "Comuna 16 - Belén",
+    "type": "comuna",
+    "status": "available",
+    "coordinates": [[
+      [6.2130, -75.6000],
+      [6.2230, -75.5900],
+      [6.2160, -75.5850],
+      [6.2060, -75.5950],
+      [6.2130, -75.6000]
+    ]]
+  },
+  {
+    "id": "envigado",
+    "name": "Envigado",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.1700, -75.5800],
+      [6.1850, -75.5650],
+      [6.1750, -75.5550],
+      [6.1600, -75.5700],
+      [6.1700, -75.5800]
+    ]]
+  },
+  {
+    "id": "itagui",
+    "name": "Itagüí",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.1600, -75.6100],
+      [6.1750, -75.5950],
+      [6.1650, -75.5850],
+      [6.1500, -75.6000],
+      [6.1600, -75.6100]
+    ]]
+  },
+  {
+    "id": "sabaneta",
+    "name": "Sabaneta",
+    "type": "municipio",
+    "status": "occupied",
+    "coordinates": [[
+      [6.1500, -75.6000],
+      [6.1650, -75.5850],
+      [6.1550, -75.5750],
+      [6.1400, -75.5900],
+      [6.1500, -75.6000]
+    ]]
+  },
+  {
+    "id": "la-estrella",
+    "name": "La Estrella",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.1400, -75.6200],
+      [6.1550, -75.6050],
+      [6.1450, -75.5950],
+      [6.1300, -75.6100],
+      [6.1400, -75.6200]
+    ]]
+  },
+  {
+    "id": "caldas",
+    "name": "Caldas",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.1000, -75.6400],
+      [6.1150, -75.6250],
+      [6.1050, -75.6150],
+      [6.0900, -75.6300],
+      [6.1000, -75.6400]
+    ]]
+  },
+  {
+    "id": "bello",
+    "name": "Bello",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.3300, -75.5700],
+      [6.3450, -75.5550],
+      [6.3350, -75.5450],
+      [6.3200, -75.5600],
+      [6.3300, -75.5700]
+    ]]
+  },
+  {
+    "id": "copacabana",
+    "name": "Copacabana",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.3500, -75.5100],
+      [6.3650, -75.4950],
+      [6.3550, -75.4850],
+      [6.3400, -75.5000],
+      [6.3500, -75.5100]
+    ]]
+  },
+  {
+    "id": "girardota",
+    "name": "Girardota",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.3800, -75.4500],
+      [6.3950, -75.4350],
+      [6.3850, -75.4250],
+      [6.3700, -75.4400],
+      [6.3800, -75.4500]
+    ]]
+  },
+  {
+    "id": "barbosa",
+    "name": "Barbosa",
+    "type": "municipio",
+    "status": "available",
+    "coordinates": [[
+      [6.4400, -75.3400],
+      [6.4550, -75.3250],
+      [6.4450, -75.3150],
+      [6.4300, -75.3300],
+      [6.4400, -75.3400]
+    ]]
+  }
+]

@@ -3,9 +3,21 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Polygon, Popup, useMap } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
-import { medellinZones, MEDELLIN_CENTER, ZoneData } from '@/data/medellinZones';
+import { MEDELLIN_CENTER } from '@/data/medellinZones';
 import styles from './RealMedellinMap.module.css';
 import 'leaflet/dist/leaflet.css';
+
+export interface ZoneData {
+    id: string;
+    name: string;
+    type: 'comuna' | 'municipio';
+    status: 'available' | 'occupied';
+    coordinates: [number, number][][];
+    metadata?: {
+        occupiedDate?: string;
+        notes?: string;
+    };
+}
 
 // Component to fit bounds
 function FitBounds() {
@@ -19,9 +31,11 @@ function FitBounds() {
 }
 
 export default function RealMedellinMap() {
+    const [zones, setZones] = useState<ZoneData[]>([]);
     const [selectedZone, setSelectedZone] = useState<ZoneData | null>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setIsMounted(true);
@@ -36,12 +50,34 @@ export default function RealMedellinMap() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    if (!isMounted) {
+    // Fetch zones from API
+    useEffect(() => {
+        const fetchZones = async () => {
+            try {
+                const response = await fetch('/api/zones');
+                const data = await response.json();
+
+                if (data.success) {
+                    setZones(data.zones);
+                }
+            } catch (error) {
+                console.error('Error loading zones:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (isMounted) {
+            fetchZones();
+        }
+    }, [isMounted]);
+
+    if (!isMounted || loading) {
         return (
             <div className={styles.mapPlaceholder}>
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🗺️</div>
-                    <p>Cargando mapa interactivo...</p>
+                    <p>{loading ? 'Cargando zonas...' : 'Cargando mapa interactivo...'}</p>
                 </div>
             </div>
         );
@@ -84,7 +120,7 @@ export default function RealMedellinMap() {
                 />
                 <FitBounds />
 
-                {medellinZones.map((zone) => (
+                {zones.map((zone) => (
                     <Polygon
                         key={zone.id}
                         positions={zone.coordinates as LatLngExpression[][]}
@@ -144,9 +180,6 @@ export default function RealMedellinMap() {
                                         <div className={styles.statusBadge}>
                                             🔒 <strong>OCUPADA</strong>
                                         </div>
-                                        <p className={styles.businessName}>
-                                            Ocupada por: <strong>{zone.business}</strong>
-                                        </p>
                                         <p className={styles.statusText}>
                                             Esta zona ya tiene un negocio activo.
                                             Explora otras zonas disponibles.
@@ -164,18 +197,18 @@ export default function RealMedellinMap() {
                 <div className={styles.stats}>
                     <div className={styles.statItem}>
                         <span className={styles.statNumber}>
-                            {medellinZones.filter(z => z.status === 'available').length}
+                            {zones.filter(z => z.status === 'available').length}
                         </span>
                         <span className={styles.statLabel}>Zonas Disponibles</span>
                     </div>
                     <div className={styles.statItem}>
                         <span className={styles.statNumber}>
-                            {medellinZones.filter(z => z.status === 'occupied').length}
+                            {zones.filter(z => z.status === 'occupied').length}
                         </span>
                         <span className={styles.statLabel}>Zonas Ocupadas</span>
                     </div>
                     <div className={styles.statItem}>
-                        <span className={styles.statNumber}>{medellinZones.length}</span>
+                        <span className={styles.statNumber}>{zones.length}</span>
                         <span className={styles.statLabel}>Total Zonas</span>
                     </div>
                 </div>
