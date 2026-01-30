@@ -73,6 +73,10 @@ export default function Navbar() {
     scrollToAnchor(href);
   };
 
+  const toggleMenu = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   const isAdminRoute = pathname?.startsWith('/admin');
 
   return (
@@ -119,10 +123,9 @@ export default function Navbar() {
 
         <button
           className={styles.menuBtn}
-          onClick={() => setMobileOpen((v) => !v)}
+          onClick={toggleMenu}
           aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={mobileOpen}
-          aria-controls="mobile-menu"
           type="button"
         >
           <span className={styles.menuIcon} aria-hidden="true" />
@@ -131,39 +134,77 @@ export default function Navbar() {
 
       {mobileOpen && (
         <div
-          className={styles.mobileMenu}
           onClick={() => setMobileOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'stretch'
+          }}
         >
           <div
-            className={styles.mobilePanel}
             onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '320px',
+              maxWidth: '85vw',
+              background: 'linear-gradient(135deg, rgba(20, 20, 20, 0.98) 0%, rgba(30, 30, 30, 0.98) 100%)',
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              overflowY: 'auto',
+              borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.5)'
+            }}
           >
-            <div className={styles.mobileHeader}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
               <Image
                 src="/LogoTurboBrand.webp"
                 alt="Turbo Brand"
-                width={150}
-                height={50}
-                className={styles.mobileLogo}
+                width={120}
+                height={40}
+                style={{ maxHeight: '40px', width: 'auto' }}
               />
               <button
-                className={styles.closeBtn}
                 onClick={() => setMobileOpen(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'white',
+                  fontSize: '24px'
+                }}
                 aria-label="Cerrar menú"
-                type="button"
               >
-                <span className={styles.closeIcon}></span>
+                ×
               </button>
             </div>
 
-            <nav className={styles.mobileNav}>
-              {items.map((it, index) => (
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+              {items.map((it) => (
                 <Link
                   key={it.href}
                   href={it.href}
                   onClick={handleAnchor(it.href)}
-                  className={styles.mobileLink}
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  style={{
+                    textDecoration: 'none',
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    padding: '16px',
+                    borderRadius: '12px',
+                    fontSize: '1.1rem',
+                    fontWeight: 600
+                  }}
                 >
                   {it.label}
                 </Link>
@@ -171,8 +212,17 @@ export default function Navbar() {
               <Link
                 href="#contacto"
                 onClick={handleAnchor("#contacto")}
-                className={styles.mobileCta}
-                style={{ animationDelay: `${items.length * 0.1}s` }}
+                style={{
+                  textDecoration: 'none',
+                  color: 'white',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  background: 'linear-gradient(135deg, #9E0060 0%, #FF0080 100%)',
+                  textAlign: 'center',
+                  marginTop: '16px'
+                }}
               >
                 Contacto
               </Link>
