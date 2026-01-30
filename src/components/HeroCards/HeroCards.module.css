@@ -3,9 +3,9 @@
   grid-template-columns: 2fr 1fr;
   gap: 24px;
   /* 🔑 BAJAR LAS TARJETAS: Ajusta este valor si las quieres aún más abajo */
-  margin-top: 80px; 
+  margin-top: 80px;
   /* 🔑 ACHICAR EL ANCHO TOTAL: Evita que se estiren de lado a lado */
-  max-width: 850px; 
+  max-width: 850px;
   align-items: stretch;
 }
 
@@ -28,12 +28,12 @@
 .card {
   height: 100%;
   /* 🔑 ACHICAR ALTURA: Antes era 190px */
-  min-height: 145px; 
+  min-height: 145px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
   /* 🔑 ACHICAR ESPACIO INTERNO */
-  padding: 22px; 
+  padding: 22px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   display: flex;
@@ -49,7 +49,7 @@
 .card h3 {
   margin: 0;
   /* 🔑 ACHICAR LETRA TITULO */
-  font-size: 0.95rem; 
+  font-size: 0.95rem;
   line-height: 1.3;
   color: #fff;
   font-weight: 600;
@@ -59,18 +59,19 @@
 .tag {
   display: block;
   /* 🔑 ACHICAR LETRA TAG */
-  font-size: 0.6rem; 
+  font-size: 0.6rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin-bottom: 8px;
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Card destacada con color del Manual de Marca */
+/* Card destacada con color del Manual de Marca - MÁS OSCURO */
 .highlight {
-  /* Código de color del manual: #9E0060 */
-  background: linear-gradient(135deg, #9E0060, #7a004a); 
+  /* Código de color más oscuro y profundo */
+  background: linear-gradient(135deg, #700044, #4a002e);
   border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Responsive */
@@ -78,8 +79,24 @@
   .cardsGrid {
     grid-template-columns: 1fr;
     margin-top: 40px;
+    /* Asegurar que el contenido se centre */
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
   }
+
   .left {
     grid-template-columns: 1fr;
+  }
+
+  /* Centrar la tarjeta Social Media específicamente en móvil */
+  .right {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .card {
+    /* Asegurar que las tarjetas tengan ancho completo en móvil si es necesario, o un ancho maximo */
+    width: 100%;
   }
 }
