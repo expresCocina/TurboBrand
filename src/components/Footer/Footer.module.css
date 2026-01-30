@@ -180,71 +180,93 @@
 
 @media (max-width: 768px) {
     .footer {
-        padding: 3rem 0 1.5rem;
+        padding: 2rem 0 1rem;
     }
 
+    /* Fix background on mobile: Skyline Effect */
+    .footer::before {
+        background-image: url('/images/mobil.jpg');
+        background-position: bottom center;
+        background-size: 100% auto;
+        opacity: 1;
+        /* Maximum clarity as requested */
+    }
+
+    /* COMPACT 2-COLUMN LAYOUT */
     .grid {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 2.5rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        text-align: left;
+        margin-bottom: 1.5rem;
+        align-items: start;
     }
 
-    .brandCol h3 {
-        font-size: 1.5rem;
-        margin-bottom: 0.75rem;
+    /* Left Column: Brand */
+    .brandCol {
+        text-align: right;
+        padding-right: 0.5rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footerLogo .logoImage {
+        max-width: 140px;
+        /* Smaller logo */
     }
 
     .brandCol p {
-        font-size: 0.9rem;
-        max-width: 300px;
-        margin: 0 auto;
+        font-size: 0.7rem;
+        line-height: 1.3;
+        color: #ccc;
+        margin-left: auto;
+        /* Align text to right */
     }
 
+    /* Right Column: Contact */
     .infoCol {
-        text-align: center;
+        text-align: left;
+        padding-left: 0.5rem;
     }
 
     .infoCol h4 {
-        font-size: 1.1rem;
-        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
     .infoCol p {
-        font-size: 0.85rem;
+        font-size: 0.7rem;
+        line-height: 1.3;
         margin-bottom: 0.5rem;
     }
 
     .socials {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
-        margin-top: 1rem;
+        align-items: flex-start;
+        margin-top: 0.5rem;
+        gap: 0.5rem;
     }
 
     .socialLink {
-        font-size: 0.9rem;
-        justify-content: center;
+        font-size: 0.75rem;
+        justify-content: flex-start;
     }
 
+    /* Compact Bottom Section */
     .madeBy {
-        padding-top: 1.5rem;
-        font-size: 0.85rem;
+        padding-top: 1rem;
+        font-size: 0.7rem;
     }
 
     .copyright {
-        padding-top: 1.5rem;
-        font-size: 0.8rem;
+        padding-top: 0.5rem;
+        font-size: 0.65rem;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.5rem;
+        border: none;
     }
 
     .adminLink {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.85rem;
-    }
-
-    .agencyLink {
-        display: inline-block;
-        margin-top: 0.25rem;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
     }
 }
