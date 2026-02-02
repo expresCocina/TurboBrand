@@ -1,0 +1,18 @@
+/* Reset básico para el CRM */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Asegurar que el CRM no herede estilos de la web */
+.crm-container {
+  all: initial;
+  * {
+    all: unset;
+  }
+}

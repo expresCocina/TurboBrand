@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from 'next';
+import Navbar from '@/components/Navbar/Navbar';
+import Footer from '@/components/Footer/Footer';
+import WhatsAppButton from '@/components/WhatsAppButton/WhatsAppButton';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
+import Script from 'next/script';
 import './globals.css';
+import { LayoutWrapper } from './LayoutWrapper';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://turbobrandcol.com'),
@@ -52,7 +58,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'google-site-verification-code', // Pending verification code
+    google: 'google-site-verification-code',
   },
   alternates: {
     canonical: '/',
@@ -107,12 +113,6 @@ const jsonLd = {
   priceRange: '$$'
 };
 
-import Navbar from '@/components/Navbar/Navbar';
-import Footer from '@/components/Footer/Footer';
-import WhatsAppButton from '@/components/WhatsAppButton/WhatsAppButton';
-import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
-import Script from 'next/script';
-
 export default function RootLayout({
   children,
 }: {
@@ -125,10 +125,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Navbar />
-        {children}
-        <WhatsAppButton />
-        <Footer />
+        <LayoutWrapper>
+          {children}
+        </LayoutWrapper>
         <GoogleAnalytics gaId="G-XYZ1234567" />
         <GoogleTagManager gtmId="GTM-XYZ12345" />
         <Script
