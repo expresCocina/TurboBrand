@@ -138,8 +138,8 @@ export default function EmailMarketingPage() {
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <div className="flex items-start gap-4">
                                         <div className={`p-3 rounded-lg ${campaign.status === 'sent' ? 'bg-green-100 text-green-600' :
-                                                campaign.status === 'failed' ? 'bg-red-100 text-red-600' :
-                                                    'bg-gray-100 text-gray-600'
+                                            campaign.status === 'failed' ? 'bg-red-100 text-red-600' :
+                                                'bg-gray-100 text-gray-600'
                                             }`}>
                                             <Mail className="h-6 w-6" />
                                         </div>
@@ -148,10 +148,10 @@ export default function EmailMarketingPage() {
                                             <p className="text-sm text-gray-500 truncate max-w-md">{campaign.subject}</p>
                                             <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                                                 <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${campaign.status === 'sent'
-                                                        ? 'bg-green-50 text-green-700 border border-green-100'
-                                                        : campaign.status === 'failed'
-                                                            ? 'bg-red-50 text-red-700 border border-red-100'
-                                                            : 'bg-gray-100 text-gray-700 border border-gray-200'
+                                                    ? 'bg-green-50 text-green-700 border border-green-100'
+                                                    : campaign.status === 'failed'
+                                                        ? 'bg-red-50 text-red-700 border border-red-100'
+                                                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                                                     }`}>
                                                     {campaign.status === 'sent' && <><CheckCircle className="h-3 w-3" /> Enviado</>}
                                                     {campaign.status === 'failed' && <><AlertCircle className="h-3 w-3" /> Error</>}
@@ -165,16 +165,21 @@ export default function EmailMarketingPage() {
                                         </div>
                                     </div>
 
-                                    {/* Stats (Placeholder hasta tener webhooks) */}
+                                    {/* Stats (Ahora con datos reales) */}
                                     {campaign.status === 'sent' && (
-                                        <div className="flex items-center gap-8 opacity-50 grayscale" title="Estadísticas requieren configuración de Webhooks">
+                                        <div className="flex items-center gap-8">
                                             <div className="text-center">
-                                                <p className="text-2xl font-bold text-gray-900">-</p>
+                                                <p className="text-2xl font-bold text-gray-900">{campaign.total_opened || 0}</p>
                                                 <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Abiertos</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="text-2xl font-bold text-gray-900">-</p>
+                                                <p className="text-2xl font-bold text-gray-900">{campaign.total_clicked || 0}</p>
                                                 <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Clicks</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-xs text-gray-500">
+                                                    {campaign.total_sent || 0} enviados
+                                                </p>
                                             </div>
                                         </div>
                                     )}

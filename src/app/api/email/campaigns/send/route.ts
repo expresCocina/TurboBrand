@@ -97,17 +97,40 @@ export async function POST(req: Request) {
             throw batchError;
         }
 
-        // 4. Actualizar estado de campaña a 'sent'
+        // 4. Guardar cada email enviado en email_sends con su ID de Resend
+        if (batchData && batchData.data) {
+            const emailSendsRecords = batchData.data.map((item: any, index: number) => ({
+                campaign_id: campaign.id,
+                contact_email: contactsToSend[index].email,
+                resend_id: item.id, // ID único de Resend para este email
+                status: 'sent',
+                sent_at: new Date().toISOString()
+            }));
+
+            const { error: sendsError } = await supabase
+                .from('email_sends')
+                .insert(emailSendsRecords);
+
+            if (sendsError) {
+                console.error('Error guardando email_sends:', sendsError);
+                // No fallar todo por esto, pero loguear
+            }
+        }
+
+        // 5. Actualizar estado de campaña a 'sent' y contador total_sent
         await supabase
             .from('email_campaigns')
-            .update({ status: 'sent' })
+            .update({
+                status: 'sent',
+                total_sent: contactsToSend.length
+            })
             .eq('id', campaign.id);
 
         return NextResponse.json({
             success: true,
             message: `Campaña enviada a ${contactsToSend.length} contactos.`,
             campaignId: campaign.id,
-            resendId: batchData
+            resendData: batchData
         });
 
     } catch (error: any) {
