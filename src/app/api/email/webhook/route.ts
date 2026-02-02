@@ -78,7 +78,7 @@ export async function POST(req: Request) {
                     .single();
 
                 if (campaign) {
-                    const currentValue = campaign[updateField] || 0;
+                    const currentValue = (campaign as any)[updateField] || 0;
                     await supabase
                         .from('email_campaigns')
                         .update({ [updateField]: currentValue + 1 })
