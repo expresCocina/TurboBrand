@@ -97,24 +97,40 @@ export async function POST(req: Request) {
             throw batchError;
         }
 
+        console.log('📧 [SEND] Respuesta de Resend Batch:', JSON.stringify(batchData, null, 2));
+
         // 4. Guardar cada email enviado en email_sends con su ID de Resend
         if (batchData && batchData.data) {
-            const emailSendsRecords = batchData.data.map((item: any, index: number) => ({
-                campaign_id: campaign.id,
-                contact_email: contactsToSend[index].email,
-                resend_id: item.id, // ID único de Resend para este email
-                status: 'sent',
-                sent_at: new Date().toISOString()
-            }));
+            console.log(`💾 [SEND] Guardando ${batchData.data.length} emails en email_sends...`);
+
+            const emailSendsRecords = batchData.data.map((item: any, index: number) => {
+                const record = {
+                    campaign_id: campaign.id,
+                    contact_email: contactsToSend[index].email,
+                    resend_id: item.id, // ID único de Resend para este email
+                    status: 'sent',
+                    sent_at: new Date().toISOString()
+                };
+                console.log(`📝 [SEND] Record ${index + 1}:`, JSON.stringify(record, null, 2));
+                return record;
+            });
+
+            console.log(`🔄 [SEND] Insertando ${emailSendsRecords.length} registros en Supabase...`);
 
             const { error: sendsError } = await supabase
                 .from('email_sends')
                 .insert(emailSendsRecords);
 
             if (sendsError) {
-                console.error('Error guardando email_sends:', sendsError);
+                console.error('❌ [SEND] Error guardando email_sends:', sendsError);
+                console.error('❌ [SEND] Detalles del error:', JSON.stringify(sendsError, null, 2));
                 // No fallar todo por esto, pero loguear
+            } else {
+                console.log(`✅ [SEND] ${emailSendsRecords.length} emails guardados exitosamente en email_sends`);
             }
+        } else {
+            console.warn('⚠️ [SEND] batchData o batchData.data es null/undefined');
+            console.warn('⚠️ [SEND] batchData:', batchData);
         }
 
         // 5. Actualizar estado de campaña a 'sent' y contador total_sent
