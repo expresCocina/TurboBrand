@@ -68,7 +68,7 @@ export default function Servicios() {
                 <h3>{servicio.title}</h3>
                 <p>{servicio.desc}</p>
                 <a
-                  href={`https://wa.me/573001234567?text=Hola, me interesa obtener más información sobre ${servicio.title}`}
+                  href={`https://wa.me/573226572955?text=¡Hola Turbo Brand! Me interesa conocer más detalles sobre ${servicio.title}. ¿Podrían brindarme información?`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.btnVerMas}

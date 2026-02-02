@@ -5,8 +5,8 @@ import { FaWhatsapp } from 'react-icons/fa';
 import styles from './WhatsAppButton.module.css';
 
 export default function WhatsAppButton() {
-    const phoneNumber = '573138537261'; // Updated as per previous context if available, otherwise using the one from Footer.
-    const message = encodeURIComponent('Hola Turbo Brand, quiero impulsar mi marca 🚀');
+    const phoneNumber = '573226572955';
+    const message = encodeURIComponent('¡Hola! Me gustaría conocer más sobre los servicios de Turbo Brand para impulsar mi negocio 🚀');
 
     return (
         <Link
