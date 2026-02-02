@@ -14,15 +14,17 @@ export async function POST(req: Request) {
         const type = payload.type;
         const data = payload.data;
 
-        console.log(`[WEBHOOK] Evento recibido: ${type}`, data);
+        console.log(`[WEBHOOK] Evento recibido: ${type}`, JSON.stringify(data, null, 2));
 
-        // Extraer el ID de Resend del evento
-        const resendEmailId = data?.email_id || data?.id;
+        // Extraer el ID de Resend del evento (según docs de Resend)
+        const resendEmailId = data?.email_id;
 
         if (!resendEmailId) {
-            console.warn('[WEBHOOK] No se encontró email_id en el payload');
+            console.warn('[WEBHOOK] No se encontró email_id en el payload:', data);
             return NextResponse.json({ received: true }, { status: 200 });
         }
+
+        console.log(`[WEBHOOK] Buscando email con resend_id: ${resendEmailId}`);
 
         // Buscar el email en nuestra tabla email_sends
         const { data: emailSend, error: findError } = await supabase
