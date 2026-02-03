@@ -1,0 +1,10 @@
+# Ignorar archivos de Supabase (Edge Functions usan Deno, no Next.js)
+supabase/
+
+# Archivos de desarrollo
+.env.local
+.env*.local
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
