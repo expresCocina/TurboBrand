@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { RefreshCw, Play, AlertTriangle, CheckCircle } from 'lucide-react';
+import { RefreshCw, Play, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
 export default function EmailDebugPage() {
     const [logs, setLogs] = useState<any[]>([]);
