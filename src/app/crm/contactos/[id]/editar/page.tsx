@@ -18,10 +18,8 @@ export default function EditarContactoPage() {
         phone: '',
         company: '',
         position: '',
-        status: 'new' as 'new' | 'contacted' | 'qualified' | 'customer',
         lead_score: 0,
-        tags: [] as string[],
-        notes: ''
+        tags: [] as string[]
     });
 
     useEffect(() => {
@@ -47,10 +45,8 @@ export default function EditarContactoPage() {
                     phone: data.phone || '',
                     company: data.company || '',
                     position: data.position || '',
-                    status: data.status || 'new',
                     lead_score: data.lead_score || 0,
-                    tags: data.tags || [],
-                    notes: data.notes || ''
+                    tags: data.tags || []
                 });
             }
         } catch (error) {
@@ -72,7 +68,10 @@ export default function EditarContactoPage() {
         try {
             setSaving(true);
 
-            const { error } = await supabase
+            console.log('Actualizando contacto:', params.id);
+            console.log('Datos:', formData);
+
+            const { data, error } = await supabase
                 .from('contacts')
                 .update({
                     name: formData.name,
@@ -80,22 +79,24 @@ export default function EditarContactoPage() {
                     phone: formData.phone || null,
                     company: formData.company || null,
                     position: formData.position || null,
-                    status: formData.status,
                     lead_score: formData.lead_score,
-                    tags: formData.tags.length > 0 ? formData.tags : null,
-                    notes: formData.notes || null,
-                    updated_at: new Date().toISOString()
+                    tags: formData.tags.length > 0 ? formData.tags : null
                 })
-                .eq('id', params.id);
+                .eq('id', params.id)
+                .select();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Error de Supabase:', error);
+                throw new Error(error.message);
+            }
 
+            console.log('Contacto actualizado:', data);
             alert('Contacto actualizado correctamente');
             router.push(`/crm/contactos/${params.id}`);
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error actualizando contacto:', error);
-            alert('Error al actualizar el contacto');
+            alert(`Error al actualizar el contacto: ${error.message || 'Error desconocido'}`);
         } finally {
             setSaving(false);
         }
@@ -133,7 +134,7 @@ export default function EditarContactoPage() {
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                                 required
                             />
                         </div>
@@ -146,7 +147,7 @@ export default function EditarContactoPage() {
                                 type="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                                 required
                             />
                         </div>
@@ -159,7 +160,7 @@ export default function EditarContactoPage() {
                                 type="tel"
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                             />
                         </div>
 
@@ -171,7 +172,7 @@ export default function EditarContactoPage() {
                                 type="text"
                                 value={formData.company}
                                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                             />
                         </div>
 
@@ -183,24 +184,8 @@ export default function EditarContactoPage() {
                                 type="text"
                                 value={formData.position}
                                 onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                             />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Estado
-                            </label>
-                            <select
-                                value={formData.status}
-                                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            >
-                                <option value="new">Nuevo</option>
-                                <option value="contacted">Contactado</option>
-                                <option value="qualified">Calificado</option>
-                                <option value="customer">Cliente</option>
-                            </select>
                         </div>
 
                         <div className="md:col-span-2">
@@ -213,20 +198,7 @@ export default function EditarContactoPage() {
                                 max="100"
                                 value={formData.lead_score}
                                 onChange={(e) => setFormData({ ...formData, lead_score: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Notas
-                            </label>
-                            <textarea
-                                value={formData.notes}
-                                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                rows={4}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                placeholder="Notas adicionales sobre el contacto..."
+                                className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                             />
                         </div>
                     </div>
@@ -249,7 +221,7 @@ export default function EditarContactoPage() {
                         </Link>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

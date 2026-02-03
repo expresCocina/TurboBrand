@@ -152,14 +152,14 @@ export default function ContactoDetallePage() {
                     <div className="flex gap-3">
                         <Link
                             href={`/crm/contactos/${contact.id}/editar`}
-                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm"
                         >
                             <Edit className="h-4 w-4" />
                             Editar
                         </Link>
                         <button
                             onClick={handleDelete}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
                         >
                             <Trash2 className="h-4 w-4" />
                             Eliminar
@@ -229,8 +229,8 @@ export default function ContactoDetallePage() {
                                         <button
                                             onClick={() => toggleTaskStatus(task)}
                                             className={`mt-0.5 flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-full border transition-all ${task.status === 'completed'
-                                                    ? 'bg-green-500 border-green-500 text-white'
-                                                    : 'border-gray-300 hover:border-purple-500'
+                                                ? 'bg-green-500 border-green-500 text-white'
+                                                : 'border-gray-300 hover:border-purple-500'
                                                 }`}
                                         >
                                             <CheckCircle className="h-3.5 w-3.5 fill-current" />
@@ -242,8 +242,8 @@ export default function ContactoDetallePage() {
                                             {task.description && <p className="text-xs text-gray-500 mt-0.5">{task.description}</p>}
                                             <div className="flex items-center gap-2 mt-1.5">
                                                 <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${task.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-                                                        task.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-                                                            'bg-blue-100 text-blue-700'
+                                                    task.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                                                        'bg-blue-100 text-blue-700'
                                                     }`}>
                                                     {task.priority === 'urgent' ? 'Urgente' : task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Baja'}
                                                 </span>
