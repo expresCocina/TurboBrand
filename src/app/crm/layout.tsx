@@ -123,6 +123,9 @@ export default function CRMLayout({
 
                     {/* Footer Credit */}
                     <div className="p-4 bg-black/20 text-center">
+                        <Link href="/privacidad" className="text-[10px] text-gray-500 hover:text-gray-300 underline mb-2 block transition-colors">
+                            Política de Privacidad
+                        </Link>
                         <p className="text-[10px] text-gray-400 font-medium">
                             Hecho con amor por <br />
                             <span className="text-purple-300/80 hover:text-purple-200 transition-colors cursor-default">
@@ -191,6 +194,9 @@ export default function CRMLayout({
 
                         {/* Footer Credit Mobile */}
                         <div className="p-4 bg-black/20 text-center">
+                            <Link href="/privacidad" className="text-[10px] text-gray-500 hover:text-gray-300 underline mb-2 block transition-colors">
+                                Política de Privacidad
+                            </Link>
                             <p className="text-[10px] text-gray-400 font-medium">
                                 Hecho con amor por <br />
                                 <span className="text-purple-300/80">

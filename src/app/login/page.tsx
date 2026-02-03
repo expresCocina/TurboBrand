@@ -109,10 +109,13 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <div className="mt-6 text-center">
+                    <div className="mt-6 text-center space-y-2">
                         <p className="text-xs text-gray-400">
                             © 2026 Turbo Brand. Todos los derechos reservados.
                         </p>
+                        <a href="/privacidad" className="text-xs text-purple-400 hover:text-purple-600 hover:underline transition-colors">
+                            Política de Privacidad
+                        </a>
                     </div>
                 </div>
             </div>
