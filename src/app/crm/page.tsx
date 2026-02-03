@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import Link from 'next/link';
 import {
     Users,
     Mail,
     MessageSquare,
     TrendingUp,
-    DollarSign,
     Target,
     Clock,
     CheckCircle
 } from 'lucide-react';
-import Link from 'next/link';
 
 interface DashboardStats {
     totalContacts: number;
@@ -21,6 +21,8 @@ interface DashboardStats {
     totalOpportunitiesValue: number;
     whatsappConversations: number;
     conversionRate: number;
+    emailsSent: number;
+    emailOpenRate: number;
 }
 
 interface PipelineStage {
@@ -38,6 +40,7 @@ interface Activity {
 }
 
 export default function CRMDashboard() {
+    const { user, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<DashboardStats>({
         totalContacts: 0,
@@ -45,23 +48,33 @@ export default function CRMDashboard() {
         totalOpportunities: 0,
         totalOpportunitiesValue: 0,
         whatsappConversations: 0,
-        conversionRate: 0
+        conversionRate: 0,
+        emailsSent: 0,
+        emailOpenRate: 0
     });
     const [pipeline, setPipeline] = useState<PipelineStage[]>([]);
     const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
 
     useEffect(() => {
-        loadDashboardData();
-    }, []);
+        if (!authLoading && user) {
+            loadDashboardData();
+        } else if (!authLoading && !user) {
+            // No user, stop loading (although layout protects this, good practice)
+            setLoading(false);
+        }
+    }, [user, authLoading]);
 
     async function loadDashboardData() {
+        if (!user) return;
         try {
             setLoading(true);
 
-            // 1. Cargar estadísticas de contactos
-            const { data: contacts, count: totalContacts } = await supabase
+            // 1. Cargar estadísticas de contactos (GLOBAL)
+            const { data: contacts, count: totalContacts, error: contactsError } = await supabase
                 .from('contacts')
                 .select('*', { count: 'exact' });
+
+            if (contactsError) console.error('Dashboard - Contacts Error:', contactsError);
 
             // Calcular contactos del mes anterior para el cambio porcentual
             const lastMonth = new Date();
@@ -75,14 +88,14 @@ export default function CRMDashboard() {
                 ? Math.round(((totalContacts || 0) - lastMonthContacts) / lastMonthContacts * 100)
                 : 0;
 
-            // 2. Cargar oportunidades
+            // 2. Cargar oportunidades (GLOBAL)
             const { data: opportunities, count: totalOpportunities } = await supabase
                 .from('opportunities')
                 .select('*', { count: 'exact' });
 
             const totalOpportunitiesValue = opportunities?.reduce((sum, opp) => sum + (opp.value || 0), 0) || 0;
 
-            // 3. Cargar conversaciones de WhatsApp
+            // 3. Cargar conversaciones de WhatsApp (GLOBAL)
             const { count: whatsappConversations } = await supabase
                 .from('whatsapp_conversations')
                 .select('*', { count: 'exact', head: true });
@@ -97,7 +110,17 @@ export default function CRMDashboard() {
                 ? Math.round((wonOpportunities || 0) / totalContacts * 100)
                 : 0;
 
-            // 5. Cargar pipeline por etapas
+            // 5. Cargar estadísticas de Email (GLOBAL)
+            const { data: sentCampaigns } = await supabase
+                .from('email_campaigns')
+                .select('total_sent, total_opened')
+                .eq('status', 'sent');
+
+            const totalEmailsSent = sentCampaigns?.reduce((sum, c) => sum + (c.total_sent || 0), 0) || 0;
+            const totalEmailsOpened = sentCampaigns?.reduce((sum, c) => sum + (c.total_opened || 0), 0) || 0;
+            const emailOpenRate = totalEmailsSent > 0 ? Math.round((totalEmailsOpened / totalEmailsSent) * 100) : 0;
+
+            // 6. Cargar pipeline por etapas (GLOBAL)
             const stages = ['lead', 'contacted', 'proposal', 'negotiation', 'won', 'lost'];
             const stageNames: { [key: string]: string } = {
                 lead: 'Leads',
@@ -125,7 +148,7 @@ export default function CRMDashboard() {
                 });
             }
 
-            // 6. Cargar actividades recientes (últimos 10 contactos y oportunidades)
+            // 7. Cargar actividades recientes (GLOBAL)
             const activities: Activity[] = [];
 
             // Últimos contactos creados
@@ -172,7 +195,9 @@ export default function CRMDashboard() {
                 totalOpportunities: totalOpportunities || 0,
                 totalOpportunitiesValue,
                 whatsappConversations: whatsappConversations || 0,
-                conversionRate
+                conversionRate,
+                emailsSent: totalEmailsSent,
+                emailOpenRate
             });
 
             setPipeline(pipelineData);
@@ -233,6 +258,14 @@ export default function CRMDashboard() {
             positive: true
         },
         {
+            label: 'Emails Enviados',
+            value: stats.emailsSent.toLocaleString(),
+            change: `${stats.emailOpenRate}% Apertura`,
+            icon: Mail,
+            color: 'bg-indigo-500',
+            positive: true
+        },
+        {
             label: 'Conversaciones WhatsApp',
             value: stats.whatsappConversations.toLocaleString(),
             change: 'Activas',
@@ -256,10 +289,11 @@ export default function CRMDashboard() {
             <div>
                 <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
                 <p className="text-gray-600 mt-1">Bienvenido al CRM de Turbo Brand</p>
+
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {statsCards.map((stat, index) => {
                     const Icon = stat.icon;
                     return (

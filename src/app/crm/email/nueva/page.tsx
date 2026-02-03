@@ -37,6 +37,7 @@ export default function NuevaCampanaPage() {
     const [stats, setStats] = useState({
         totalContacts: 0
     });
+    const [orgId, setOrgId] = useState<string | null>(null);
 
     const [segments, setSegments] = useState<any[]>([]);
 
@@ -54,21 +55,30 @@ export default function NuevaCampanaPage() {
     // Cargar segmentos y contactos
     useEffect(() => {
         async function loadData() {
-            // Cargar segmentos
-            const { data: segmentsData } = await supabase
-                .from('contact_segments')
-                .select('*')
-                .order('name');
+            try {
+                // 1. Obtener usuario (solo verificación)
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
 
-            setSegments(segmentsData || []);
+                // 2. Cargar segmentos (GLOBAL)
+                const { data: segmentsData } = await supabase
+                    .from('contact_segments')
+                    .select('*')
+                    .order('name');
 
-            // Cargar número total de contactos
-            const { count } = await supabase
-                .from('contacts')
-                .select('*', { count: 'exact', head: true })
-                .not('email', 'is', null);
+                setSegments(segmentsData || []);
 
-            setStats({ totalContacts: count || 0 });
+                // 3. Cargar número total de contactos (GLOBAL)
+                // Eliminamos filtro de orgId y aseguramos que tenga email
+                const { count } = await supabase
+                    .from('contacts')
+                    .select('*', { count: 'exact', head: true })
+                    .not('email', 'is', null);
+
+                setStats({ totalContacts: count || 0 });
+            } catch (e) {
+                console.error(e);
+            }
         }
         loadData();
     }, []);
@@ -109,7 +119,7 @@ export default function NuevaCampanaPage() {
                 subject: formData.subject,
                 content: formData.content,
                 segment_id: formData.segment_id || null,
-                organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc'
+                // organization_id: orgId // Ya no enviamos orgId explícito, o enviamos null
             };
 
             let endpoint = '/api/email/campaigns/send';

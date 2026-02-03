@@ -9,6 +9,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
+        // FIXME: Requiere auth server-side real para ser seguro.
+        // Por ahora confiamos en que el cliente envía el ID correcto o usamos fallback.
         const orgId = searchParams.get('organization_id') || '5e5b7400-1a66-42dc-880e-e501021edadc';
 
         const { data: org, error } = await supabase

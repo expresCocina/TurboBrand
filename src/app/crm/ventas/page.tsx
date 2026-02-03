@@ -17,32 +17,50 @@ const COLUMNS = [
     { id: 'lost', title: 'Perdidas', color: 'border-red-500' },
 ];
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function VentasPage() {
+    const { user, loading: authLoading } = useAuth();
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
     const [contactsMap, setContactsMap] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadData();
-    }, []);
+        if (!authLoading && user) {
+            loadData();
+        } else if (!authLoading && !user) {
+            setLoading(false);
+        }
+    }, [user, authLoading]);
 
     async function loadData() {
+        if (!user) return;
         try {
             setLoading(true);
+
+            const { data: crmUser } = await supabase
+                .from('crm_users')
+                .select('organization_id')
+                .eq('id', user.id)
+                .single();
+
+            if (!crmUser?.organization_id) return;
+            const orgId = crmUser.organization_id;
 
             // 1. Cargar Oportunidades
             const { data: oppsData, error: oppsError } = await supabase
                 .from('opportunities')
                 .select('*')
+                .eq('organization_id', orgId)
                 .order('created_at', { ascending: false });
 
             if (oppsError) throw oppsError;
 
             // 2. Cargar Contactos para el mapa de nombres
-            // Optimización: Solo cargar IDs necesarios si son muchos, por ahora cargamos todos para simplificar
             const { data: contactsData, error: contactsError } = await supabase
                 .from('contacts')
-                .select('id, name');
+                .select('id, name')
+                .eq('organization_id', orgId);
 
             if (contactsError) throw contactsError;
 

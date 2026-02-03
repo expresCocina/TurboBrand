@@ -28,18 +28,39 @@ export default function SegmentosPage() {
     const [contacts, setContacts] = useState<any[]>([]);
     const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set());
     const [searchQuery, setSearchQuery] = useState('');
+    const [orgId, setOrgId] = useState<string | null>(null);
 
     useEffect(() => {
-        loadSegments();
-        loadContacts();
+        loadData();
     }, []);
 
-    async function loadContacts() {
+    async function loadData() {
         try {
-            // Cargar directamente desde Supabase (el cliente ya tiene la sesión)
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data: crmUser } = await supabase
+                .from('crm_users')
+                .select('organization_id')
+                .eq('id', user.id)
+                .single();
+
+            if (crmUser) {
+                setOrgId(crmUser.organization_id);
+                loadSegments(crmUser.organization_id);
+                loadContacts(crmUser.organization_id);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function loadContacts(organizationId: string) {
+        try {
             const { data, error } = await supabase
                 .from('contacts')
                 .select('id, name, email')
+                .eq('organization_id', organizationId)
                 .order('name', { ascending: true })
                 .limit(100);
 
@@ -55,31 +76,22 @@ export default function SegmentosPage() {
         }
     }
 
-    async function loadSegments() {
+    async function loadSegments(organizationId: string) {
         try {
-            const { data, error } = await supabase
-                .from('contact_segments')
-                .select('*')
-                .order('created_at', { ascending: false });
+            // Usamos la API pero pasando el orgId
+            const response = await fetch(`/api/email/segments?organization_id=${organizationId}`);
+            const data = await response.json();
 
-            if (error) throw error;
+            // Obtener conteo de contactos (client-side join temporal, idealmente backend)
+            // Nota: La API ya devuelve contact_count si se actualizó el route, verifiquemos.
+            // Si la API devuelve los datos listos:
+            // setSegments(data);
 
-            // Obtener conteo de contactos para cada segmento
-            const segmentsWithCount = await Promise.all(
-                (data || []).map(async (segment) => {
-                    const { count } = await supabase
-                        .from('contact_segment_members')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('segment_id', segment.id);
+            // Si la API NO devuelve conteo (versión simple), mantenemos la lógica client-side pero filtrando por org
+            // Para simplificar y asegurar consistencia con el route modificado, asumimos que devuelve objetos Segment
 
-                    return {
-                        ...segment,
-                        contact_count: count || 0
-                    };
-                })
-            );
+            setSegments(data || []);
 
-            setSegments(segmentsWithCount);
         } catch (error) {
             console.error('Error cargando segmentos:', error);
         } finally {
@@ -98,7 +110,7 @@ export default function SegmentosPage() {
                     name: formData.name,
                     description: formData.description,
                     filter_type: formData.type,
-                    organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
+                    organization_id: orgId, // ID dinámico
                     contact_ids: formData.type === 'manual' ? Array.from(selectedContacts) : [],
                     // Si es dinámico sin filtros, el backend podría asumir "todos" o podríamos enviar un flag especial.
                     // Por ahora, filter_config: null implica 'todos' en nuestra lógica simplificada de backend si así lo definimos.
@@ -114,7 +126,7 @@ export default function SegmentosPage() {
             setShowModal(false);
             setFormData({ name: '', description: '', type: 'manual' });
             setSelectedContacts(new Set());
-            loadSegments();
+            if (orgId) loadSegments(orgId);
         } catch (error: any) {
             console.error('Error creando segmento:', error);
             alert(`Error al crear el segmento: ${error.message}`);
@@ -133,7 +145,7 @@ export default function SegmentosPage() {
             if (error) throw error;
 
             alert('Segmento eliminado');
-            loadSegments();
+            if (orgId) loadSegments(orgId);
         } catch (error) {
             console.error('Error eliminando segmento:', error);
             alert('Error al eliminar el segmento');

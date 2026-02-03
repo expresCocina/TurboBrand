@@ -22,12 +22,16 @@ import {
 import { arrayToCSV, downloadCSV, formatDateForCSV, formatPercentage } from '@/lib/exportUtils';
 import CampaignRow from '@/components/email/CampaignRow';
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function EmailMarketingPage() {
+    const { user, loading: authLoading } = useAuth();
     const [campaigns, setCampaigns] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [newLimit, setNewLimit] = useState(2000);
     const [savingSettings, setSavingSettings] = useState(false);
+    const [orgId, setOrgId] = useState<string | null>(null);
     const [stats, setStats] = useState({
         totalSent: 0,
         openRate: 0,
@@ -37,17 +41,37 @@ export default function EmailMarketingPage() {
     });
 
     useEffect(() => {
-        loadData();
-    }, []);
+        if (!authLoading && user) {
+            loadData();
+        } else if (!authLoading && !user) {
+            setLoading(false);
+        }
+    }, [user, authLoading]);
 
     async function loadData() {
+        if (!user) return;
         try {
             setLoading(true);
+
+            // 0. Obtener Organización
+            const { data: crmUser } = await supabase
+                .from('crm_users')
+                .select('organization_id')
+                .eq('id', user.id)
+                .single();
+
+            if (!crmUser?.organization_id) {
+                console.error('No organization found');
+                return;
+            }
+            const organizationId = crmUser.organization_id;
+            setOrgId(organizationId);
 
             // 1. Cargar Campañas
             const { data: campaignsData, error } = await supabase
                 .from('email_campaigns')
                 .select('*')
+                .eq('organization_id', organizationId)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -67,12 +91,10 @@ export default function EmailMarketingPage() {
             const clickRate = totalSent > 0 ? Math.round((totalClicked / totalSent) * 100) : 0;
 
             // Obtener límite mensual y contador
-            const orgId = '5e5b7400-1a66-42dc-880e-e501021edadc';
-
             const { data: org } = await supabase
                 .from('organizations')
                 .select('email_monthly_limit')
-                .eq('id', orgId)
+                .eq('id', organizationId)
                 .single();
 
             const monthlyLimit = org?.email_monthly_limit || 2000;
@@ -83,7 +105,7 @@ export default function EmailMarketingPage() {
 
             const { data: monthlyCount } = await supabase
                 .rpc('get_monthly_email_count', {
-                    p_organization_id: orgId,
+                    p_organization_id: organizationId,
                     p_month: currentMonth,
                     p_year: currentYear
                 });
@@ -144,7 +166,7 @@ export default function EmailMarketingPage() {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
+                    organization_id: orgId,
                     email_monthly_limit: newLimit
                 })
             });

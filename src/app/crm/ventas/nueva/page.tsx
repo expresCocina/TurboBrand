@@ -35,22 +35,10 @@ export default function NuevaOportunidadPage() {
         setLoading(true);
 
         try {
-            // Obtener organization_id real
-            const { data: orgData, error: orgError } = await supabase
-                .from('organizations')
-                .select('id')
-                .limit(1)
-                .single();
-
-            if (orgError) throw new Error('No se encontró organización');
-
-            const organizationId = orgData.id;
-
             const { error } = await supabase
                 .from('opportunities')
                 .insert([{
                     ...formData,
-                    organization_id: organizationId,
                 }]);
 
             if (error) throw error;

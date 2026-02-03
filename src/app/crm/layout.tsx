@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import {
     LayoutDashboard,
     Users,
@@ -14,7 +15,8 @@ import {
     Settings,
     Menu,
     X,
-    LogOut
+    LogOut,
+    Loader2
 } from 'lucide-react';
 
 const menuItems = [
@@ -35,6 +37,27 @@ export default function CRMLayout({
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
+    const { user, loading } = useAuth();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login');
+        }
+    }, [user, loading, router]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
+                    <p className="text-sm text-gray-500">Cargando CRM...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -77,9 +100,11 @@ export default function CRMLayout({
                                         TB
                                     </div>
                                 </div>
-                                <div className="ml-3">
-                                    <p className="text-sm font-medium text-white">Turbo Brand</p>
-                                    <p className="text-xs text-purple-300">Admin</p>
+                                <div className="ml-3 overflow-hidden">
+                                    <p className="text-sm font-medium text-white truncate max-w-[140px]">
+                                        {user?.email || 'Usuario'}
+                                    </p>
+                                    <p className="text-xs text-purple-300">Turbo Brand</p>
                                 </div>
                             </div>
                             <Link

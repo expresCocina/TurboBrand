@@ -18,6 +18,9 @@ export default function NuevoContactoPage() {
         sector: '',
         source: 'manual',
         lead_score: 50,
+        address: '',
+        city: '',
+        department: '',
     });
 
     async function handleSubmit(e: React.FormEvent) {
@@ -26,7 +29,6 @@ export default function NuevoContactoPage() {
 
         try {
             // Usamos el ID de Turbo Brand directamente (Obtenido de tu base de datos)
-            // Esto evita cualquier error de búsqueda o permisos de lectura.
             const organizationId = '5e5b7400-1a66-42dc-880e-e501021edadc';
 
             const { data, error } = await supabase
@@ -129,6 +131,55 @@ export default function NuevoContactoPage() {
                             </div>
                         </div>
 
+                        {/* NUEVA Tarjeta: Ubicación */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                                <div className="p-2 bg-orange-100 rounded-lg text-orange-600">
+                                    <Globe className="h-5 w-5" />
+                                </div>
+                                <h2 className="text-lg font-semibold text-gray-900">Ubicación</h2>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                        Dirección
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                                        placeholder="Ej: Calle 123 # 45 - 67"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                        Departamento
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.department}
+                                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                                        placeholder="Ej: Antioquia"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                        Ciudad
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.city}
+                                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                                        placeholder="Ej: Medellín"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Tarjeta: Información Profesional */}
                         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                             <div className="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
@@ -205,7 +256,7 @@ export default function NuevoContactoPage() {
                                     <select
                                         value={formData.source}
                                         onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all cursor-pointer"
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all cursor-pointer"
                                     >
                                         <option value="manual">Entrada Manual</option>
                                         <option value="web">Sitio Web</option>

@@ -36,7 +36,7 @@ export async function POST(req: Request) {
                 segment_id: segment_id || null,
                 scheduled_at,
                 status: 'scheduled',
-                organization_id: organization_id || '5e5b7400-1a66-42dc-880e-e501021edadc',
+                organization_id: organization_id || '5e5b7400-1a66-42dc-880e-e501021edadc', // ID dinámico con fallback
                 created_at: new Date().toISOString()
             })
             .select()
