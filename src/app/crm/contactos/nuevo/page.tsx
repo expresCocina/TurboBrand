@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Save, User, Briefcase, Tag, Building, Phone, Mail, Globe, Hash } from 'lucide-react';
 import Link from 'next/link';
 
+import { checkAndRunAutomations } from '@/lib/automations';
+
 export default function NuevoContactoPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -31,6 +33,10 @@ export default function NuevoContactoPage() {
             // Usamos el ID de Turbo Brand directamente (Obtenido de tu base de datos)
             const organizationId = '5e5b7400-1a66-42dc-880e-e501021edadc';
 
+
+
+            // ... (inside component)
+
             const { data, error } = await supabase
                 .from('contacts')
                 .insert([{
@@ -41,6 +47,12 @@ export default function NuevoContactoPage() {
                 .single();
 
             if (error) throw error;
+
+            // 🤖 EJECUTAR AUTOMATIZACIONES
+            if (data) {
+                // No esperamos esto (void) para no bloquear la UI
+                checkAndRunAutomations('new_lead', data, supabase);
+            }
 
             router.push(`/crm/contactos`);
         } catch (error) {

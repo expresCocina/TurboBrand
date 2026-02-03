@@ -221,7 +221,7 @@ export default function TuLocalDigital() {
                                     Zona Disponible
                                 </span>
                                 <span className={styles.legendItem}>
-                                    <span className={styles.dot} style={{ background: '#666' }}></span>
+                                    <span className={styles.dot} style={{ background: '#ef4444' }}></span>
                                     Zona Ocupada
                                 </span>
                             </span>

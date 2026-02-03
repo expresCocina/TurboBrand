@@ -119,10 +119,14 @@ export default function ContactosPage() {
     // Estadísticas
     const stats = {
         total: contacts.length,
-        web: contacts.filter(c => c.source === 'web').length,
+        web: contacts.filter(c => c.source === 'web' || c.source === 'website').length,
         whatsapp: contacts.filter(c => c.source === 'whatsapp').length,
         manual: contacts.filter(c => c.source === 'manual').length,
     };
+
+    // ... (lines 127-488 omitted)
+
+
 
     // Exportar contactos a CSV
     const handleExport = () => {
@@ -487,17 +491,17 @@ export default function ContactosPage() {
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${contact.source === 'web' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${(contact.source === 'web' || contact.source === 'website') ? 'bg-blue-50 text-blue-700 border-blue-100' :
                                                 contact.source === 'whatsapp' ? 'bg-green-50 text-green-700 border-green-100' :
                                                     contact.source === 'manual' ? 'bg-purple-50 text-purple-700 border-purple-100' :
                                                         contact.source === 'import' ? 'bg-orange-50 text-orange-700 border-orange-100' :
                                                             'bg-gray-50 text-gray-700 border-gray-100'
                                                 }`}>
-                                                {contact.source === 'web' && 'Web'}
+                                                {(contact.source === 'web' || contact.source === 'website') && 'Web'}
                                                 {contact.source === 'whatsapp' && 'WhatsApp'}
                                                 {contact.source === 'manual' && 'Manual'}
                                                 {contact.source === 'import' && 'Importado'}
-                                                {!['web', 'whatsapp', 'manual', 'import'].includes(contact.source || '') && (contact.source || 'Otro')}
+                                                {!['web', 'website', 'whatsapp', 'manual', 'import'].includes(contact.source || '') && (contact.source || 'Otro')}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">

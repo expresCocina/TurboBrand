@@ -84,13 +84,13 @@ export default function RealMedellinMap() {
     }
 
     const getZoneColor = (zone: ZoneData) => {
-        return zone.status === 'available' ? '#00ff88' : '#666666';
+        return zone.status === 'available' ? '#00ff88' : '#ef4444';
     };
 
     const getZoneFillColor = (zone: ZoneData) => {
         return zone.status === 'available'
             ? 'rgba(0, 255, 136, 0.3)'
-            : 'rgba(100, 100, 100, 0.3)';
+            : 'rgba(239, 68, 68, 0.3)';
     };
 
     const handleReserve = (zone: ZoneData) => {
@@ -128,7 +128,7 @@ export default function RealMedellinMap() {
                             color: getZoneColor(zone),
                             fillColor: getZoneFillColor(zone),
                             fillOpacity: 0.4,
-                            weight: 2,
+                            weight: zone.status === 'occupied' ? 3 : 2,
                             opacity: 0.8
                         }}
                         eventHandlers={{

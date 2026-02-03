@@ -38,29 +38,19 @@ export default function VentasPage() {
         try {
             setLoading(true);
 
-            const { data: crmUser } = await supabase
-                .from('crm_users')
-                .select('organization_id')
-                .eq('id', user.id)
-                .single();
-
-            if (!crmUser?.organization_id) return;
-            const orgId = crmUser.organization_id;
-
-            // 1. Cargar Oportunidades
+            // 1. Cargar Oportunidades (GLOBAL)
+            // Ya no filtramos por organization_id
             const { data: oppsData, error: oppsError } = await supabase
                 .from('opportunities')
                 .select('*')
-                .eq('organization_id', orgId)
                 .order('created_at', { ascending: false });
 
             if (oppsError) throw oppsError;
 
-            // 2. Cargar Contactos para el mapa de nombres
+            // 2. Cargar Contactos para el mapa de nombres (GLOBAL)
             const { data: contactsData, error: contactsError } = await supabase
                 .from('contacts')
-                .select('id, name')
-                .eq('organization_id', orgId);
+                .select('id, name');
 
             if (contactsError) throw contactsError;
 

@@ -39,8 +39,12 @@ export default function LoginPage() {
         <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="p-8 text-center bg-purple-50 border-b border-purple-100">
-                    <div className="h-16 w-16 bg-purple-600 rounded-xl mx-auto flex items-center justify-center shadow-lg mb-4">
-                        <span className="text-2xl font-bold text-white">TB</span>
+                    <div className="h-24 w-full mx-auto flex items-center justify-center mb-6">
+                        <img
+                            src="/LogoTurboBrand.webp"
+                            alt="Turbo Brand"
+                            className="h-full w-auto object-contain"
+                        />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900">Turbo Brand CRM</h1>
                     <p className="text-gray-500 mt-2">Acceso exclusivo para administradores</p>

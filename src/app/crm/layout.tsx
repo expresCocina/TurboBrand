@@ -63,10 +63,14 @@ export default function CRMLayout({
         <div className="min-h-screen bg-gray-50">
             {/* Sidebar para desktop */}
             <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
-                <div className="flex flex-col flex-grow bg-gradient-to-b from-purple-900 to-purple-800 overflow-y-auto">
+                <div className="flex flex-col flex-grow bg-gradient-to-b from-black via-gray-900 to-fuchsia-900 overflow-y-auto">
                     {/* Logo */}
-                    <div className="flex items-center h-16 flex-shrink-0 px-4 bg-purple-950">
-                        <h1 className="text-xl font-bold text-white">Turbo Brand CRM</h1>
+                    <div className="flex items-center h-20 flex-shrink-0 px-6 bg-black/20">
+                        <img
+                            src="/LogoTurboBrand.webp"
+                            alt="Turbo Brand CRM"
+                            className="h-12 w-auto object-contain"
+                        />
                     </div>
 
                     {/* Navigation */}
@@ -116,6 +120,16 @@ export default function CRMLayout({
                             </Link>
                         </div>
                     </div>
+
+                    {/* Footer Credit */}
+                    <div className="p-4 bg-black/20 text-center">
+                        <p className="text-[10px] text-gray-400 font-medium">
+                            Hecho con amor por <br />
+                            <span className="text-purple-300/80 hover:text-purple-200 transition-colors cursor-default">
+                                Renting AMC Agency Web
+                            </span>
+                        </p>
+                    </div>
                 </div>
             </aside>
 
@@ -124,9 +138,13 @@ export default function CRMLayout({
                 <div className="fixed inset-0 z-40 md:hidden">
                     <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
 
-                    <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-gradient-to-b from-purple-900 to-purple-800">
-                        <div className="flex items-center justify-between h-16 px-4 bg-purple-950">
-                            <h1 className="text-xl font-bold text-white">Turbo Brand CRM</h1>
+                    <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-gradient-to-b from-black via-gray-900 to-fuchsia-900">
+                        <div className="flex items-center justify-between h-16 px-4 bg-black/20">
+                            <img
+                                src="/LogoTurboBrand.webp"
+                                alt="Turbo Brand CRM"
+                                className="h-10 w-auto object-contain"
+                            />
                             <button onClick={() => setSidebarOpen(false)} className="text-white">
                                 <X className="h-6 w-6" />
                             </button>
@@ -170,6 +188,16 @@ export default function CRMLayout({
                                 </Link>
                             </div>
                         </div>
+
+                        {/* Footer Credit Mobile */}
+                        <div className="p-4 bg-black/20 text-center">
+                            <p className="text-[10px] text-gray-400 font-medium">
+                                Hecho con amor por <br />
+                                <span className="text-purple-300/80">
+                                    Renting AMC Agency Web
+                                </span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             )}
@@ -184,7 +212,11 @@ export default function CRMLayout({
                     >
                         <Menu className="h-6 w-6" />
                     </button>
-                    <h1 className="text-lg font-semibold text-gray-900">Turbo Brand CRM</h1>
+                    <img
+                        src="/LogoTurboBrand.webp"
+                        alt="Turbo Brand CRM"
+                        className="h-8 w-auto object-contain"
+                    />
                     <div className="w-6" />
                 </div>
 
@@ -193,6 +225,6 @@ export default function CRMLayout({
                     {children}
                 </main>
             </div>
-        </div>
+        </div >
     );
 }

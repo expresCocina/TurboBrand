@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Save, DollarSign, Calendar, Target, User } from 'lucide-react';
 import Link from 'next/link';
+import { checkAndRunAutomations } from '@/lib/automations';
 
 export default function NuevaOportunidadPage() {
     const router = useRouter();
@@ -35,13 +36,30 @@ export default function NuevaOportunidadPage() {
         setLoading(true);
 
         try {
-            const { error } = await supabase
+
+
+            // ... (in submit handler)
+
+            // Usamos el ID de Turbo Brand (mismo que en contactos)
+            const organizationId = '5e5b7400-1a66-42dc-880e-e501021edadc';
+
+            const { data, error } = await supabase
                 .from('opportunities')
                 .insert([{
                     ...formData,
-                }]);
+                    organization_id: organizationId,
+                }])
+                .select() // Importante: necesitamos select() para obtener el ID
+                .single();
 
             if (error) throw error;
+
+            // 🤖 AUTOMATION TRIGGER: "new_lead"
+            // Si la oportunidad se crea en la etapa "lead" (Nuevos Leads), disparamos la automatización
+            if (data && formData.stage === 'lead') {
+                // Usamos 'new_lead' para reutilizar la automatización existente
+                checkAndRunAutomations('new_lead', data, supabase);
+            }
 
             router.push('/crm/ventas');
         } catch (error) {

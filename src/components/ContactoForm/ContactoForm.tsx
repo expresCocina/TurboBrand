@@ -15,11 +15,13 @@ export default function ContactoForm() {
     });
     const [submitted, setSubmitted] = useState(false);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleNext = (e: React.FormEvent) => {
+    const handleNext = async (e: React.FormEvent) => {
         e.preventDefault();
         if (step === 1) {
             // Basic validation for step 1
@@ -28,8 +30,25 @@ export default function ContactoForm() {
             }
         } else {
             // Submit logic
-            console.log("Form Submitted:", formData);
-            setSubmitted(true);
+            setIsSubmitting(true);
+            try {
+                const response = await fetch('/api/leads/web-form', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                if (response.ok) {
+                    setSubmitted(true);
+                } else {
+                    alert('Hubo un error al enviar el formulario. Intenta de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Error de conexión.');
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -112,7 +131,9 @@ export default function ContactoForm() {
                         </div>
                         <div className={styles.btnGroup}>
                             <button type="button" className={styles.backBtn} onClick={() => setStep(1)}>Atrás</button>
-                            <button type="submit" className={styles.submitBtn}>Enviar Solicitud</button>
+                            <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+                                {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
+                            </button>
                         </div>
                     </div>
                 )}

@@ -157,6 +157,11 @@ export default function RootLayout({
               `
           }}
         />
+        <Script
+          id="waas-lock"
+          src="https://amcagencyweb.com/waas-lock.js?domain=https://www.turbobrandcol.com/"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
