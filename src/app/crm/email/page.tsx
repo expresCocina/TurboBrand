@@ -23,7 +23,8 @@ export default function EmailMarketingPage() {
         totalSent: 0,
         openRate: 0,
         clickRate: 0,
-        monthlyLimit: 3000 // Límite ejemplo plan free
+        monthlyLimit: 2000,
+        monthlySent: 0
     });
 
     useEffect(() => {
@@ -44,19 +45,47 @@ export default function EmailMarketingPage() {
 
             setCampaigns(campaignsData || []);
 
-            // 2. Calcular Estadísticas (Simuladas/Básicas por ahora hasta tener webhooks)
-            // En un futuro, esto se calcularía sumando eventos de la tabla 'email_sends' o 'email_events'
-
-            // Ejemplo simple: Contar campañas enviadas
+            // 2. Calcular Estadísticas Globales
             const sentCampaigns = campaignsData?.filter(c => c.status === 'sent') || [];
-            // Asumimos un promedio de destinatarios por campaña para el demo, o si tuvieramos el count real
-            // Como no guardamos el count en campaigns (mala practica corregible), estimamos o dejamos en 0.
 
-            setStats(prev => ({
-                ...prev,
-                totalSent: sentCampaigns.length, // Esto es campañas enviadas, no emails individuales
-                // openRate y clickRate vendrán de webhooks
-            }));
+            // Sumar totales de todas las campañas
+            const totalSent = sentCampaigns.reduce((sum, c) => sum + (c.total_sent || 0), 0);
+            const totalOpened = sentCampaigns.reduce((sum, c) => sum + (c.total_opened || 0), 0);
+            const totalClicked = sentCampaigns.reduce((sum, c) => sum + (c.total_clicked || 0), 0);
+
+            // Calcular tasas
+            const openRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0;
+            const clickRate = totalSent > 0 ? Math.round((totalClicked / totalSent) * 100) : 0;
+
+            // Obtener límite mensual y contador
+            const orgId = '5e5b7400-1a66-42dc-880e-e501021edadc';
+
+            const { data: org } = await supabase
+                .from('organizations')
+                .select('email_monthly_limit')
+                .eq('id', orgId)
+                .single();
+
+            const monthlyLimit = org?.email_monthly_limit || 2000;
+
+            // Contar emails enviados este mes
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+
+            const { data: monthlyCount } = await supabase
+                .rpc('get_monthly_email_count', {
+                    p_organization_id: orgId,
+                    p_month: currentMonth,
+                    p_year: currentYear
+                });
+
+            setStats({
+                totalSent: sentCampaigns.length,
+                openRate,
+                clickRate,
+                monthlyLimit,
+                monthlySent: monthlyCount || 0
+            });
 
         } catch (error) {
             console.error('Error cargando campañas:', error);
@@ -91,28 +120,35 @@ export default function EmailMarketingPage() {
                     </div>
                     <p className="text-2xl font-bold text-gray-900">{stats.totalSent}</p>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 opacity-60">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-gray-500">Tasa de Apertura</p>
                         <BarChart2 className="h-4 w-4 text-green-500" />
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">--%</p>
-                    <p className="text-xs text-gray-400">Requiere Webhhoks</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.openRate}%</p>
                 </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 opacity-60">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-gray-500">Clicks</p>
                         <Users className="h-4 w-4 text-purple-500" />
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">--%</p>
-                    <p className="text-xs text-gray-400">Requiere Webhhoks</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.clickRate}%</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-gray-500">Límite Mensual</p>
                         <FileText className="h-4 w-4 text-orange-500" />
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">{stats.monthlyLimit}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.monthlySent} / {stats.monthlyLimit}</p>
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                        <div
+                            className={`h-2 rounded-full transition-all ${stats.monthlySent / stats.monthlyLimit > 0.8 ? 'bg-red-500' :
+                                    stats.monthlySent / stats.monthlyLimit > 0.6 ? 'bg-yellow-500' :
+                                        'bg-green-500'
+                                }`}
+                            style={{ width: `${Math.min((stats.monthlySent / stats.monthlyLimit) * 100, 100)}%` }}
+                        />
+                    </div>
                 </div>
             </div>
 

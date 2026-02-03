@@ -32,6 +32,54 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'No hay contactos con email para enviar.' }, { status: 400 });
         }
 
+        // Validar límite mensual
+        const orgId = organization_id || '5e5b7400-1a66-42dc-880e-e501021edadc';
+
+        // Obtener límite mensual de la organización
+        const { data: org, error: orgError } = await supabase
+            .from('organizations')
+            .select('email_monthly_limit')
+            .eq('id', orgId)
+            .single();
+
+        if (orgError) {
+            console.error('Error obteniendo organización:', orgError);
+        }
+
+        const monthlyLimit = org?.email_monthly_limit || 2000;
+
+        // Contar emails enviados este mes
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+
+        const { data: monthlyCount, error: countError } = await supabase
+            .rpc('get_monthly_email_count', {
+                p_organization_id: orgId,
+                p_month: currentMonth,
+                p_year: currentYear
+            });
+
+        if (countError) {
+            console.error('Error contando emails mensuales:', countError);
+        }
+
+        const emailsSentThisMonth = monthlyCount || 0;
+        const emailsToSend = contacts.length;
+
+        console.log(`📊 Límite mensual: ${emailsSentThisMonth}/${monthlyLimit} emails enviados este mes`);
+        console.log(`📧 Intentando enviar: ${emailsToSend} emails`);
+
+        // Verificar si excede el límite
+        if (emailsSentThisMonth + emailsToSend > monthlyLimit) {
+            const remaining = monthlyLimit - emailsSentThisMonth;
+            return NextResponse.json({
+                error: `Límite mensual excedido. Has enviado ${emailsSentThisMonth}/${monthlyLimit} emails este mes. Solo puedes enviar ${remaining} más.`,
+                sent: emailsSentThisMonth,
+                limit: monthlyLimit,
+                remaining: remaining
+            }, { status: 403 });
+        }
+
         // 2. Registrar la campaña en Base de Datos (Tabla 'email_campaigns')
         // Primero verificamos si existe la tabla, si no, fallará y lo veremos en logs.
         // Asumimos que la tabla fue creada con el script SQL previo.
