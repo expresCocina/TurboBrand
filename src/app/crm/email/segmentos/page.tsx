@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Users, Plus, Trash2, Filter } from 'lucide-react';
+import { Users, Plus, Trash2, Filter, Search } from 'lucide-react';
 
 interface Segment {
     id: string;
@@ -24,9 +24,36 @@ export default function SegmentosPage() {
         type: 'manual' as 'manual' | 'dynamic'
     });
 
+    // Estados para selección de contactos
+    const [contacts, setContacts] = useState<any[]>([]);
+    const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set());
+    const [searchQuery, setSearchQuery] = useState('');
+
     useEffect(() => {
         loadSegments();
+        loadContacts();
     }, []);
+
+    async function loadContacts() {
+        try {
+            // Cargar directamente desde Supabase (el cliente ya tiene la sesión)
+            const { data, error } = await supabase
+                .from('contacts')
+                .select('id, name, email')
+                .order('name', { ascending: true })
+                .limit(100);
+
+            if (error) {
+                console.error('Error cargando contactos:', error);
+                return;
+            }
+
+            console.log('Contactos cargados:', data?.length, data);
+            setContacts(data || []);
+        } catch (e) {
+            console.error('Error cargando contactos:', e);
+        }
+    }
 
     async function loadSegments() {
         try {
@@ -64,25 +91,33 @@ export default function SegmentosPage() {
         e.preventDefault();
 
         try {
-            const { error } = await supabase
-                .from('contact_segments')
-                .insert({
+            const response = await fetch('/api/email/segments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     name: formData.name,
                     description: formData.description,
-                    type: formData.type,
-                    filter_criteria: null,
-                    organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc' // TODO: Obtener de sesión
-                });
+                    filter_type: formData.type,
+                    organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
+                    contact_ids: formData.type === 'manual' ? Array.from(selectedContacts) : [],
+                    // Si es dinámico sin filtros, el backend podría asumir "todos" o podríamos enviar un flag especial.
+                    // Por ahora, filter_config: null implica 'todos' en nuestra lógica simplificada de backend si así lo definimos.
+                    filter_config: formData.type === 'dynamic' ? { all: true } : null
+                })
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.error || 'Error al crear segmento');
 
             alert('Segmento creado correctamente');
             setShowModal(false);
             setFormData({ name: '', description: '', type: 'manual' });
+            setSelectedContacts(new Set());
             loadSegments();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creando segmento:', error);
-            alert('Error al crear el segmento');
+            alert(`Error al crear el segmento: ${error.message}`);
         }
     }
 
@@ -104,6 +139,21 @@ export default function SegmentosPage() {
             alert('Error al eliminar el segmento');
         }
     }
+
+    const toggleContact = (id: string) => {
+        const newSelected = new Set(selectedContacts);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedContacts(newSelected);
+    };
+
+    const filteredContacts = contacts.filter(contact =>
+        contact.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     if (loading) {
         return (
@@ -192,7 +242,7 @@ export default function SegmentosPage() {
             {/* Modal Crear Segmento */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Nuevo Segmento</h2>
 
                         <form onSubmit={handleCreateSegment} className="space-y-4">
@@ -204,7 +254,7 @@ export default function SegmentosPage() {
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-400"
                                     placeholder="Ej: Clientes VIP"
                                     required
                                 />
@@ -217,7 +267,7 @@ export default function SegmentosPage() {
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 placeholder-gray-400"
                                     placeholder="Describe este segmento..."
                                     rows={3}
                                 />
@@ -233,12 +283,69 @@ export default function SegmentosPage() {
                                     className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                                 >
                                     <option value="manual">Manual</option>
-                                    <option value="dynamic">Dinámico</option>
+                                    <option value="dynamic">Dinámico (Todos)</option>
                                 </select>
                                 <p className="text-xs text-gray-500 mt-1">
-                                    Manual: Agregas contactos manualmente. Dinámico: Se actualiza automáticamente según criterios.
+                                    {formData.type === 'manual'
+                                        ? 'Manual: Selecciona contactos de la lista.'
+                                        : 'Dinámico: Incluirá automáticamente a TODOS los contactos existentes y futuros.'}
                                 </p>
                             </div>
+
+                            {/* Selector de Contactos (Solo si es Manual) */}
+                            {formData.type === 'manual' && (
+                                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="text-sm font-medium text-gray-700">Seleccionar Contactos</label>
+                                        <span className="text-xs text-purple-600 font-medium">
+                                            {selectedContacts.size} seleccionados
+                                        </span>
+                                    </div>
+
+                                    <div className="relative mb-3">
+                                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar contacto..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none text-gray-900 focus:border-purple-500 placeholder-gray-400"
+                                        />
+                                    </div>
+
+                                    <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+                                        {filteredContacts.length > 0 ? (
+                                            filteredContacts.map(contact => (
+                                                <div
+                                                    key={contact.id}
+                                                    onClick={() => toggleContact(contact.id)}
+                                                    className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition-colors ${selectedContacts.has(contact.id) ? 'bg-purple-100' : 'hover:bg-gray-200'
+                                                        }`}
+                                                >
+                                                    <div className={`w-4 h-4 rounded border flex items-center justify-center ${selectedContacts.has(contact.id) ? 'bg-purple-600 border-purple-600' : 'border-gray-400 bg-white'
+                                                        }`}>
+                                                        {selectedContacts.has(contact.id) && (
+                                                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-sm">
+                                                        <p className="font-medium text-gray-900">
+                                                            {contact.name}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">{contact.email}</p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-center text-sm text-gray-500 py-4">
+                                                {contacts.length === 0 ? 'Cargando o no hay contactos...' : 'No se encontraron coincidencias'}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="flex gap-3 pt-4">
                                 <button
@@ -252,6 +359,7 @@ export default function SegmentosPage() {
                                     onClick={() => {
                                         setShowModal(false);
                                         setFormData({ name: '', description: '', type: 'manual' });
+                                        setSelectedContacts(new Set());
                                     }}
                                     className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                                 >

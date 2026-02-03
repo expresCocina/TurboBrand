@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         }
 
         // 1. Obtener destinatarios (Contactos con email)
-        let contacts: { email: string; name: string }[] = [];
+        let contacts: { email: string; name: string; company?: string }[] = [];
 
         const segmentId = campaignData.segment_id || segment_id;
 
@@ -50,19 +50,19 @@ export async function POST(req: Request) {
             // Si hay segmento, obtener solo contactos de ese segmento
             const { data: segmentMembers, error: segmentError } = await supabase
                 .from('contact_segment_members')
-                .select('contact_id, contacts(email, name)')
+                .select('contact_id, contacts(email, name, company)')
                 .eq('segment_id', segmentId);
 
             if (segmentError) throw segmentError;
 
             contacts = (segmentMembers || [])
                 .map((sm: any) => sm.contacts)
-                .filter((c: any) => c && c.email) as { email: string; name: string }[];
+                .filter((c: any) => c && c.email) as { email: string; name: string; company?: string }[];
         } else {
             // Si no hay segmento, obtener todos los contactos
             const { data: allContacts, error: contactsError } = await supabase
                 .from('contacts')
-                .select('email, name')
+                .select('email, name, company')
                 .not('email', 'is', null);
 
             if (contactsError) throw contactsError;
@@ -173,12 +173,23 @@ export async function POST(req: Request) {
         // Resend soporta Batch Sending de hasta 100 emails por request. Usemos eso.
         // Mapeamos contactos al formato de Resend Batch
 
-        const emailBatch = contactsToSend.map(contact => ({
-            from: 'Turbo Brand CRM <crm@turbobrandcol.com>',
-            to: contact.email,
-            subject: subject,
-            html: content,
-        }));
+        const emailBatch = contactsToSend.map(contact => {
+            // Reemplazo simple de variables
+            let personalizedHtml = content
+                .replace(/{{nombre}}/g, contact.name || 'Cliente')
+                .replace(/{{email}}/g, contact.email)
+                .replace(/{{empresa}}/g, contact.company || 'su empresa'); // Asumiendo que el contacto puede tener empresa, si no fallback
+
+            let personalizedSubject = subject
+                .replace(/{{nombre}}/g, contact.name || 'Cliente');
+
+            return {
+                from: 'Turbo Brand CRM <crm@turbobrandcol.com>',
+                to: contact.email,
+                subject: personalizedSubject,
+                html: personalizedHtml,
+            };
+        });
 
         // Enviar en lotes de 100 (aunque aquí enviamos todo de una si es menos de 100)
         // Usamos el dominio de pruebas de Resend: onboarding@resend.dev 

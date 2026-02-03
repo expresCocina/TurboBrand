@@ -16,9 +16,11 @@ import {
     AlertCircle,
     Settings,
     Download,
-    X
+    X,
+    Layout
 } from 'lucide-react';
 import { arrayToCSV, downloadCSV, formatDateForCSV, formatPercentage } from '@/lib/exportUtils';
+import CampaignRow from '@/components/email/CampaignRow';
 
 export default function EmailMarketingPage() {
     const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -185,6 +187,13 @@ export default function EmailMarketingPage() {
                         <Users className="h-5 w-5" />
                         Segmentos
                     </Link>
+                    <Link
+                        href="/crm/email/plantillas"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium border border-gray-200"
+                    >
+                        <Layout className="h-5 w-5" />
+                        Plantillas
+                    </Link>
                     <button
                         onClick={openSettingsModal}
                         className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium border border-gray-200"
@@ -261,125 +270,72 @@ export default function EmailMarketingPage() {
                 ) : (
                     <div className="divide-y divide-gray-100">
                         {campaigns.map((campaign) => (
-                            <div key={campaign.id} className="p-6 hover:bg-gray-50 transition-colors">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div className="flex items-start gap-4">
-                                        <div className={`p-3 rounded-lg ${campaign.status === 'sent' ? 'bg-green-100 text-green-600' :
-                                            campaign.status === 'failed' ? 'bg-red-100 text-red-600' :
-                                                'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            <Mail className="h-6 w-6" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-base font-semibold text-gray-900">{campaign.name}</h3>
-                                            <p className="text-sm text-gray-500 truncate max-w-md">{campaign.subject}</p>
-                                            <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-                                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${campaign.status === 'sent'
-                                                    ? 'bg-green-50 text-green-700 border border-green-100'
-                                                    : campaign.status === 'failed'
-                                                        ? 'bg-red-50 text-red-700 border border-red-100'
-                                                        : 'bg-gray-100 text-gray-700 border border-gray-200'
-                                                    }`}>
-                                                    {campaign.status === 'sent' && <><CheckCircle className="h-3 w-3" /> Enviado</>}
-                                                    {campaign.status === 'failed' && <><AlertCircle className="h-3 w-3" /> Error</>}
-                                                    {campaign.status === 'draft' && <><Clock className="h-3 w-3" /> Borrador</>}
-                                                    {campaign.status === 'sending' && <><Clock className="h-3 w-3 animate-spin" /> Enviando...</>}
-                                                </span>
-                                                {campaign.sent_at && (
-                                                    <span>{new Date(campaign.sent_at).toLocaleDateString()} {new Date(campaign.sent_at).toLocaleTimeString()}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Stats (Ahora con datos reales) */}
-                                    {campaign.status === 'sent' && (
-                                        <div className="flex items-center gap-8">
-                                            <div className="text-center">
-                                                <p className="text-2xl font-bold text-gray-900">{campaign.total_opened || 0}</p>
-                                                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Abiertos</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-2xl font-bold text-gray-900">{campaign.total_clicked || 0}</p>
-                                                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Clicks</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-xs text-gray-500">
-                                                    {campaign.total_sent || 0} enviados
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div>
-                                        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
-                                            <MoreVertical className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <CampaignRow key={campaign.id} campaign={campaign} />
                         ))}
                     </div>
+
                 )}
             </div>
 
             {/* Modal de Configuración */}
-            {showSettingsModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Configuración de Email</h2>
-                            <button
-                                onClick={() => setShowSettingsModal(false)}
-                                className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
-                            >
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Límite Mensual de Emails
-                                </label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={newLimit}
-                                    onChange={(e) => setNewLimit(parseInt(e.target.value) || 0)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                    placeholder="2000"
-                                />
-                                <p className="mt-2 text-sm text-gray-500">
-                                    Número máximo de emails que puedes enviar por mes.
-                                </p>
+            {
+                showSettingsModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-bold text-gray-900">Configuración de Email</h2>
+                                <button
+                                    onClick={() => setShowSettingsModal(false)}
+                                    className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
                             </div>
 
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <p className="text-sm text-blue-800">
-                                    <strong>Uso actual:</strong> {stats.monthlySent} / {stats.monthlyLimit} emails este mes
-                                </p>
-                            </div>
-                        </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Límite Mensual de Emails
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={newLimit}
+                                        onChange={(e) => setNewLimit(parseInt(e.target.value) || 0)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        placeholder="2000"
+                                    />
+                                    <p className="mt-2 text-sm text-gray-500">
+                                        Número máximo de emails que puedes enviar por mes.
+                                    </p>
+                                </div>
 
-                        <div className="flex items-center gap-3 mt-6">
-                            <button
-                                onClick={() => setShowSettingsModal(false)}
-                                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={saveSettings}
-                                disabled={savingSettings}
-                                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {savingSettings ? 'Guardando...' : 'Guardar'}
-                            </button>
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <p className="text-sm text-blue-800">
+                                        <strong>Uso actual:</strong> {stats.monthlySent} / {stats.monthlyLimit} emails este mes
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 mt-6">
+                                <button
+                                    onClick={() => setShowSettingsModal(false)}
+                                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={saveSettings}
+                                    disabled={savingSettings}
+                                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {savingSettings ? 'Guardando...' : 'Guardar'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }

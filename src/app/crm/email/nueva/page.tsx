@@ -11,9 +11,11 @@ import {
     Eye,
     Users,
     Clock,
-    Calendar
+    Calendar,
+    Layout
 } from 'lucide-react';
 import Link from 'next/link';
+import TemplateSelector from '@/components/email/TemplateSelector';
 
 export default function NuevaCampanaPage() {
     const router = useRouter();
@@ -37,6 +39,17 @@ export default function NuevaCampanaPage() {
     });
 
     const [segments, setSegments] = useState<any[]>([]);
+
+    const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+
+    const handleTemplateSelect = (template: any) => {
+        setFormData(prev => ({
+            ...prev,
+            subject: template.subject || prev.subject,
+            content: template.html_content || prev.content
+        }));
+        setShowTemplateSelector(false);
+    };
 
     // Cargar segmentos y contactos
     useEffect(() => {
@@ -256,7 +269,17 @@ export default function NuevaCampanaPage() {
                         )}
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Contenido (HTML simple)</label>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-sm font-medium text-gray-700">Contenido (HTML simple)</label>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowTemplateSelector(true)}
+                                    className="text-sm text-purple-600 font-medium hover:text-purple-700 flex items-center gap-1 bg-purple-50 px-3 py-1 rounded-full transition-colors"
+                                >
+                                    <Layout className="h-4 w-4" />
+                                    Cargar Plantilla
+                                </button>
+                            </div>
                             <textarea
                                 rows={12}
                                 value={formData.content}
@@ -330,6 +353,13 @@ export default function NuevaCampanaPage() {
                     </div>
                 </div>
             </div>
-        </div>
+
+
+            <TemplateSelector
+                isOpen={showTemplateSelector}
+                onClose={() => setShowTemplateSelector(false)}
+                onSelect={handleTemplateSelect}
+            />
+        </div >
     );
 }
