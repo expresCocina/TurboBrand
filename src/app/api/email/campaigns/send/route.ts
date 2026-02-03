@@ -14,26 +14,67 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { name, subject, content, organization_id } = body;
+        const { campaign_id, name, subject, content, organization_id, segment_id } = body;
 
-        if (!subject || !content) {
+        let campaignData: any;
+        let campaignId: string | null = campaign_id || null;
+
+        // Si viene campaign_id, es una campaña programada ejecutada por el cron
+        if (campaign_id) {
+            const { data, error } = await supabase
+                .from('email_campaigns')
+                .select('*')
+                .eq('id', campaign_id)
+                .single();
+
+            if (error || !data) {
+                return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 });
+            }
+
+            campaignData = data;
+        } else {
+            // Envío inmediato, usar datos del body
+            campaignData = { name, subject, content, segment_id, organization_id };
+        }
+
+        if (!campaignData.subject || !campaignData.content) {
             return NextResponse.json({ error: 'Faltan datos requeridos (Asunto o Contenido)' }, { status: 400 });
         }
 
         // 1. Obtener destinatarios (Contactos con email)
-        const { data: contacts, error: contactsError } = await supabase
-            .from('contacts')
-            .select('email, name')
-            .not('email', 'is', null);
+        let contacts: { email: string; name: string }[] = [];
 
-        if (contactsError) throw contactsError;
+        const segmentId = campaignData.segment_id || segment_id;
+
+        if (segmentId) {
+            // Si hay segmento, obtener solo contactos de ese segmento
+            const { data: segmentMembers, error: segmentError } = await supabase
+                .from('contact_segment_members')
+                .select('contact_id, contacts(email, name)')
+                .eq('segment_id', segmentId);
+
+            if (segmentError) throw segmentError;
+
+            contacts = (segmentMembers || [])
+                .map((sm: any) => sm.contacts)
+                .filter((c: any) => c && c.email) as { email: string; name: string }[];
+        } else {
+            // Si no hay segmento, obtener todos los contactos
+            const { data: allContacts, error: contactsError } = await supabase
+                .from('contacts')
+                .select('email, name')
+                .not('email', 'is', null);
+
+            if (contactsError) throw contactsError;
+            contacts = allContacts || [];
+        }
 
         if (!contacts || contacts.length === 0) {
             return NextResponse.json({ error: 'No hay contactos con email para enviar.' }, { status: 400 });
         }
 
         // Validar límite mensual
-        const orgId = organization_id || '5e5b7400-1a66-42dc-880e-e501021edadc';
+        const orgId = campaignData.organization_id || organization_id || '5e5b7400-1a66-42dc-880e-e501021edadc';
 
         // Obtener límite mensual de la organización
         const { data: org, error: orgError } = await supabase
@@ -80,28 +121,41 @@ export async function POST(req: Request) {
             }, { status: 403 });
         }
 
-        // 2. Registrar la campaña en Base de Datos (Tabla 'email_campaigns')
-        // Primero verificamos si existe la tabla, si no, fallará y lo veremos en logs.
-        // Asumimos que la tabla fue creada con el script SQL previo.
+        // 2. Registrar/Actualizar la campaña en Base de Datos
+        let campaign: any;
 
-        const { data: campaign, error: campaignError } = await supabase
-            .from('email_campaigns')
-            .insert([{
-                name: name || subject, // Fallback name
-                subject: subject,
-                content: content,
-                status: 'sending',
-                organization_id: organization_id || '5e5b7400-1a66-42dc-880e-e501021edadc', // Default Org ID
-                sent_at: new Date().toISOString()
-            }])
-            .select()
-            .single();
+        if (campaignId) {
+            // Si viene campaign_id, actualizar status a 'sending'
+            const { data, error: updateError } = await supabase
+                .from('email_campaigns')
+                .update({ status: 'sending', sent_at: new Date().toISOString() })
+                .eq('id', campaignId)
+                .select()
+                .single();
 
-        if (campaignError) {
-            console.error('Error creando campaña DB:', campaignError);
-            // Si falla DB, detenemos el envío para no perder historial? 
-            // O seguimos? Mejor fallar para consistencia.
-            throw new Error(`Error registrando campaña: ${campaignError.message}`);
+            if (updateError) throw updateError;
+            campaign = data;
+        } else {
+            // Crear nueva campaña
+            const { data, error: campaignError } = await supabase
+                .from('email_campaigns')
+                .insert([{
+                    name: campaignData.name || campaignData.subject,
+                    subject: campaignData.subject,
+                    content: campaignData.content,
+                    status: 'sending',
+                    organization_id: orgId,
+                    sent_at: new Date().toISOString()
+                }])
+                .select()
+                .single();
+
+            if (campaignError) throw campaignError;
+            campaign = data;
+        }
+
+        if (!campaign) {
+            throw new Error('Error registrando campaña en la base de datos');
         }
 
         // 3. Enviar Emails con Resend

@@ -178,6 +178,13 @@ export default function EmailMarketingPage() {
                         <Download className="h-5 w-5" />
                         Exportar
                     </button>
+                    <Link
+                        href="/crm/email/segmentos"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium border border-gray-200"
+                    >
+                        <Users className="h-5 w-5" />
+                        Segmentos
+                    </Link>
                     <button
                         onClick={openSettingsModal}
                         className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium border border-gray-200"
