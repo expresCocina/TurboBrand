@@ -4,8 +4,15 @@ import Footer from '@/components/Footer/Footer';
 import WhatsAppButton from '@/components/WhatsAppButton/WhatsAppButton';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import Script from 'next/script';
+import { Outfit } from 'next/font/google';
 import './globals.css';
 import { LayoutWrapper } from './LayoutWrapper';
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://turbobrandcol.com'),
@@ -132,7 +139,7 @@ export default function RootLayout({
         <GoogleTagManager gtmId="GTM-XYZ12345" />
         <Script
           id="fb-pixel"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               !function(f,b,e,v,n,t,s)
