@@ -13,12 +13,19 @@ import {
     MoreVertical,
     Clock,
     CheckCircle,
-    AlertCircle
+    AlertCircle,
+    Settings,
+    Download,
+    X
 } from 'lucide-react';
+import { arrayToCSV, downloadCSV, formatDateForCSV, formatPercentage } from '@/lib/exportUtils';
 
 export default function EmailMarketingPage() {
     const [campaigns, setCampaigns] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [newLimit, setNewLimit] = useState(2000);
+    const [savingSettings, setSavingSettings] = useState(false);
     const [stats, setStats] = useState({
         totalSent: 0,
         openRate: 0,
@@ -94,6 +101,67 @@ export default function EmailMarketingPage() {
         }
     }
 
+    // Exportar campañas a CSV
+    function exportCampaigns() {
+        if (campaigns.length === 0) {
+            alert('No hay campañas para exportar');
+            return;
+        }
+
+        const exportData = campaigns.map(campaign => ({
+            'Nombre': campaign.name,
+            'Asunto': campaign.subject,
+            'Estado': campaign.status,
+            'Fecha de Envío': campaign.sent_at ? formatDateForCSV(campaign.sent_at) : 'No enviado',
+            'Total Enviados': campaign.total_sent || 0,
+            'Abiertos': campaign.total_opened || 0,
+            'Tasa de Apertura': formatPercentage(campaign.total_opened || 0, campaign.total_sent || 0),
+            'Clicks': campaign.total_clicked || 0,
+            'Tasa de Clicks': formatPercentage(campaign.total_clicked || 0, campaign.total_sent || 0),
+            'Rebotados': campaign.total_bounced || 0,
+            'Quejas': campaign.total_complained || 0
+        }));
+
+        const csv = arrayToCSV(exportData);
+        const filename = `campanas_email_${new Date().toISOString().split('T')[0]}.csv`;
+        downloadCSV(csv, filename);
+    }
+
+    // Abrir modal de configuración
+    function openSettingsModal() {
+        setNewLimit(stats.monthlyLimit);
+        setShowSettingsModal(true);
+    }
+
+    // Guardar nueva configuración
+    async function saveSettings() {
+        try {
+            setSavingSettings(true);
+
+            const response = await fetch('/api/email/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
+                    email_monthly_limit: newLimit
+                })
+            });
+
+            if (!response.ok) throw new Error('Error actualizando configuración');
+
+            // Actualizar estado local
+            setStats(prev => ({ ...prev, monthlyLimit: newLimit }));
+            setShowSettingsModal(false);
+            alert('Configuración actualizada correctamente');
+
+        } catch (error) {
+            console.error('Error guardando configuración:', error);
+            alert('Error al guardar la configuración');
+        } finally {
+            setSavingSettings(false);
+        }
+    }
+
     return (
         <div className="p-6 space-y-6 min-h-screen bg-gray-50">
             {/* Header */}
@@ -102,13 +170,29 @@ export default function EmailMarketingPage() {
                     <h1 className="text-3xl font-bold text-gray-900">Email Marketing</h1>
                     <p className="text-gray-600 mt-1">Gestiona tus campañas de correo y automatizaciones.</p>
                 </div>
-                <Link
-                    href="/crm/email/nueva"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm font-medium"
-                >
-                    <Plus className="h-5 w-5" />
-                    Nueva Campaña
-                </Link>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={exportCampaigns}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium border border-gray-200"
+                    >
+                        <Download className="h-5 w-5" />
+                        Exportar
+                    </button>
+                    <button
+                        onClick={openSettingsModal}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium border border-gray-200"
+                    >
+                        <Settings className="h-5 w-5" />
+                        Configurar
+                    </button>
+                    <Link
+                        href="/crm/email/nueva"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm font-medium"
+                    >
+                        <Plus className="h-5 w-5" />
+                        Nueva Campaña
+                    </Link>
+                </div>
             </div>
 
             {/* Stats Overview */}
@@ -143,8 +227,8 @@ export default function EmailMarketingPage() {
                     <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
                         <div
                             className={`h-2 rounded-full transition-all ${stats.monthlySent / stats.monthlyLimit > 0.8 ? 'bg-red-500' :
-                                    stats.monthlySent / stats.monthlyLimit > 0.6 ? 'bg-yellow-500' :
-                                        'bg-green-500'
+                                stats.monthlySent / stats.monthlyLimit > 0.6 ? 'bg-yellow-500' :
+                                    'bg-green-500'
                                 }`}
                             style={{ width: `${Math.min((stats.monthlySent / stats.monthlyLimit) * 100, 100)}%` }}
                         />
@@ -231,6 +315,64 @@ export default function EmailMarketingPage() {
                     </div>
                 )}
             </div>
+
+            {/* Modal de Configuración */}
+            {showSettingsModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-gray-900">Configuración de Email</h2>
+                            <button
+                                onClick={() => setShowSettingsModal(false)}
+                                className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Límite Mensual de Emails
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={newLimit}
+                                    onChange={(e) => setNewLimit(parseInt(e.target.value) || 0)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder="2000"
+                                />
+                                <p className="mt-2 text-sm text-gray-500">
+                                    Número máximo de emails que puedes enviar por mes.
+                                </p>
+                            </div>
+
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p className="text-sm text-blue-800">
+                                    <strong>Uso actual:</strong> {stats.monthlySent} / {stats.monthlyLimit} emails este mes
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 mt-6">
+                            <button
+                                onClick={() => setShowSettingsModal(false)}
+                                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={saveSettings}
+                                disabled={savingSettings}
+                                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {savingSettings ? 'Guardando...' : 'Guardar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
