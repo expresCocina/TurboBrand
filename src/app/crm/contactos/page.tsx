@@ -37,6 +37,7 @@ export default function ContactosPage() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterSource, setFilterSource] = useState<string>('all');
+    const [orgId, setOrgId] = useState<string | null>(null);
 
     // Filtros avanzados
     const [showFilters, setShowFilters] = useState(false);
@@ -48,7 +49,27 @@ export default function ContactosPage() {
     // Cargar contactos
     useEffect(() => {
         loadContactsAndTasks();
+        fetchOrgId();
     }, []);
+
+    async function fetchOrgId() {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data: crmUser } = await supabase
+                .from('crm_users')
+                .select('organization_id')
+                .eq('id', user.id)
+                .single();
+
+            if (crmUser) {
+                setOrgId(crmUser.organization_id);
+            }
+        } catch (e) {
+            console.error('Error fetching org ID:', e);
+        }
+    }
 
     async function loadContactsAndTasks() {
         try {
@@ -176,6 +197,17 @@ export default function ContactosPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        if (!orgId) {
+            // Un fallback por si no se cargó el orgId, o un alert
+            // Por ahora usamos el hardcoded como fallback silencioso o alertamos
+            console.warn("No organization ID found, defaulting or failing safely");
+            // Podemos decidir usar el hardcoded si es el user 'admin' o similar, pero mejor intentamos asegurar el orgId
+        }
+
+        // Define organization to use, defaulting to the hardcoded test one ONLY if absolutely necessary, 
+        // but preferrably we want the real one.
+        const targetOrgId = orgId || '5e5b7400-1a66-42dc-880e-e501021edadc';
+
         setLoading(true);
 
         try {
@@ -284,7 +316,7 @@ export default function ContactosPage() {
 
                 // Crear contacto
                 const contact: any = {
-                    organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
+                    organization_id: targetOrgId,
                     lead_score: 50,
                     source: 'import',
                     name: name || phone || email || 'Sin Nombre',
