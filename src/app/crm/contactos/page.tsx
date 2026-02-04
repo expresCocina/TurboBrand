@@ -18,9 +18,15 @@ import {
     Eye,
     Users,
     CheckCircle,
-    Bell
+    Bell,
+    MoreVertical,
+    CheckSquare,
+    X,
+    MessageCircle,
+    FileSpreadsheet
 } from 'lucide-react';
 import Link from 'next/link';
+import * as XLSX from 'xlsx';
 
 interface ContactWithTasks extends Contact {
     pending_tasks_count?: number;
@@ -165,151 +171,156 @@ export default function ContactosPage() {
         }
     };
 
-    // Importar contactos desde CSV con mapeo inteligente de columnas
+    // Importar contactos desde Excel o CSV
     const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         setLoading(true);
-        const reader = new FileReader();
 
-        reader.onload = async (event) => {
-            try {
-                const text = event.target?.result as string;
-                const lines = text.split('\n').filter(line => line.trim());
+        try {
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const worksheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[worksheetName];
 
-                if (lines.length < 2) {
-                    alert('El archivo está vacío o no tiene datos');
-                    return;
-                }
+            // Convertir a JSON array
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
 
-                // Leer encabezados (primera línea)
-                const headers = lines[0].split(',').map(h =>
-                    h.trim().toLowerCase().replace(/^\"|\"$/g, '').replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e').replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o').replace(/[úùüû]/g, 'u')
-                );
-
-                console.log('📋 Columnas detectadas:', headers);
-
-                // Mapeo inteligente de columnas
-                const columnMap: any = {};
-
-                headers.forEach((header, index) => {
-                    // Nombre
-                    if (header.includes('nombre') || header.includes('name') || header.includes('contact')) {
-                        columnMap.name = index;
-                    }
-                    // Email
-                    else if (header.includes('email') || header.includes('correo') || header.includes('mail')) {
-                        columnMap.email = index;
-                    }
-                    // Teléfono
-                    else if (header.includes('telefono') || header.includes('phone') || header.includes('celular') || header.includes('movil') || header.includes('whatsapp')) {
-                        columnMap.phone = index;
-                    }
-                    // Empresa
-                    else if (header.includes('empresa') || header.includes('company') || header.includes('organizacion')) {
-                        columnMap.company = index;
-                    }
-                    // Cargo
-                    else if (header.includes('cargo') || header.includes('position') || header.includes('puesto') || header.includes('titulo')) {
-                        columnMap.position = index;
-                    }
-                    // Sector
-                    else if (header.includes('sector') || header.includes('industry') || header.includes('industria')) {
-                        columnMap.sector = index;
-                    }
-                    // Ciudad
-                    else if (header.includes('ciudad') || header.includes('city')) {
-                        columnMap.city = index;
-                    }
-                    // País
-                    else if (header.includes('pais') || header.includes('country')) {
-                        columnMap.country = index;
-                    }
-                    // Notas
-                    else if (header.includes('nota') || header.includes('note') || header.includes('comentario') || header.includes('observacion')) {
-                        columnMap.notes = index;
-                    }
-                });
-
-                console.log('🗺️ Mapeo de columnas:', columnMap);
-
-                const newContacts = [];
-                let skipped = 0;
-
-                // Procesar cada fila (empezando desde línea 2)
-                for (let i = 1; i < lines.length; i++) {
-                    if (!lines[i].trim()) continue;
-
-                    const values = lines[i].split(',').map(v => v.trim().replace(/^\"|\"$/g, ''));
-
-                    // Validar que al menos tenga nombre o teléfono
-                    const name = columnMap.name !== undefined ? values[columnMap.name] : null;
-                    const phone = columnMap.phone !== undefined ? values[columnMap.phone] : null;
-
-                    if (!name && !phone) {
-                        skipped++;
-                        continue;
-                    }
-
-                    // Crear contacto con mapeo flexible
-                    const contact: any = {
-                        organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
-                        lead_score: 50,
-                        source: 'import',
-                        name: name || phone || 'Sin Nombre',
-                        email: columnMap.email !== undefined ? values[columnMap.email] || null : null,
-                        phone: phone || null,
-                        company: columnMap.company !== undefined ? values[columnMap.company] || null : null,
-                        position: columnMap.position !== undefined ? values[columnMap.position] || null : null,
-                        sector: columnMap.sector !== undefined ? values[columnMap.sector] || null : null,
-                        city: columnMap.city !== undefined ? values[columnMap.city] || null : null,
-                        country: columnMap.country !== undefined ? values[columnMap.country] || null : null,
-                        notes: columnMap.notes !== undefined ? values[columnMap.notes] || null : null,
-                    };
-
-                    newContacts.push(contact);
-                }
-
-                if (newContacts.length === 0) {
-                    alert('No se encontraron contactos válidos en el archivo');
-                    return;
-                }
-
-                console.log(`📊 Importando ${newContacts.length} contactos...`);
-
-                // Insertar en lotes de 100 para mejor rendimiento
-                const batchSize = 100;
-                let imported = 0;
-
-                for (let i = 0; i < newContacts.length; i += batchSize) {
-                    const batch = newContacts.slice(i, i + batchSize);
-                    const { error } = await supabase
-                        .from('contacts')
-                        .insert(batch);
-
-                    if (error) {
-                        console.error('Error en lote:', error);
-                        throw error;
-                    }
-
-                    imported += batch.length;
-                    console.log(`✅ Importados ${imported}/${newContacts.length}`);
-                }
-
-                const message = `✅ ${newContacts.length} contactos importados exitosamente${skipped > 0 ? `\n⚠️ ${skipped} filas omitidas (sin nombre ni teléfono)` : ''}`;
-                alert(message);
-                loadContactsAndTasks();
-            } catch (error) {
-                console.error('❌ Error importando:', error);
-                alert('Error al importar el archivo. Verifica que sea un CSV válido.');
-            } finally {
-                setLoading(false);
-                e.target.value = '';
+            if (jsonData.length < 2) {
+                alert('El archivo está vacío o no tiene datos');
+                return;
             }
-        };
 
-        reader.readAsText(file);
+            // Leer encabezados (primera fila)
+            const headers = jsonData[0].map((h: any) =>
+                String(h).trim().toLowerCase()
+                    .replace(/^\"|\"$/g, '')
+                    .replace(/[áàäâ]/g, 'a')
+                    .replace(/[éèëê]/g, 'e')
+                    .replace(/[íìïî]/g, 'i')
+                    .replace(/[óòöô]/g, 'o')
+                    .replace(/[úùüû]/g, 'u')
+            );
+
+            console.log('📋 Columnas detectadas:', headers);
+
+            // Mapeo inteligente de columnas
+            const columnMap: any = {};
+
+            headers.forEach((header, index) => {
+                // Nombre
+                if (header.includes('nombre') || header.includes('name') || header.includes('contact')) {
+                    columnMap.name = index;
+                }
+                // Email
+                else if (header.includes('email') || header.includes('correo') || header.includes('mail')) {
+                    columnMap.email = index;
+                }
+                // Teléfono
+                else if (header.includes('telefono') || header.includes('phone') || header.includes('celular') || header.includes('movil') || header.includes('whatsapp')) {
+                    columnMap.phone = index;
+                }
+                // Empresa
+                else if (header.includes('empresa') || header.includes('company') || header.includes('organizacion')) {
+                    columnMap.company = index;
+                }
+                // Cargo
+                else if (header.includes('cargo') || header.includes('position') || header.includes('puesto') || header.includes('titulo')) {
+                    columnMap.position = index;
+                }
+                // Sector
+                else if (header.includes('sector') || header.includes('industry') || header.includes('industria')) {
+                    columnMap.sector = index;
+                }
+                // Ciudad
+                else if (header.includes('ciudad') || header.includes('city')) {
+                    columnMap.city = index;
+                }
+                // País
+                else if (header.includes('pais') || header.includes('country')) {
+                    columnMap.country = index;
+                }
+                // Notas
+                else if (header.includes('nota') || header.includes('note') || header.includes('comentario') || header.includes('observacion')) {
+                    columnMap.notes = index;
+                }
+            });
+
+            console.log('🗺️ Mapeo de columnas:', columnMap);
+
+            const newContacts = [];
+            let skipped = 0;
+
+            // Procesar cada fila (empezando desde fila 2)
+            for (let i = 1; i < jsonData.length; i++) {
+                const row = jsonData[i];
+                if (!row || row.length === 0) continue;
+
+                // Validar que al menos tenga nombre o teléfono
+                const name = columnMap.name !== undefined ? row[columnMap.name] : null;
+                const phone = columnMap.phone !== undefined ? row[columnMap.phone] : null;
+
+                if (!name && !phone) {
+                    skipped++;
+                    continue;
+                }
+
+                // Crear contacto
+                const contact: any = {
+                    organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
+                    lead_score: 50,
+                    source: 'import',
+                    name: name || phone || 'Sin Nombre',
+                    email: columnMap.email !== undefined ? row[columnMap.email] || null : null,
+                    phone: phone || null,
+                    company: columnMap.company !== undefined ? row[columnMap.company] || null : null,
+                    position: columnMap.position !== undefined ? row[columnMap.position] || null : null,
+                    sector: columnMap.sector !== undefined ? row[columnMap.sector] || null : null,
+                    city: columnMap.city !== undefined ? row[columnMap.city] || null : null,
+                    country: columnMap.country !== undefined ? row[columnMap.country] || null : null,
+                    notes: columnMap.notes !== undefined ? row[columnMap.notes] || null : null,
+                };
+
+                newContacts.push(contact);
+            }
+
+            if (newContacts.length === 0) {
+                alert('No se encontraron contactos válidos en el archivo');
+                return;
+            }
+
+            console.log(`📊 Importando ${newContacts.length} contactos...`);
+
+            // Insertar en lotes de 100
+            const batchSize = 100;
+            let imported = 0;
+
+            for (let i = 0; i < newContacts.length; i += batchSize) {
+                const batch = newContacts.slice(i, i + batchSize);
+                const { error } = await supabase
+                    .from('contacts')
+                    .insert(batch);
+
+                if (error) {
+                    console.error('Error en lote:', error);
+                    throw error;
+                }
+
+                imported += batch.length;
+                console.log(`✅ Importados ${imported}/${newContacts.length}`);
+            }
+
+            const message = `✅ ${newContacts.length} contactos importados exitosamente${skipped > 0 ? `\n⚠️ ${skipped} filas omitidas` : ''}`;
+            alert(message);
+            loadContactsAndTasks();
+        } catch (error) {
+            console.error('❌ Error importando:', error);
+            alert('Error al importar el archivo. Verifica el formato e intenta nuevamente.');
+        } finally {
+            setLoading(false);
+            e.target.value = '';
+        }
     };
 
     return (
@@ -324,14 +335,14 @@ export default function ContactosPage() {
                     <div className="relative">
                         <input
                             type="file"
-                            accept=".csv"
+                            accept=".csv, .xlsx, .xls"
                             onChange={handleImport}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                            title="Seleccionar archivo CSV"
+                            title="Seleccionar archivo Excel o CSV"
                         />
                         <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors shadow-sm font-medium">
-                            <Upload className="h-4 w-4" />
-                            Importar CSV
+                            <FileSpreadsheet className="h-4 w-4" />
+                            Importar Excel/CSV
                         </button>
                     </div>
 
