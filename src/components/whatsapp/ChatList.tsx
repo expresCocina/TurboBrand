@@ -9,13 +9,23 @@ interface ChatListProps {
     activeId: string | null;
 }
 
-interface ConversationWithMessages extends any {
+interface Contact {
+    id: string;
+    name: string;
+    phone: string;
+}
+
+interface ConversationWithMessages {
+    id: string;
+    phone_number: string;
+    contacts?: Contact;
     last_message?: {
         content: string;
         timestamp: string;
         direction: string;
     };
     unread_count?: number;
+    tags?: string[];
 }
 
 export default function ChatList({ onSelect, activeId }: ChatListProps) {
@@ -176,11 +186,11 @@ export default function ChatList({ onSelect, activeId }: ChatListProps) {
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-baseline justify-between mb-1">
-                                <h3 className={`font-semibold truncate ${conv.unread_count > 0 ? 'text-gray-900' : 'text-gray-700'}`}>
+                                <h3 className={`font-semibold truncate ${(conv.unread_count ?? 0) > 0 ? 'text-gray-900' : 'text-gray-700'}`}>
                                     {conv.contacts?.name || conv.phone_number}
                                 </h3>
                                 {conv.last_message && (
-                                    <span className={`text-xs ml-2 flex-shrink-0 ${conv.unread_count > 0 ? 'text-green-600 font-semibold' : 'text-gray-400'}`}>
+                                    <span className={`text-xs ml-2 flex-shrink-0 ${(conv.unread_count ?? 0) > 0 ? 'text-green-600 font-semibold' : 'text-gray-400'}`}>
                                         {formatTime(conv.last_message.timestamp)}
                                     </span>
                                 )}
@@ -188,7 +198,7 @@ export default function ChatList({ onSelect, activeId }: ChatListProps) {
 
                             <div className="flex items-center justify-between gap-2">
                                 <div className="flex-1 min-w-0">
-                                    <p className={`text-sm truncate ${conv.unread_count > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+                                    <p className={`text-sm truncate ${(conv.unread_count ?? 0) > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
                                         {conv.last_message ? (
                                             <>
                                                 {conv.last_message.direction === 'outbound' && (
@@ -220,7 +230,7 @@ export default function ChatList({ onSelect, activeId }: ChatListProps) {
                                 </div>
 
                                 {/* Unread badge */}
-                                {conv.unread_count > 0 && (
+                                {(conv.unread_count ?? 0) > 0 && (
                                     <span className="ml-2 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
                                         {conv.unread_count}
                                     </span>
