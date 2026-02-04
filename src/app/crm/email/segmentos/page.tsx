@@ -60,7 +60,7 @@ export default function SegmentosPage() {
             const { data, error } = await supabase
                 .from('contacts')
                 .select('id, name, email')
-                .eq('organization_id', organizationId)
+                // .eq('organization_id', organizationId) // Removed to match ContactsPage behavior
                 .order('name', { ascending: true })
                 .limit(100);
 
