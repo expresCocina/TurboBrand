@@ -117,27 +117,24 @@ async function processIncomingMessage(supabase: any, message: any, contact: any,
             metadata: { message_id: message.id, conversation_id: conversation.id },
         });
 
-        // 5. BOT LOGIC - Only if bot is active
+        // BOT LOGIC: Check if bot is active for this conversation
         if (conversation.bot_active) {
-            // Check if welcome menu needs to be sent
+            // If welcome hasn't been sent, send it
             if (!conversation.welcome_sent) {
-                await sendWelcomeMenu(phoneNumber, metadata);
-                // Mark welcome as sent
-                await supabase
-                    .from('whatsapp_conversations')
-                    .update({ welcome_sent: true })
-                    .eq('id', conversation.id);
-                console.log('✅ Welcome menu sent');
-            } else {
-                // Check if message is a menu response (1-6)
-                const menuResponse = await handleMenuResponse(messageText, phoneNumber, metadata);
-                if (menuResponse) {
-                    // Deactivate bot after responding
-                    await supabase
-                        .from('whatsapp_conversations')
-                        .update({ bot_active: false })
-                        .eq('id', conversation.id);
-                    console.log('✅ Bot deactivated - Human takeover');
+                await sendWelcomeMenu(supabase, phoneNumber, conversation.id, metadata);
+            }
+            // If welcome was sent, check if this is a menu response
+            else {
+                const wasMenuResponse = await handleMenuResponse(
+                    supabase,
+                    messageText,
+                    phoneNumber,
+                    conversation.id,
+                    metadata
+                );
+
+                if (!wasMenuResponse) {
+                    console.log('📝 Not a menu option - message saved, bot still active');
                 }
             }
         } else {
@@ -283,7 +280,7 @@ async function checkAutomations(supabase: any, contactId: string, trigger: strin
 // BOT FUNCTIONS
 // =============================================
 
-async function sendWelcomeMenu(phoneNumber: string, metadata: any) {
+async function sendWelcomeMenu(supabase: any, to: string, conversationId: string, metadata: any) {
     const welcomeMessage = `¡Hola! Bienvenido Turbo Brand agencia de marketing 5.0! Cuéntanos en qué tipo de servicio te encuentras interesado el día de hoy?
 
 1. Pauta Digital
@@ -295,25 +292,65 @@ async function sendWelcomeMenu(phoneNumber: string, metadata: any) {
 
 En un momento, uno de nuestros asesores se estará comunicando para darte una asesoría completa`;
 
-    await sendWhatsAppMessage(phoneNumber, welcomeMessage, metadata);
+    await sendWhatsAppMessage(to, welcomeMessage, metadata);
+
+    // Save bot message to database so it appears in CRM
+    await supabase.from('whatsapp_messages').insert({
+        conversation_id: conversationId,
+        from_number: metadata?.phone_number_id || 'bot',
+        to_number: to,
+        message_type: 'text',
+        content: welcomeMessage,
+        direction: 'outbound',
+        status: 'sent',
+        timestamp: new Date().toISOString(),
+    });
+
+    // Mark welcome as sent
+    await supabase
+        .from('whatsapp_conversations')
+        .update({ welcome_sent: true })
+        .eq('id', conversationId);
+
+    console.log('✅ Welcome menu sent');
 }
 
-async function handleMenuResponse(messageText: string, phoneNumber: string, metadata: any): Promise<boolean> {
-    const trimmed = messageText.trim();
+async function handleMenuResponse(supabase: any, messageText: string, to: string, conversationId: string, metadata: any): Promise<boolean> {
+    const option = messageText.trim();
 
-    const responses: Record<string, string> = {
+    const responses: { [key: string]: string } = {
         '1': 'Perfecto! Un asesor te ayudará con tu pauta digital. En breve nos comunicaremos contigo.',
-        '2': 'Excelente elección! Un asesor especializado en capacitación te contactará pronto para diseñar tu curso personalizado.',
-        '3': 'Genial! Un asesor te ayudará con la creación de tu página web. Nos comunicaremos contigo en breve.',
-        '4': 'Perfecto! Un asesor te ayudará con la implementación de tu CRM. En breve nos comunicaremos contigo.',
-        '5': 'Excelente! Un asesor te contactará pronto para agendar tu sesión de consultoría.',
-        '6': 'Gracias por tu interés! Un asesor se comunicará contigo para conocer más sobre tus necesidades.',
+        '2': 'Excelente! Te contactaremos para personalizar tu curso de marketing digital.',
+        '3': 'Genial! Un especialista te asesorará sobre la creación de tu página web.',
+        '4': 'Perfecto! Te mostraremos cómo nuestro CRM puede ayudarte.',
+        '5': 'Excelente! Agendaremos una consultoría personalizada contigo.',
+        '6': 'Gracias por tu interés. Un asesor se comunicará contigo para conocer tus necesidades.',
     };
 
-    if (responses[trimmed]) {
-        await sendWhatsAppMessage(phoneNumber, responses[trimmed], metadata);
-        console.log(`✅ Sent response for option ${trimmed}`);
-        return true; // Indicates bot should be deactivated
+    if (responses[option]) {
+        await sendWhatsAppMessage(to, responses[option], metadata);
+
+        // Save bot response to database
+        await supabase.from('whatsapp_messages').insert({
+            conversation_id: conversationId,
+            from_number: metadata?.phone_number_id || 'bot',
+            to_number: to,
+            message_type: 'text',
+            content: responses[option],
+            direction: 'outbound',
+            status: 'sent',
+            timestamp: new Date().toISOString(),
+        });
+
+        // Deactivate bot - human takeover
+        await supabase
+            .from('whatsapp_conversations')
+            .update({ bot_active: false })
+            .eq('id', conversationId);
+
+        console.log(`✅ Sent response for option ${option}`);
+        console.log('✅ Bot deactivated - Human takeover');
+        return true;
     }
 
     return false; // Not a valid menu option
