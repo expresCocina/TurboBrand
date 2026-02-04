@@ -180,21 +180,27 @@ export default function ContactosPage() {
 
         try {
             const data = await file.arrayBuffer();
-            const workbook = XLSX.read(data);
+            // Especificar type: 'array' es crucial para que lea correctamente el ArrayBuffer
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            if (!workbook.SheetNames.length) {
+                throw new Error('El archivo Excel no tiene hojas');
+            }
+
             const worksheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[worksheetName];
+            const worksheet = workbook.Sheets[workssheetName];
 
             // Convertir a JSON array
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
 
-            if (jsonData.length < 2) {
-                alert('El archivo está vacío o no tiene datos');
+            if (!jsonData || jsonData.length < 2) {
+                alert('El archivo está vacío o no tiene datos (se requieren encabezados y al menos una fila)');
                 return;
             }
 
             // Leer encabezados (primera fila)
             const headers = jsonData[0].map((h: any) =>
-                String(h).trim().toLowerCase()
+                String(h || '').trim().toLowerCase()
                     .replace(/^\"|\"$/g, '')
                     .replace(/[áàäâ]/g, 'a')
                     .replace(/[éèëê]/g, 'e')
@@ -209,45 +215,52 @@ export default function ContactosPage() {
             const columnMap: any = {};
 
             headers.forEach((header, index) => {
+                const h = header.toLowerCase();
                 // Nombre
-                if (header.includes('nombre') || header.includes('name') || header.includes('contact')) {
+                if (h.includes('nombre') || h.includes('name') || h.includes('contact') || h.includes('cliente')) {
                     columnMap.name = index;
                 }
                 // Email
-                else if (header.includes('email') || header.includes('correo') || header.includes('mail')) {
+                else if (h.includes('email') || h.includes('correo') || h.includes('mail')) {
                     columnMap.email = index;
                 }
                 // Teléfono
-                else if (header.includes('telefono') || header.includes('phone') || header.includes('celular') || header.includes('movil') || header.includes('whatsapp')) {
+                else if (h.includes('telefono') || h.includes('phone') || h.includes('celular') || h.includes('movil') || h.includes('whatsapp')) {
                     columnMap.phone = index;
                 }
                 // Empresa
-                else if (header.includes('empresa') || header.includes('company') || header.includes('organizacion')) {
+                else if (h.includes('empresa') || h.includes('company') || h.includes('organizacion') || h.includes('negocio')) {
                     columnMap.company = index;
                 }
                 // Cargo
-                else if (header.includes('cargo') || header.includes('position') || header.includes('puesto') || header.includes('titulo')) {
+                else if (h.includes('cargo') || h.includes('position') || h.includes('puesto') || h.includes('titulo')) {
                     columnMap.position = index;
                 }
                 // Sector
-                else if (header.includes('sector') || header.includes('industry') || header.includes('industria')) {
+                else if (h.includes('sector') || h.includes('industry') || h.includes('industria') || h.includes('rubro')) {
                     columnMap.sector = index;
                 }
                 // Ciudad
-                else if (header.includes('ciudad') || header.includes('city')) {
+                else if (h.includes('ciudad') || h.includes('city') || h.includes('ubicacion')) {
                     columnMap.city = index;
                 }
                 // País
-                else if (header.includes('pais') || header.includes('country')) {
+                else if (h.includes('pais') || h.includes('country')) {
                     columnMap.country = index;
                 }
                 // Notas
-                else if (header.includes('nota') || header.includes('note') || header.includes('comentario') || header.includes('observacion')) {
+                else if (h.includes('nota') || h.includes('note') || h.includes('comentario') || h.includes('observacion')) {
                     columnMap.notes = index;
                 }
             });
 
             console.log('🗺️ Mapeo de columnas:', columnMap);
+
+            if (columnMap.name === undefined && columnMap.phone === undefined && columnMap.email === undefined) {
+                const headerList = headers.join(', ');
+                alert(`No pude detectar columnas clave (Nombre, Teléfono o Email). Columnas encontradas: ${headerList}`);
+                return;
+            }
 
             const newContacts = [];
             let skipped = 0;
@@ -257,11 +270,14 @@ export default function ContactosPage() {
                 const row = jsonData[i];
                 if (!row || row.length === 0) continue;
 
-                // Validar que al menos tenga nombre o teléfono
-                const name = columnMap.name !== undefined ? row[columnMap.name] : null;
-                const phone = columnMap.phone !== undefined ? row[columnMap.phone] : null;
+                // Safely get values
+                const getValue = (idx: number) => idx !== undefined && row[idx] ? String(row[idx]).trim() : null;
 
-                if (!name && !phone) {
+                const name = getValue(columnMap.name);
+                const phone = getValue(columnMap.phone);
+                const email = getValue(columnMap.email);
+
+                if (!name && !phone && !email) {
                     skipped++;
                     continue;
                 }
@@ -271,22 +287,22 @@ export default function ContactosPage() {
                     organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
                     lead_score: 50,
                     source: 'import',
-                    name: name || phone || 'Sin Nombre',
-                    email: columnMap.email !== undefined ? row[columnMap.email] || null : null,
-                    phone: phone || null,
-                    company: columnMap.company !== undefined ? row[columnMap.company] || null : null,
-                    position: columnMap.position !== undefined ? row[columnMap.position] || null : null,
-                    sector: columnMap.sector !== undefined ? row[columnMap.sector] || null : null,
-                    city: columnMap.city !== undefined ? row[columnMap.city] || null : null,
-                    country: columnMap.country !== undefined ? row[columnMap.country] || null : null,
-                    notes: columnMap.notes !== undefined ? row[columnMap.notes] || null : null,
+                    name: name || phone || email || 'Sin Nombre',
+                    email: email,
+                    phone: phone,
+                    company: getValue(columnMap.company),
+                    position: getValue(columnMap.position),
+                    sector: getValue(columnMap.sector),
+                    city: getValue(columnMap.city),
+                    country: getValue(columnMap.country),
+                    notes: getValue(columnMap.notes),
                 };
 
                 newContacts.push(contact);
             }
 
             if (newContacts.length === 0) {
-                alert('No se encontraron contactos válidos en el archivo');
+                alert('No se encontraron contactos válidos en el archivo (filas vacías o sin datos clave)');
                 return;
             }
 
@@ -303,8 +319,8 @@ export default function ContactosPage() {
                     .insert(batch);
 
                 if (error) {
-                    console.error('Error en lote:', error);
-                    throw error;
+                    console.error('Error DB:', error);
+                    throw new Error(`Error guardando en base de datos: ${error.message}`);
                 }
 
                 imported += batch.length;
@@ -314,9 +330,10 @@ export default function ContactosPage() {
             const message = `✅ ${newContacts.length} contactos importados exitosamente${skipped > 0 ? `\n⚠️ ${skipped} filas omitidas` : ''}`;
             alert(message);
             loadContactsAndTasks();
-        } catch (error) {
+        } catch (error: any) {
             console.error('❌ Error importando:', error);
-            alert('Error al importar el archivo. Verifica el formato e intenta nuevamente.');
+            // Mostrar el mensaje real del error
+            alert(`Error al importar: ${error.message || error}`);
         } finally {
             setLoading(false);
             e.target.value = '';
