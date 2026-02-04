@@ -9,18 +9,31 @@ interface ChatListProps {
     activeId: string | null;
 }
 
+interface ConversationWithMessages extends any {
+    last_message?: {
+        content: string;
+        timestamp: string;
+        direction: string;
+    };
+    unread_count?: number;
+}
+
 export default function ChatList({ onSelect, activeId }: ChatListProps) {
-    const [conversations, setConversations] = useState<any[]>([]);
+    const [conversations, setConversations] = useState<ConversationWithMessages[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadConversations();
 
-        // Suscripción a nuevos mensajes
+        // Real-time subscription for new messages and conversations
         const channel = supabase
-            .channel('whatsapp_updates')
+            .channel('whatsapp_realtime')
             .on('postgres_changes',
                 { event: '*', schema: 'public', table: 'whatsapp_conversations' },
+                () => loadConversations()
+            )
+            .on('postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'whatsapp_messages' },
                 () => loadConversations()
             )
             .subscribe();
@@ -32,21 +45,106 @@ export default function ChatList({ onSelect, activeId }: ChatListProps) {
 
     async function loadConversations() {
         try {
-            const { data, error } = await supabase
+            setLoading(true);
+            const { data: convos, error } = await supabase
                 .from('whatsapp_conversations')
                 .select(`
                     *,
-                    contacts (name, phone)
+                    contacts (
+                        name,
+                        email
+                    )
                 `)
                 .order('last_message_at', { ascending: false });
 
             if (error) throw error;
-            setConversations(data || []);
+
+            // Load last message for each conversation
+            const conversationsWithMessages = await Promise.all(
+                (convos || []).map(async (conv) => {
+                    const { data: lastMsg } = await supabase
+                        .from('whatsapp_messages')
+                        .select('content, timestamp, direction')
+                        .eq('conversation_id', conv.id)
+                        .order('timestamp', { ascending: false })
+                        .limit(1)
+                        .single();
+
+                    // Count unread messages (inbound messages where read_at IS NULL)
+                    const { count } = await supabase
+                        .from('whatsapp_messages')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('conversation_id', conv.id)
+                        .eq('direction', 'inbound')
+                        .is('read_at', null);
+
+                    return {
+                        ...conv,
+                        last_message: lastMsg,
+                        unread_count: count || 0,
+                        tags: conv.tags || [], // Asegurar que tags viene de la BD
+                    };
+                })
+            );
+
+            setConversations(conversationsWithMessages);
         } catch (error) {
             console.error('Error loading chats:', error);
         } finally {
             setLoading(false);
         }
+    }
+
+    function formatTime(timestamp: string) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now.getTime() - date.getTime();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        if (days === 0) {
+            return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        } else if (days === 1) {
+            return 'Ayer';
+        } else if (days < 7) {
+            return date.toLocaleDateString('es-ES', { weekday: 'short' });
+        } else {
+            return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+        }
+    }
+
+    function getInitials(name: string): string {
+        if (!name) return '?';
+        const words = name.trim().split(' ');
+        if (words.length >= 2) {
+            return (words[0][0] + words[1][0]).toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
+    }
+
+    function getTagColor(tagValue: string): string {
+        const tagColors: Record<string, string> = {
+            'nuevo': 'bg-blue-100 text-blue-700',
+            'interesado': 'bg-yellow-100 text-yellow-700',
+            'cliente': 'bg-green-100 text-green-700',
+            'cotizacion': 'bg-purple-100 text-purple-700',
+            'seguimiento': 'bg-orange-100 text-orange-700',
+            'cerrado': 'bg-gray-100 text-gray-700',
+            'spam': 'bg-red-100 text-red-700',
+        };
+        return tagColors[tagValue] || 'bg-gray-100 text-gray-700';
+    }
+
+    function getTagLabel(tagValue: string): string {
+        const tagLabels: Record<string, string> = {
+            'nuevo': 'Nuevo',
+            'interesado': 'Interesado',
+            'cliente': 'Cliente',
+            'cotizacion': 'Cotización',
+            'seguimiento': 'Seguimiento',
+            'cerrado': 'Cerrado',
+            'spam': 'Spam',
+        };
+        return tagLabels[tagValue] || tagValue;
     }
 
     if (loading) return <div className="p-4 text-center text-gray-500">Cargando chats...</div>;
@@ -61,32 +159,74 @@ export default function ChatList({ onSelect, activeId }: ChatListProps) {
     }
 
     return (
-        <div className="divide-y divide-gray-100 overflow-y-auto h-full">
+        <div className="divide-y divide-gray-100 overflow-y-auto h-full bg-white">
             {conversations.map((conv) => (
                 <div
                     key={conv.id}
                     onClick={() => onSelect(conv)}
-                    className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${activeId === conv.id ? 'bg-purple-50 border-l-4 border-purple-600' : 'border-l-4 border-transparent'
+                    className={`p-3 cursor-pointer hover:bg-gray-50 transition-colors relative ${activeId === conv.id ? 'bg-[#f0f2f5]' : ''
                         }`}
                 >
-                    <div className="flex items-start justify-between mb-1">
-                        <div className="font-semibold text-gray-900 truncate">
-                            {conv.contacts?.name || conv.phone}
+                    <div className="flex items-start gap-3">
+                        {/* Avatar */}
+                        <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 text-white font-semibold">
+                            {getInitials(conv.contacts?.name || conv.phone_number)}
                         </div>
-                        {conv.last_message_at && (
-                            <div className="text-xs text-gray-400 whitespace-nowrap flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {new Date(conv.last_message_at).toLocaleDateString()}
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline justify-between mb-1">
+                                <h3 className={`font-semibold truncate ${conv.unread_count > 0 ? 'text-gray-900' : 'text-gray-700'}`}>
+                                    {conv.contacts?.name || conv.phone_number}
+                                </h3>
+                                {conv.last_message && (
+                                    <span className={`text-xs ml-2 flex-shrink-0 ${conv.unread_count > 0 ? 'text-green-600 font-semibold' : 'text-gray-400'}`}>
+                                        {formatTime(conv.last_message.timestamp)}
+                                    </span>
+                                )}
                             </div>
-                        )}
-                    </div>
-                    <div className="text-sm text-gray-600 truncate flex items-center gap-2">
-                        {conv.status === 'open' ? (
-                            <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                        ) : (
-                            <span className="w-2 h-2 rounded-full bg-gray-300"></span>
-                        )}
-                        <span className="truncate">{conv.phone}</span>
+
+                            <div className="flex items-center justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                    <p className={`text-sm truncate ${conv.unread_count > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+                                        {conv.last_message ? (
+                                            <>
+                                                {conv.last_message.direction === 'outbound' && (
+                                                    <span className="text-blue-500 mr-1">✓✓</span>
+                                                )}
+                                                {conv.last_message.content}
+                                            </>
+                                        ) : (
+                                            <span className="italic">Sin mensajes</span>
+                                        )}
+                                    </p>
+
+                                    {/* Tag Indicators */}
+                                    {conv.tags && conv.tags.length > 0 && (
+                                        <div className="flex items-center gap-1 mt-1">
+                                            {conv.tags.slice(0, 2).map((tag: string) => (
+                                                <span
+                                                    key={tag}
+                                                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${getTagColor(tag)}`}
+                                                >
+                                                    {getTagLabel(tag)}
+                                                </span>
+                                            ))}
+                                            {conv.tags.length > 2 && (
+                                                <span className="text-[10px] text-gray-400">+{conv.tags.length - 2}</span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Unread badge */}
+                                {conv.unread_count > 0 && (
+                                    <span className="ml-2 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
+                                        {conv.unread_count}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             ))}
