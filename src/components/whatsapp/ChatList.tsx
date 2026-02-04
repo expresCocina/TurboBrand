@@ -54,55 +54,63 @@ export default function ChatList({ onSelect, activeId }: ChatListProps) {
     }, []);
 
     async function loadConversations() {
-        try {
-            setLoading(true);
-            const { data: convos, error } = await supabase
-                .from('whatsapp_conversations')
-                .select(`
-                    *,
-                    contacts (
-                        name,
-                        email
-                    )
-                `)
-                .order('last_message_at', { ascending: false });
+        const { data, error } = await supabase
+            .from('whatsapp_conversations')
+            .select(`
+                *,
+                contacts (
+                    id,
+                    name,
+                    phone
+                )
+            `)
+            .eq('status', 'open')
+            .order('last_message_at', { ascending: false }); // Sort by most recent first
 
-            if (error) throw error;
-
-            // Load last message for each conversation
-            const conversationsWithMessages = await Promise.all(
-                (convos || []).map(async (conv) => {
-                    const { data: lastMsg } = await supabase
-                        .from('whatsapp_messages')
-                        .select('content, timestamp, direction')
-                        .eq('conversation_id', conv.id)
-                        .order('timestamp', { ascending: false })
-                        .limit(1)
-                        .single();
-
-                    // Count unread messages (inbound messages where read_at IS NULL)
-                    const { count } = await supabase
-                        .from('whatsapp_messages')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('conversation_id', conv.id)
-                        .eq('direction', 'inbound')
-                        .is('read_at', null);
-
-                    return {
-                        ...conv,
-                        last_message: lastMsg,
-                        unread_count: count || 0,
-                        tags: conv.tags || [], // Asegurar que tags viene de la BD
-                    };
-                })
-            );
-
-            setConversations(conversationsWithMessages);
-        } catch (error) {
-            console.error('Error loading chats:', error);
-        } finally {
+        if (error) {
+            console.error('Error loading conversations:', error);
             setLoading(false);
+            return;
         }
+
+        // Process conversations with last message and unread count
+        const conversationsWithData = await Promise.all(
+            (data || []).map(async (conv: any) => {
+                // Get last message
+                const { data: lastMsg } = await supabase
+                    .from('whatsapp_messages')
+                    .select('content, timestamp, direction')
+                    .eq('conversation_id', conv.id)
+                    .order('timestamp', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                // Count unread messages
+                const { count } = await supabase
+                    .from('whatsapp_messages')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('conversation_id', conv.id)
+                    .eq('direction', 'inbound')
+                    .is('read_at', null);
+
+                return {
+                    ...conv,
+                    last_message: lastMsg,
+                    unread_count: count || 0,
+                    tags: conv.tags || []
+                };
+            })
+        );
+
+        // Sort again by last message timestamp to ensure correct order
+        conversationsWithData.sort((a, b) => {
+            const timeA = a.last_message?.timestamp || a.created_at || '';
+            const timeB = b.last_message?.timestamp || b.created_at || '';
+            return new Date(timeB).getTime() - new Date(timeA).getTime();
+        });
+
+        setConversations(conversationsWithData);
+        setLoading(false);
     }
 
     function formatTime(timestamp: string) {
