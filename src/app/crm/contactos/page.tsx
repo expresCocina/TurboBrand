@@ -188,7 +188,7 @@ export default function ContactosPage() {
             }
 
             const worksheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[workssheetName];
+            const worksheet = workbook.Sheets[worksheetName];
 
             // Convertir a JSON array
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
