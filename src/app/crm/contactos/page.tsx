@@ -165,7 +165,7 @@ export default function ContactosPage() {
         }
     };
 
-    // Importar contactos desde CSV
+    // Importar contactos desde CSV con mapeo inteligente de columnas
     const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -176,44 +176,133 @@ export default function ContactosPage() {
         reader.onload = async (event) => {
             try {
                 const text = event.target?.result as string;
-                const lines = text.split('\n');
+                const lines = text.split('\n').filter(line => line.trim());
+
+                if (lines.length < 2) {
+                    alert('El archivo está vacío o no tiene datos');
+                    return;
+                }
+
+                // Leer encabezados (primera línea)
+                const headers = lines[0].split(',').map(h =>
+                    h.trim().toLowerCase().replace(/^\"|\"$/g, '').replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e').replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o').replace(/[úùüû]/g, 'u')
+                );
+
+                console.log('📋 Columnas detectadas:', headers);
+
+                // Mapeo inteligente de columnas
+                const columnMap: any = {};
+
+                headers.forEach((header, index) => {
+                    // Nombre
+                    if (header.includes('nombre') || header.includes('name') || header.includes('contact')) {
+                        columnMap.name = index;
+                    }
+                    // Email
+                    else if (header.includes('email') || header.includes('correo') || header.includes('mail')) {
+                        columnMap.email = index;
+                    }
+                    // Teléfono
+                    else if (header.includes('telefono') || header.includes('phone') || header.includes('celular') || header.includes('movil') || header.includes('whatsapp')) {
+                        columnMap.phone = index;
+                    }
+                    // Empresa
+                    else if (header.includes('empresa') || header.includes('company') || header.includes('organizacion')) {
+                        columnMap.company = index;
+                    }
+                    // Cargo
+                    else if (header.includes('cargo') || header.includes('position') || header.includes('puesto') || header.includes('titulo')) {
+                        columnMap.position = index;
+                    }
+                    // Sector
+                    else if (header.includes('sector') || header.includes('industry') || header.includes('industria')) {
+                        columnMap.sector = index;
+                    }
+                    // Ciudad
+                    else if (header.includes('ciudad') || header.includes('city')) {
+                        columnMap.city = index;
+                    }
+                    // País
+                    else if (header.includes('pais') || header.includes('country')) {
+                        columnMap.country = index;
+                    }
+                    // Notas
+                    else if (header.includes('nota') || header.includes('note') || header.includes('comentario') || header.includes('observacion')) {
+                        columnMap.notes = index;
+                    }
+                });
+
+                console.log('🗺️ Mapeo de columnas:', columnMap);
 
                 const newContacts = [];
+                let skipped = 0;
 
+                // Procesar cada fila (empezando desde línea 2)
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;
 
-                    const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                    const values = lines[i].split(',').map(v => v.trim().replace(/^\"|\"$/g, ''));
 
-                    // Mapeo simple basado en orden esperado: Name, Email, Phone, Company
+                    // Validar que al menos tenga nombre o teléfono
+                    const name = columnMap.name !== undefined ? values[columnMap.name] : null;
+                    const phone = columnMap.phone !== undefined ? values[columnMap.phone] : null;
+
+                    if (!name && !phone) {
+                        skipped++;
+                        continue;
+                    }
+
+                    // Crear contacto con mapeo flexible
                     const contact: any = {
-                        organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc', // Fixed ID
+                        organization_id: '5e5b7400-1a66-42dc-880e-e501021edadc',
                         lead_score: 50,
                         source: 'import',
-                        name: values[0] || 'Sin Nombre',
-                        email: values[1] || null,
-                        phone: values[2] || null,
-                        company: values[3] || null,
+                        name: name || phone || 'Sin Nombre',
+                        email: columnMap.email !== undefined ? values[columnMap.email] || null : null,
+                        phone: phone || null,
+                        company: columnMap.company !== undefined ? values[columnMap.company] || null : null,
+                        position: columnMap.position !== undefined ? values[columnMap.position] || null : null,
+                        sector: columnMap.sector !== undefined ? values[columnMap.sector] || null : null,
+                        city: columnMap.city !== undefined ? values[columnMap.city] || null : null,
+                        country: columnMap.country !== undefined ? values[columnMap.country] || null : null,
+                        notes: columnMap.notes !== undefined ? values[columnMap.notes] || null : null,
                     };
 
-                    if (contact.name) {
-                        newContacts.push(contact);
-                    }
+                    newContacts.push(contact);
                 }
 
-                if (newContacts.length > 0) {
+                if (newContacts.length === 0) {
+                    alert('No se encontraron contactos válidos en el archivo');
+                    return;
+                }
+
+                console.log(`📊 Importando ${newContacts.length} contactos...`);
+
+                // Insertar en lotes de 100 para mejor rendimiento
+                const batchSize = 100;
+                let imported = 0;
+
+                for (let i = 0; i < newContacts.length; i += batchSize) {
+                    const batch = newContacts.slice(i, i + batchSize);
                     const { error } = await supabase
                         .from('contacts')
-                        .insert(newContacts);
+                        .insert(batch);
 
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Error en lote:', error);
+                        throw error;
+                    }
 
-                    alert(`${newContacts.length} contactos importados exitosamente`);
-                    loadContactsAndTasks();
+                    imported += batch.length;
+                    console.log(`✅ Importados ${imported}/${newContacts.length}`);
                 }
+
+                const message = `✅ ${newContacts.length} contactos importados exitosamente${skipped > 0 ? `\n⚠️ ${skipped} filas omitidas (sin nombre ni teléfono)` : ''}`;
+                alert(message);
+                loadContactsAndTasks();
             } catch (error) {
-                console.error('Error importando:', error);
-                alert('Error al importar el archivo. Asegúrate de usar el formato correcto.');
+                console.error('❌ Error importando:', error);
+                alert('Error al importar el archivo. Verifica que sea un CSV válido.');
             } finally {
                 setLoading(false);
                 e.target.value = '';
