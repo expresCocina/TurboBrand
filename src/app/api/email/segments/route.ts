@@ -93,15 +93,48 @@ export async function POST(req: Request) {
         }
 
         // Si es dinámico, aplicar filtro
-        if (filter_type !== 'manual' && filter_config) {
-            const { data: count } = await supabase
-                .rpc('add_contacts_to_segment_by_filter', {
-                    p_segment_id: segment.id,
-                    p_filter_type: filter_type,
-                    p_filter_value: filter_config.value
-                });
+        if (filter_type === 'dynamic' && filter_config) {
+            // Si el filtro es "todos los contactos"
+            if (filter_config.all === true) {
+                console.log('📊 Agregando TODOS los contactos al segmento dinámico...');
 
-            console.log(`Agregados ${count} contactos al segmento dinámico`);
+                // Obtener todos los contactos de la organización
+                const { data: allContacts, error: contactsError } = await supabase
+                    .from('contacts')
+                    .select('id')
+                    .eq('organization_id', orgId);
+
+                if (contactsError) {
+                    console.error('Error obteniendo contactos:', contactsError);
+                } else if (allContacts && allContacts.length > 0) {
+                    // Agregar todos los contactos al segmento
+                    const members = allContacts.map((contact) => ({
+                        segment_id: segment.id,
+                        contact_id: contact.id
+                    }));
+
+                    const { error: membersError } = await supabase
+                        .from('contact_segment_members')
+                        .insert(members);
+
+                    if (membersError) {
+                        console.error('Error agregando contactos al segmento:', membersError);
+                    } else {
+                        console.log(`✅ Agregados ${allContacts.length} contactos al segmento dinámico`);
+                    }
+                }
+            }
+            // Si hay otros filtros específicos (por ejemplo, por sector, etc.)
+            else if (filter_config.value) {
+                const { data: count } = await supabase
+                    .rpc('add_contacts_to_segment_by_filter', {
+                        p_segment_id: segment.id,
+                        p_filter_type: filter_type,
+                        p_filter_value: filter_config.value
+                    });
+
+                console.log(`Agregados ${count} contactos al segmento dinámico`);
+            }
         }
 
         return NextResponse.json(segment, { status: 201 });
