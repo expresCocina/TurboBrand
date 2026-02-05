@@ -29,7 +29,7 @@ export default function ContactoForm() {
                 setStep(2);
             }
         } else {
-            // Submit logic
+            // Submit logic with dual tracking
             setIsSubmitting(true);
             try {
                 const response = await fetch('/api/leads/web-form', {
@@ -39,6 +39,40 @@ export default function ContactoForm() {
                 });
 
                 if (response.ok) {
+                    const result = await response.json();
+
+                    // Client-side Facebook Pixel tracking
+                    if (typeof window !== 'undefined' && (window as any).fbq) {
+                        // Generate unique event ID for deduplication
+                        const eventId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+                        (window as any).fbq('track', 'Lead', {
+                            content_name: 'Contact Form',
+                            content_category: 'Web Form',
+                            value: 0,
+                            currency: 'COP',
+                        }, { eventID: eventId });
+
+                        // Server-side CAPI tracking with same event_id for deduplication
+                        fetch('/api/capi', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                eventName: 'Lead',
+                                eventId: eventId,
+                                emails: [formData.email],
+                                phones: formData.phone ? [`+57${formData.phone}`] : undefined,
+                                sourceUrl: window.location.href,
+                                clientIp: undefined, // Will be captured server-side if needed
+                                userAgent: navigator.userAgent,
+                                customData: {
+                                    content_name: 'Contact Form',
+                                    content_category: 'Web Form',
+                                },
+                            }),
+                        }).catch(err => console.error('CAPI tracking failed:', err));
+                    }
+
                     setSubmitted(true);
                 } else {
                     alert('Hubo un error al enviar el formulario. Intenta de nuevo.');
