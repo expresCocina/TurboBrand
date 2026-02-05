@@ -98,14 +98,17 @@ export async function POST(req: Request) {
             if (filter_config.all === true) {
                 console.log('📊 Agregando TODOS los contactos al segmento dinámico...');
 
-                // Obtener todos los contactos de la organización
+                // Obtener todos los contactos (sin filtrar por organization_id para coincidir con ContactsPage)
                 const { data: allContacts, error: contactsError } = await supabase
                     .from('contacts')
                     .select('id')
-                    .eq('organization_id', orgId);
+                    // .eq('organization_id', orgId) // Removed to match ContactsPage behavior
+                    .order('id', { ascending: true });
+
+                console.log(`📋 Contactos encontrados: ${allContacts?.length || 0}`, allContacts);
 
                 if (contactsError) {
-                    console.error('Error obteniendo contactos:', contactsError);
+                    console.error('❌ Error obteniendo contactos:', contactsError);
                 } else if (allContacts && allContacts.length > 0) {
                     // Agregar todos los contactos al segmento
                     const members = allContacts.map((contact) => ({
@@ -113,15 +116,19 @@ export async function POST(req: Request) {
                         contact_id: contact.id
                     }));
 
+                    console.log(`📝 Insertando ${members.length} contactos en segment_members...`);
+
                     const { error: membersError } = await supabase
                         .from('contact_segment_members')
                         .insert(members);
 
                     if (membersError) {
-                        console.error('Error agregando contactos al segmento:', membersError);
+                        console.error('❌ Error agregando contactos al segmento:', membersError);
                     } else {
                         console.log(`✅ Agregados ${allContacts.length} contactos al segmento dinámico`);
                     }
+                } else {
+                    console.warn('⚠️ No se encontraron contactos para agregar al segmento');
                 }
             }
             // Si hay otros filtros específicos (por ejemplo, por sector, etc.)
