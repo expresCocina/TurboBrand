@@ -135,7 +135,7 @@ export default function RootLayout({
         <LayoutWrapper>
           {children}
         </LayoutWrapper>
-        <GoogleAnalytics gaId="G-XYZ1234567" />
+        <GoogleAnalytics gaId="G-X8N3PJJCF8" />
         <GoogleTagManager gtmId="GTM-XYZ12345" />
         <Script
           id="fb-pixel"
@@ -156,12 +156,71 @@ export default function RootLayout({
           }}
         />
         <Script
-          id="google-site-verification"
+          id="button-tracking"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-                // Google Search Console Verification Script (if needed via JS, though meta tag is better)
-              `
+              // Automatic Button Click Tracking for GA4 and Facebook Pixel
+              (function() {
+                function trackButtonClick(button) {
+                  var buttonText = button.innerText || button.textContent || button.value || 'Unknown Button';
+                  var buttonId = button.id || 'no-id';
+                  var buttonClass = button.className || 'no-class';
+                  var buttonHref = button.href || button.getAttribute('href') || '';
+                  
+                  // Track with Google Analytics 4
+                  if (typeof gtag !== 'undefined') {
+                    gtag('event', 'button_click', {
+                      'event_category': 'Button',
+                      'event_label': buttonText,
+                      'button_id': buttonId,
+                      'button_class': buttonClass,
+                      'button_href': buttonHref
+                    });
+                  }
+                  
+                  // Track with Facebook Pixel
+                  if (typeof fbq !== 'undefined') {
+                    fbq('trackCustom', 'ButtonClick', {
+                      button_text: buttonText,
+                      button_id: buttonId,
+                      button_class: buttonClass,
+                      button_href: buttonHref
+                    });
+                  }
+                  
+                  console.log('📊 Button tracked:', buttonText);
+                }
+                
+                // Wait for DOM to be ready
+                function initTracking() {
+                  // Track all buttons
+                  document.addEventListener('click', function(e) {
+                    var target = e.target;
+                    
+                    // Find the closest button or link
+                    while (target && target !== document) {
+                      if (target.tagName === 'BUTTON' || 
+                          target.tagName === 'A' || 
+                          target.getAttribute('role') === 'button') {
+                        trackButtonClick(target);
+                        break;
+                      }
+                      target = target.parentElement;
+                    }
+                  }, true);
+                  
+                  console.log('✅ Button tracking initialized');
+                }
+                
+                // Initialize when DOM is ready
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', initTracking);
+                } else {
+                  initTracking();
+                }
+              })();
+            `,
           }}
         />
         <Script
