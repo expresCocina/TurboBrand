@@ -33,6 +33,7 @@ export async function POST(req: Request) {
         // ========================================
         if (type === 'email.received') {
             console.log('📬 [WEBHOOK] Email recibido - procesando forwarding...');
+            console.log('📦 [WEBHOOK] Data completa:', JSON.stringify(data, null, 2));
 
             const to = data?.to?.[0]; // Email de destino original
             const from = data?.from;
@@ -41,9 +42,13 @@ export async function POST(req: Request) {
             const text = data?.text;
 
             console.log(`📧 [WEBHOOK] De: ${from}, Para: ${to}, Asunto: ${subject}`);
+            console.log(`🔍 [WEBHOOK] Reglas disponibles:`, Object.keys(EMAIL_FORWARDING_RULES));
 
             // Verificar si hay una regla de forwarding para este destinatario
             const forwardTo = EMAIL_FORWARDING_RULES[to as keyof typeof EMAIL_FORWARDING_RULES];
+
+            console.log(`🎯 [WEBHOOK] Buscando regla para: "${to}"`);
+            console.log(`🎯 [WEBHOOK] Regla encontrada: "${forwardTo || 'NINGUNA'}"`);
 
             if (forwardTo) {
                 console.log(`🔄 [WEBHOOK] Reenviando email de ${to} a ${forwardTo}`);
@@ -104,7 +109,8 @@ ${text || 'Sin contenido de texto'}
                 console.log(`ℹ️ [WEBHOOK] No hay regla de forwarding para ${to}`);
                 return NextResponse.json({
                     received: true,
-                    info: 'no_forwarding_rule'
+                    info: 'no_forwarding_rule',
+                    to_address: to
                 }, { status: 200 });
             }
         }
