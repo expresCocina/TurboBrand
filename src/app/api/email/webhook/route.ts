@@ -1,9 +1,20 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Email forwarding configuration
+const EMAIL_FORWARDING_RULES = {
+    'gerencia@turbobrandcol.com': 'demo.marin@gmail.com',
+    // Puedes agregar más reglas aquí:
+    // 'ventas@turbobrandcol.com': 'demo.marin@gmail.com',
+    // 'soporte@turbobrandcol.com': 'demo.marin@gmail.com',
+};
 
 export async function POST(req: Request) {
     console.log('🔔 [WEBHOOK] Iniciando procesamiento...');
@@ -17,7 +28,90 @@ export async function POST(req: Request) {
 
         console.log(`📨 [WEBHOOK] Tipo de evento: ${type}`);
 
-        // Extraer el ID de Resend del evento
+        // ========================================
+        // NUEVO: Manejo de emails recibidos (forwarding)
+        // ========================================
+        if (type === 'email.received') {
+            console.log('📬 [WEBHOOK] Email recibido - procesando forwarding...');
+
+            const to = data?.to?.[0]; // Email de destino original
+            const from = data?.from;
+            const subject = data?.subject;
+            const html = data?.html;
+            const text = data?.text;
+
+            console.log(`📧 [WEBHOOK] De: ${from}, Para: ${to}, Asunto: ${subject}`);
+
+            // Verificar si hay una regla de forwarding para este destinatario
+            const forwardTo = EMAIL_FORWARDING_RULES[to as keyof typeof EMAIL_FORWARDING_RULES];
+
+            if (forwardTo) {
+                console.log(`🔄 [WEBHOOK] Reenviando email de ${to} a ${forwardTo}`);
+
+                try {
+                    const { data: forwardData, error: forwardError } = await resend.emails.send({
+                        from: 'noreply@turbobrandcol.com',
+                        to: forwardTo,
+                        subject: `[Reenviado de ${to}] ${subject}`,
+                        html: `
+                            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                <p style="margin: 0; color: #666;"><strong>Email reenviado automáticamente</strong></p>
+                                <p style="margin: 5px 0; color: #666;"><strong>De:</strong> ${from}</p>
+                                <p style="margin: 5px 0; color: #666;"><strong>Para:</strong> ${to}</p>
+                                <p style="margin: 5px 0; color: #666;"><strong>Asunto:</strong> ${subject}</p>
+                            </div>
+                            <div>
+                                ${html || text || '<p>Sin contenido</p>'}
+                            </div>
+                        `,
+                        text: `
+Email reenviado automáticamente
+De: ${from}
+Para: ${to}
+Asunto: ${subject}
+
+---
+
+${text || 'Sin contenido de texto'}
+                        `,
+                    });
+
+                    if (forwardError) {
+                        console.error('❌ [WEBHOOK] Error reenviando email:', forwardError);
+                        return NextResponse.json({
+                            received: true,
+                            error: 'forward_failed',
+                            details: forwardError
+                        }, { status: 200 });
+                    }
+
+                    console.log('✅ [WEBHOOK] Email reenviado exitosamente:', forwardData);
+                    return NextResponse.json({
+                        received: true,
+                        forwarded: true,
+                        forward_id: forwardData?.id
+                    }, { status: 200 });
+
+                } catch (forwardError: any) {
+                    console.error('❌ [WEBHOOK] Error crítico reenviando:', forwardError);
+                    return NextResponse.json({
+                        received: true,
+                        error: 'forward_exception',
+                        message: forwardError.message
+                    }, { status: 200 });
+                }
+            } else {
+                console.log(`ℹ️ [WEBHOOK] No hay regla de forwarding para ${to}`);
+                return NextResponse.json({
+                    received: true,
+                    info: 'no_forwarding_rule'
+                }, { status: 200 });
+            }
+        }
+
+        // ========================================
+        // EXISTENTE: Manejo de eventos de campañas
+        // ========================================
         const resendEmailId = data?.email_id;
         console.log(`🔍 [WEBHOOK] Email ID extraído: ${resendEmailId}`);
 
