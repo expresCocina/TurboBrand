@@ -10,10 +10,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email forwarding configuration
 const EMAIL_FORWARDING_RULES = {
-    'gerencia@turbobrandcol.com': 'demo.marin@gmail.com',
+    'gerencia@turbobrandcol.com': 'damo.marin@gmail.com',
     // Puedes agregar más reglas aquí:
-    // 'ventas@turbobrandcol.com': 'demo.marin@gmail.com',
-    // 'soporte@turbobrandcol.com': 'demo.marin@gmail.com',
+    // 'ventas@turbobrandcol.com': 'damo.marin@gmail.com',
+    // 'soporte@turbobrandcol.com': 'damo.marin@gmail.com',
 };
 
 export async function POST(req: Request) {
