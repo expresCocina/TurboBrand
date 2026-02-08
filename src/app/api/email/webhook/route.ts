@@ -54,31 +54,39 @@ export async function POST(req: Request) {
                 console.log(`🔄 [WEBHOOK] Reenviando email de ${to} a ${forwardTo}`);
 
                 try {
-                    const { data: forwardData, error: forwardError } = await resend.emails.send({
-                        from: 'noreply@turbobrandcol.com',
-                        to: forwardTo,
-                        subject: `[Reenviado de ${to}] ${subject}`,
-                        html: `
-                            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                                <p style="margin: 0; color: #666;"><strong>Email reenviado automáticamente</strong></p>
-                                <p style="margin: 5px 0; color: #666;"><strong>De:</strong> ${from}</p>
-                                <p style="margin: 5px 0; color: #666;"><strong>Para:</strong> ${to}</p>
-                                <p style="margin: 5px 0; color: #666;"><strong>Asunto:</strong> ${subject}</p>
-                            </div>
-                            <div>
-                                ${html || text || '<p>Sin contenido</p>'}
-                            </div>
-                        `,
-                        text: `
-Email reenviado automáticamente
+                    // Formato simple para evitar la pestaña de Promociones en Gmail
+                    const plainTextBody = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 EMAIL REENVIADO AUTOMÁTICAMENTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 De: ${from}
 Para: ${to}
 Asunto: ${subject}
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MENSAJE ORIGINAL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${text || 'Sin contenido de texto'}
-                        `,
+${text || html?.replace(/<[^>]*>/g, '') || 'Sin contenido'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Este email fue reenviado automáticamente desde ${to}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    `.trim();
+
+                    const { data: forwardData, error: forwardError } = await resend.emails.send({
+                        from: 'gerencia@turbobrandcol.com', // Usar el email original como remitente
+                        to: forwardTo,
+                        subject: `FWD: ${subject}`, // Formato estándar de reenvío
+                        text: plainTextBody,
+                        // Usar HTML minimalista sin estilos promocionales
+                        html: `<pre style="font-family: monospace; font-size: 14px; line-height: 1.5;">${plainTextBody}</pre>`,
+                        headers: {
+                            'X-Priority': '1', // Alta prioridad
+                            'Importance': 'high',
+                            'X-Auto-Response-Suppress': 'OOF, AutoReply',
+                        },
                     });
 
                     if (forwardError) {
