@@ -61,7 +61,7 @@ VALUES (
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 15px; font-size: 16px; font-weight: 600; color: #1f2937;">Turbo Brand</p>
-                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Cali, Valle del Cauca, Colombia</p>
+                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Medellín, Antioquia, Colombia</p>
                             <p style="margin: 0 0 15px; font-size: 14px;">
                                 <a href="https://www.turbobrandcol.com" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">Sitio Web</a> |
                                 <a href="https://www.turbobrandcol.com/politica-privacidad" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">PolÃ­tica de Privacidad</a> |
@@ -132,7 +132,7 @@ VALUES (
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 15px; font-size: 16px; font-weight: 600; color: #1f2937;">Turbo Brand</p>
-                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Cali, Valle del Cauca, Colombia</p>
+                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Medellín, Antioquia, Colombia</p>
                             <p style="margin: 0 0 15px; font-size: 14px;">
                                 <a href="https://www.turbobrandcol.com" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">Sitio Web</a> |
                                 <a href="https://www.turbobrandcol.com/politica-privacidad" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">PolÃ­tica de Privacidad</a> |
@@ -200,7 +200,7 @@ VALUES (
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 15px; font-size: 16px; font-weight: 600; color: #1f2937;">Turbo Brand</p>
-                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Cali, Valle del Cauca, Colombia</p>
+                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Medellín, Antioquia, Colombia</p>
                             <p style="margin: 0 0 15px; font-size: 14px;">
                                 <a href="https://www.turbobrandcol.com" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">Sitio Web</a> |
                                 <a href="https://www.turbobrandcol.com/politica-privacidad" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">PolÃ­tica de Privacidad</a> |
@@ -270,7 +270,7 @@ VALUES (
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 15px; font-size: 16px; font-weight: 600; color: #1f2937;">Turbo Brand</p>
-                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Cali, Valle del Cauca, Colombia</p>
+                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Medellín, Antioquia, Colombia</p>
                             <p style="margin: 0 0 15px; font-size: 14px;">
                                 <a href="https://www.turbobrandcol.com" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">Sitio Web</a> |
                                 <a href="https://www.turbobrandcol.com/politica-privacidad" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">PolÃ­tica de Privacidad</a> |
@@ -341,7 +341,7 @@ VALUES (
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 15px; font-size: 16px; font-weight: 600; color: #1f2937;">Turbo Brand</p>
-                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Cali, Valle del Cauca, Colombia</p>
+                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Medellín, Antioquia, Colombia</p>
                             <p style="margin: 0 0 15px; font-size: 14px;">
                                 <a href="https://www.turbobrandcol.com" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">Sitio Web</a> |
                                 <a href="https://www.turbobrandcol.com/politica-privacidad" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">PolÃ­tica de Privacidad</a> |
@@ -412,7 +412,7 @@ VALUES (
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 15px; font-size: 16px; font-weight: 600; color: #1f2937;">Turbo Brand</p>
-                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Cali, Valle del Cauca, Colombia</p>
+                            <p style="margin: 0 0 15px; font-size: 14px; color: #6b7280;">Medellín, Antioquia, Colombia</p>
                             <p style="margin: 0 0 15px; font-size: 14px;">
                                 <a href="https://www.turbobrandcol.com" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">Sitio Web</a> |
                                 <a href="https://www.turbobrandcol.com/politica-privacidad" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">PolÃ­tica de Privacidad</a> |
