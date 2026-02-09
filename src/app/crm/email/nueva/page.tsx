@@ -56,11 +56,22 @@ export default function NuevaCampanaPage() {
     useEffect(() => {
         async function loadData() {
             try {
-                // 1. Obtener usuario (solo verificación)
+                // 1. Obtener usuario y organización
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
 
-                // 2. Cargar segmentos (GLOBAL)
+                // 2. Obtener organization_id del usuario
+                const { data: crmUser } = await supabase
+                    .from('crm_users')
+                    .select('organization_id')
+                    .eq('id', user.id)
+                    .single();
+
+                if (crmUser?.organization_id) {
+                    setOrgId(crmUser.organization_id);
+                }
+
+                // 3. Cargar segmentos (GLOBAL)
                 const { data: segmentsData } = await supabase
                     .from('contact_segments')
                     .select('*')
@@ -68,7 +79,7 @@ export default function NuevaCampanaPage() {
 
                 setSegments(segmentsData || []);
 
-                // 3. Cargar número total de contactos (GLOBAL)
+                // 4. Cargar número total de contactos (GLOBAL)
                 // Eliminamos filtro de orgId y aseguramos que tenga email
                 const { count } = await supabase
                     .from('contacts')
@@ -119,7 +130,7 @@ export default function NuevaCampanaPage() {
                 subject: formData.subject,
                 content: formData.content,
                 segment_id: formData.segment_id || null,
-                // organization_id: orgId // Ya no enviamos orgId explícito, o enviamos null
+                organization_id: orgId // Enviar organization_id para que se guarde correctamente
             };
 
             let endpoint = '/api/email/campaigns/send';
