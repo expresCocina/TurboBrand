@@ -184,10 +184,17 @@ export async function POST(req: Request) {
                 .replace(/{{nombre}}/g, contact.name || 'Cliente');
 
             return {
-                from: 'Turbo Brand CRM <crm@turbobrandcol.com>',
+                from: 'Turbo Brand <crm@turbobrandcol.com>',
+                replyTo: 'gerencia@turbobrandcol.com', // Respuestas van a gerencia
                 to: contact.email,
                 subject: personalizedSubject,
                 html: personalizedHtml,
+                headers: {
+                    'X-Priority': '3', // Prioridad normal para campañas
+                    'X-Mailer': 'Turbo Brand CRM',
+                    'List-Unsubscribe': '<mailto:gerencia@turbobrandcol.com?subject=unsubscribe>',
+                    'Precedence': 'bulk',
+                },
             };
         });
 

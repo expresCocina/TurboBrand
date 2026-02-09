@@ -76,16 +76,20 @@ Este email fue reenviado automáticamente desde ${to}
                     `.trim();
 
                     const { data: forwardData, error: forwardError } = await resend.emails.send({
-                        from: 'gerencia@turbobrandcol.com', // Usar el email original como remitente
+                        from: 'Gerencia Turbo Brand <gerencia@turbobrandcol.com>', // Nombre + email
+                        replyTo: from, // Responder al remitente original
                         to: forwardTo,
                         subject: `FWD: ${subject}`, // Formato estándar de reenvío
                         text: plainTextBody,
                         // Usar HTML minimalista sin estilos promocionales
-                        html: `<pre style="font-family: monospace; font-size: 14px; line-height: 1.5;">${plainTextBody}</pre>`,
+                        html: `<pre style="font-family: monospace; font-size: 14px; line-height: 1.5; white-space: pre-wrap;">${plainTextBody}</pre>`,
                         headers: {
                             'X-Priority': '1', // Alta prioridad
                             'Importance': 'high',
                             'X-Auto-Response-Suppress': 'OOF, AutoReply',
+                            'X-Mailer': 'Turbo Brand CRM',
+                            'List-Unsubscribe': '<mailto:gerencia@turbobrandcol.com?subject=unsubscribe>',
+                            'Precedence': 'bulk',
                         },
                     });
 
