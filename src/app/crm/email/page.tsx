@@ -292,7 +292,7 @@ export default function EmailMarketingPage() {
                 ) : (
                     <div className="divide-y divide-gray-100">
                         {campaigns.map((campaign) => (
-                            <CampaignRow key={campaign.id} campaign={campaign} />
+                            <CampaignRow key={campaign.id} campaign={campaign} onDelete={loadData} />
                         ))}
                     </div>
 

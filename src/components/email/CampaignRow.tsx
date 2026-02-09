@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Mail, CheckCircle, AlertCircle, Clock, MoreVertical, Edit, Trash2, FileText } from 'lucide-react';
 
-export default function CampaignRow({ campaign }: { campaign: any }) {
+export default function CampaignRow({ campaign, onDelete }: { campaign: any; onDelete?: () => void }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -19,6 +20,36 @@ export default function CampaignRow({ campaign }: { campaign: any }) {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    async function handleDelete() {
+        if (!confirm('¿Estás seguro de eliminar esta campaña? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            const response = await fetch(`/api/email/campaigns/${campaign.id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al eliminar la campaña');
+            }
+
+            alert('Campaña eliminada exitosamente');
+            setIsMenuOpen(false);
+
+            // Llamar callback para refrescar la lista
+            if (onDelete) {
+                onDelete();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar la campaña');
+        } finally {
+            setIsDeleting(false);
+        }
+    }
 
     return (
         <div className="p-6 hover:bg-gray-50 transition-colors relative">
@@ -103,9 +134,13 @@ export default function CampaignRow({ campaign }: { campaign: any }) {
                                 Ver Detalles
                             </button>
                             <div className="h-px bg-gray-100 my-1"></div>
-                            <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
+                            <button
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
                                 <Trash2 className="h-4 w-4" />
-                                Eliminar
+                                {isDeleting ? 'Eliminando...' : 'Eliminar'}
                             </button>
                         </div>
                     )}
