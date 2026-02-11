@@ -265,7 +265,7 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                             </div>
                         ) : (
                             // Modo selector: buscar y seleccionar contacto
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 {/* Búsqueda */}
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -273,29 +273,43 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Buscar contacto..."
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        placeholder="Buscar contacto por nombre o email..."
+                                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     />
                                 </div>
 
-                                {/* Selector */}
+                                {/* Selector - Dropdown normal */}
                                 <select
                                     value={selectedContact}
                                     onChange={(e) => setSelectedContact(e.target.value)}
                                     disabled={!!contactId}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100"
-                                    size={Math.min(filteredContacts.length + 1, 5)}
+                                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100"
                                 >
-                                    <option value="">Seleccionar contacto...</option>
+                                    <option value="">
+                                        {filteredContacts.length > 0
+                                            ? `Seleccionar contacto (${filteredContacts.length} disponibles)...`
+                                            : 'Cargando contactos...'}
+                                    </option>
                                     {filteredContacts.map((contact) => (
                                         <option key={contact.id} value={contact.id}>
-                                            {contact.name} ({contact.email})
+                                            {contact.name} - {contact.email}
                                         </option>
                                     ))}
                                 </select>
 
+                                {/* Mensajes de ayuda */}
                                 {searchQuery && filteredContacts.length === 0 && (
-                                    <p className="text-sm text-gray-500">No se encontraron contactos</p>
+                                    <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                                        <span>❌</span>
+                                        <span>No se encontraron contactos que coincidan con "{searchQuery}"</span>
+                                    </div>
+                                )}
+
+                                {!searchQuery && contacts.length === 0 && (
+                                    <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+                                        <span>💡</span>
+                                        <span>No tienes contactos aún. Usa el modo manual para enviar a cualquier email.</span>
+                                    </div>
                                 )}
                             </div>
                         )}

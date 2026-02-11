@@ -195,13 +195,22 @@ export default function EmailInboxPage() {
                                     <div className="p-8 text-center text-gray-500">
                                         Cargando...
                                     </div>
-                                ) : threads.length === 0 ? (
+                                ) : threads.filter(t => {
+                                    // Filtrar por vista: inbox muestra inbound, sent muestra outbound
+                                    if (view === 'inbox') return t.lastMessageDirection === 'inbound';
+                                    if (view === 'sent') return t.lastMessageDirection === 'outbound';
+                                    return true;
+                                }).length === 0 ? (
                                     <div className="p-8 text-center text-gray-500">
                                         <Mail className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                                        <p>No hay emails</p>
+                                        <p>{view === 'inbox' ? 'No hay emails recibidos' : 'No hay emails enviados'}</p>
                                     </div>
                                 ) : (
-                                    threads.map((thread) => (
+                                    threads.filter(t => {
+                                        if (view === 'inbox') return t.lastMessageDirection === 'inbound';
+                                        if (view === 'sent') return t.lastMessageDirection === 'outbound';
+                                        return true;
+                                    }).map((thread) => (
                                         <button
                                             key={thread.id}
                                             onClick={() => loadThread(thread.id)}
