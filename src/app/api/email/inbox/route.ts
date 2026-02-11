@@ -17,21 +17,10 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 });
         }
 
-        // Obtener organization_id del primer contacto del usuario
-        // (asumiendo que todos los contactos pertenecen a la misma organización)
-        const { data: firstContact } = await supabaseAdmin
-            .from('contacts')
-            .select('organization_id')
-            .limit(1)
-            .single();
+        console.log('📧 Fetching inbox for user:', authUser.id);
 
-        if (!firstContact) {
-            return NextResponse.json({ threads: [] }); // No hay contactos aún
-        }
-
-        const organizationId = firstContact.organization_id;
-
-        // Obtener threads con información del contacto y último mensaje
+        // Obtener todos los threads con información del contacto y mensajes
+        // Como usamos supabaseAdmin, no necesitamos filtrar por organization_id
         const { data: threads, error } = await supabaseAdmin
             .from('email_threads')
             .select(`
@@ -45,10 +34,14 @@ export async function GET(req: Request) {
                     created_at
                 )
             `)
-            .eq('organization_id', organizationId)
             .order('last_message_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Error fetching threads:', error);
+            throw error;
+        }
+
+        console.log(`✅ Found ${threads?.length || 0} threads`);
 
         // Formatear respuesta
         const formattedThreads = threads?.map(thread => {
