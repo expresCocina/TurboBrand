@@ -29,27 +29,19 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 });
         }
 
-        // Obtener información del usuario y organización
-        const { data: user, error: userError } = await supabase
-            .from('crm_users')
-            .select('organization_id')
-            .eq('id', authUser.id)
-            .single();
-
-        if (!user || userError) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
-        // Obtener información del contacto
+        // Obtener información del contacto primero
         const { data: contact } = await supabase
             .from('contacts')
-            .select('*')
+            .select('*, organization_id')
             .eq('id', contactId)
             .single();
 
         if (!contact) {
             return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
         }
+
+        // Usar organization_id del contacto
+        const organizationId = contact.organization_id;
 
         // Buscar o crear thread
         let thread;
@@ -66,7 +58,7 @@ export async function POST(req: Request) {
             const { data: newThread, error: threadError } = await supabase
                 .from('email_threads')
                 .insert({
-                    organization_id: user.organization_id,
+                    organization_id: organizationId,
                     contact_id: contactId,
                     subject: subject,
                     total_messages: 0,
@@ -85,7 +77,7 @@ export async function POST(req: Request) {
             .from('email_messages')
             .insert({
                 thread_id: thread.id,
-                organization_id: user.organization_id,
+                organization_id: organizationId,
                 direction: 'outbound',
                 from_email: 'gerencia@turbobrandcol.com',
                 from_name: 'Turbo Brand',
