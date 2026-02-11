@@ -74,7 +74,7 @@ export async function POST(req: Request) {
                 thread_id: thread.id,
                 organization_id: user.organization_id,
                 direction: 'outbound',
-                from_email: process.env.RESEND_INBOUND_EMAIL || 'inbox@turbobrandcol.com',
+                from_email: 'gerencia@turbobrandcol.com',
                 from_name: user.name || 'Turbo Brand',
                 to_email: contact.email,
                 to_name: contact.name,
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
 
         // Enviar email via Resend
         const { data: emailData, error: emailError } = await resend.emails.send({
-            from: `${user.name || 'Turbo Brand'} <${process.env.RESEND_INBOUND_EMAIL || 'inbox@turbobrandcol.com'}>`,
+            from: `${user.name || 'Turbo Brand'} <gerencia@turbobrandcol.com>`,
             to: [contact.email],
             subject: subject,
             html: processedContent,
