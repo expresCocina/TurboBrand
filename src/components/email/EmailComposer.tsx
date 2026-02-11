@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Send, Bold, Italic, Link as LinkIcon } from 'lucide-react';
+import { X, Send, Bold, Italic, Link as LinkIcon, Search, Mail } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Contact {
@@ -26,6 +26,12 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
     const [sending, setSending] = useState(false);
     const [user, setUser] = useState<any>(null);
 
+    // Nuevas funcionalidades
+    const [searchQuery, setSearchQuery] = useState('');
+    const [manualMode, setManualMode] = useState(false);
+    const [manualEmail, setManualEmail] = useState('');
+    const [manualName, setManualName] = useState('');
+
     useEffect(() => {
         if (isOpen) {
             loadUser();
@@ -40,33 +46,81 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
 
     async function loadContacts() {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
 
-            const { data: crmUser } = await supabase
-                .from('crm_users')
-                .select('organization_id')
-                .eq('id', user.id)
-                .single();
+            const response = await fetch('/api/contacts', {
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
 
-            if (!crmUser) return;
-
-            const { data: contactsData } = await supabase
-                .from('contacts')
-                .select('id, name, email')
-                .eq('organization_id', crmUser.organization_id)
-                .order('name');
-
-            if (contactsData) {
-                setContacts(contactsData);
+            if (response.ok) {
+                const data = await response.json();
+                setContacts(data.contacts || []);
             }
         } catch (error) {
             console.error('Error loading contacts:', error);
         }
     }
 
+    // Filtrar contactos por búsqueda
+    const filteredContacts = contacts.filter(contact =>
+        contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Validar email
+    function isValidEmail(email: string) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
     async function handleSend() {
-        if (!selectedContact || !subject || !content) {
+        let contactToUse = selectedContact;
+
+        // Si está en modo manual, crear o buscar contacto
+        if (manualMode) {
+            if (!manualEmail || !isValidEmail(manualEmail)) {
+                alert('Por favor ingresa un email válido');
+                return;
+            }
+
+            // Buscar si el contacto ya existe
+            const existingContact = contacts.find(c => c.email.toLowerCase() === manualEmail.toLowerCase());
+
+            if (existingContact) {
+                contactToUse = existingContact.id;
+            } else {
+                // Crear nuevo contacto
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const response = await fetch('/api/contacts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${session?.access_token}`
+                        },
+                        body: JSON.stringify({
+                            name: manualName || manualEmail.split('@')[0],
+                            email: manualEmail,
+                            source: 'email_manual'
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        contactToUse = data.contact.id;
+                    } else {
+                        throw new Error('No se pudo crear el contacto');
+                    }
+                } catch (error: any) {
+                    alert('Error creando contacto: ' + error.message);
+                    return;
+                }
+            }
+        }
+
+        if (!contactToUse || !subject || !content) {
             alert('Por favor completa todos los campos');
             return;
         }
@@ -81,7 +135,7 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                     'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
                 },
                 body: JSON.stringify({
-                    contactId: selectedContact,
+                    contactId: contactToUse,
                     subject,
                     content,
                     threadId
@@ -95,6 +149,9 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                 setSelectedContact('');
                 setSubject('');
                 setContent('');
+                setManualEmail('');
+                setManualName('');
+                setSearchQuery('');
                 onSent?.();
                 onClose();
             } else {
@@ -168,24 +225,80 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
 
                 {/* Form */}
                 <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-140px)]">
-                    {/* To */}
+                    {/* To - Modo Toggle */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Para:
-                        </label>
-                        <select
-                            value={selectedContact}
-                            onChange={(e) => setSelectedContact(e.target.value)}
-                            disabled={!!contactId}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100"
-                        >
-                            <option value="">Seleccionar contacto...</option>
-                            {contacts.map((contact) => (
-                                <option key={contact.id} value={contact.id}>
-                                    {contact.name} ({contact.email})
-                                </option>
-                            ))}
-                        </select>
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                                Para:
+                            </label>
+                            {!contactId && (
+                                <button
+                                    type="button"
+                                    onClick={() => setManualMode(!manualMode)}
+                                    className="text-xs text-purple-600 hover:text-purple-700 font-medium"
+                                >
+                                    {manualMode ? '← Seleccionar de contactos' : '✉️ Escribir email manualmente'}
+                                </button>
+                            )}
+                        </div>
+
+                        {manualMode ? (
+                            // Modo manual: escribir email directamente
+                            <div className="space-y-2">
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                        type="email"
+                                        value={manualEmail}
+                                        onChange={(e) => setManualEmail(e.target.value)}
+                                        placeholder="email@ejemplo.com"
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={manualName}
+                                    onChange={(e) => setManualName(e.target.value)}
+                                    placeholder="Nombre (opcional)"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                />
+                            </div>
+                        ) : (
+                            // Modo selector: buscar y seleccionar contacto
+                            <div className="space-y-2">
+                                {/* Búsqueda */}
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Buscar contacto..."
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                {/* Selector */}
+                                <select
+                                    value={selectedContact}
+                                    onChange={(e) => setSelectedContact(e.target.value)}
+                                    disabled={!!contactId}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100"
+                                    size={Math.min(filteredContacts.length + 1, 5)}
+                                >
+                                    <option value="">Seleccionar contacto...</option>
+                                    {filteredContacts.map((contact) => (
+                                        <option key={contact.id} value={contact.id}>
+                                            {contact.name} ({contact.email})
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {searchQuery && filteredContacts.length === 0 && (
+                                    <p className="text-sm text-gray-500">No se encontraron contactos</p>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Subject */}
