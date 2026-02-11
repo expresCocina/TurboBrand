@@ -57,7 +57,7 @@ export async function GET(req: Request) {
             const preview = lastMessage?.text_content?.substring(0, 100) || '';
 
             // Obtener métricas del último mensaje enviado (outbound)
-            const outboundMessages = thread.messages?.filter(m => m.direction === 'outbound') || [];
+            const outboundMessages = thread.messages?.filter((m: any) => m.direction === 'outbound') || [];
             const lastOutbound = outboundMessages[outboundMessages.length - 1];
 
             // Contar para métricas globales
