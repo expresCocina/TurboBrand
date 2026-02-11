@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Mail, Inbox, Send, Star, Trash2, Search, Plus, ArrowLeft } from 'lucide-react';
-import EmailComposer from '@/components/email/EmailComposer';
+import EmailComposer from '@/components/email/EmailComposerNew';
 
 interface Thread {
     id: string;
