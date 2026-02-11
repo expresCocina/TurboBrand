@@ -199,14 +199,14 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                                     value={manualEmail}
                                     onChange={(e) => setManualEmail(e.target.value)}
                                     placeholder="destinatario@ejemplo.com"
-                                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    className="w-full px-4 py-3 bg-white text-gray-900 placeholder-gray-400 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                                 />
                                 <input
                                     type="text"
                                     value={manualName}
                                     onChange={(e) => setManualName(e.target.value)}
                                     placeholder="Nombre del destinatario (opcional)"
-                                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    className="w-full px-4 py-3 bg-white text-gray-900 placeholder-gray-400 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                                 />
                             </div>
                         ) : (
@@ -236,7 +236,7 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                                 placeholder="🔍 Buscar contacto..."
-                                                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                                className="w-full px-3 py-2 bg-gray-50 text-gray-900 placeholder-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                                                 autoFocus
                                             />
                                         </div>
@@ -286,7 +286,7 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                             value={subject}
                             onChange={(e) => setSubject(e.target.value)}
                             placeholder="Escribe el asunto del email..."
-                            className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                            className="w-full px-4 py-3 bg-white text-gray-900 placeholder-gray-400 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                         />
                     </div>
 
@@ -300,7 +300,7 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
                             onChange={(e) => setContent(e.target.value)}
                             rows={12}
                             placeholder="Escribe tu mensaje aquí..."
-                            className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none"
+                            className="w-full px-4 py-3 bg-white text-gray-900 placeholder-gray-400 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none"
                         />
                     </div>
                 </div>
