@@ -8,16 +8,16 @@ export async function GET(
 ) {
     try {
         const { id: messageId, linkId } = await params;
-        const { searchParams, headers } = new URL(req.url);
-        const targetUrl = searchParams.get('url');
+        const url = new URL(req.url);
+        const targetUrl = url.searchParams.get('url');
 
         if (!targetUrl) {
             return NextResponse.json({ error: 'URL not provided' }, { status: 400 });
         }
 
         // Obtener user agent e IP
-        const userAgent = headers.get('user-agent') || '';
-        const ip = headers.get('x-forwarded-for') || headers.get('x-real-ip') || '';
+        const userAgent = req.headers.get('user-agent') || '';
+        const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '';
 
         // Registrar evento de click
         await supabase

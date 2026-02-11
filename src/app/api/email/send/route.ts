@@ -17,13 +17,13 @@ export async function POST(req: Request) {
         }
 
         // Obtener información del usuario y organización
-        const { data: user } = await supabase
+        const { data: user, error: userError } = await supabase
             .from('crm_users')
-            .select('organization_id, email, name')
+            .select('organization_id')
             .eq('id', userId)
             .single();
 
-        if (!user) {
+        if (!user || userError) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
                 organization_id: user.organization_id,
                 direction: 'outbound',
                 from_email: 'gerencia@turbobrandcol.com',
-                from_name: user.name || 'Turbo Brand',
+                from_name: 'Turbo Brand',
                 to_email: contact.email,
                 to_name: contact.name,
                 subject: subject,
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
 
         // Enviar email via Resend
         const { data: emailData, error: emailError } = await resend.emails.send({
-            from: `${user.name || 'Turbo Brand'} <gerencia@turbobrandcol.com>`,
+            from: 'Turbo Brand <gerencia@turbobrandcol.com>',
             to: [contact.email],
             subject: subject,
             html: processedContent,
