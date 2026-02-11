@@ -121,18 +121,23 @@ export default function EmailInboxPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-50">
+            {/* Header con gradiente */}
+            <div className="bg-white/80 backdrop-blur-sm border-b border-purple-100 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <Mail className="h-6 w-6 text-purple-600" />
-                            <h1 className="text-2xl font-bold text-gray-900">Email</h1>
+                            <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg shadow-purple-500/30">
+                                <Mail className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Email</h1>
+                                <p className="text-xs text-gray-500">Gestiona tus conversaciones</p>
+                            </div>
                         </div>
                         <button
                             onClick={() => setShowComposer(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 font-medium"
                         >
                             <Plus className="h-4 w-4" />
                             Nuevo Email
@@ -141,51 +146,55 @@ export default function EmailInboxPage() {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-12 gap-6">
-                    {/* Sidebar */}
+                    {/* Sidebar con diseño premium */}
                     <div className="col-span-3">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                            <nav className="space-y-1">
+                        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-purple-100/50 p-5">
+                            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">Carpetas</h3>
+                            <nav className="space-y-2">
                                 <button
                                     onClick={() => setView('inbox')}
-                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${view === 'inbox'
-                                        ? 'bg-purple-50 text-purple-700'
-                                        : 'text-gray-700 hover:bg-gray-50'
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${view === 'inbox'
+                                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30'
+                                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
                                         }`}
                                 >
                                     <Inbox className="h-5 w-5" />
-                                    <span className="font-medium">Bandeja de Entrada</span>
+                                    <span className="font-semibold">Recibidos</span>
                                     {threads.filter(t => t.unreadCount > 0).length > 0 && (
-                                        <span className="ml-auto bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                                        <span className={`ml-auto text-xs px-2.5 py-1 rounded-full font-bold ${view === 'inbox'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-purple-100 text-purple-700'
+                                            }`}>
                                             {threads.filter(t => t.unreadCount > 0).length}
                                         </span>
                                     )}
                                 </button>
                                 <button
                                     onClick={() => setView('sent')}
-                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${view === 'sent'
-                                        ? 'bg-purple-50 text-purple-700'
-                                        : 'text-gray-700 hover:bg-gray-50'
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${view === 'sent'
+                                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30'
+                                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
                                         }`}
                                 >
                                     <Send className="h-5 w-5" />
-                                    <span className="font-medium">Enviados</span>
+                                    <span className="font-semibold">Enviados</span>
                                 </button>
                             </nav>
                         </div>
                     </div>
 
-                    {/* Thread List */}
+                    {/* Thread List con diseño moderno */}
                     <div className="col-span-4">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div className="p-4 border-b border-gray-200">
+                        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-purple-100/50 overflow-hidden">
+                            <div className="p-5 border-b border-purple-100/50 bg-gradient-to-r from-purple-50/50 to-transparent">
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-400" />
                                     <input
                                         type="text"
-                                        placeholder="Buscar emails..."
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        placeholder="🔍 Buscar emails..."
+                                        className="w-full pl-11 pr-4 py-3 bg-white border-2 border-purple-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-gray-900 placeholder-gray-400"
                                     />
                                 </div>
                             </div>
@@ -196,14 +205,16 @@ export default function EmailInboxPage() {
                                         Cargando...
                                     </div>
                                 ) : threads.filter(t => {
-                                    // Filtrar por vista: inbox muestra inbound, sent muestra outbound
                                     if (view === 'inbox') return t.lastMessageDirection === 'inbound';
                                     if (view === 'sent') return t.lastMessageDirection === 'outbound';
                                     return true;
                                 }).length === 0 ? (
-                                    <div className="p-8 text-center text-gray-500">
-                                        <Mail className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                                        <p>{view === 'inbox' ? 'No hay emails recibidos' : 'No hay emails enviados'}</p>
+                                    <div className="p-12 text-center">
+                                        <div className="inline-flex p-4 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl mb-4">
+                                            <Mail className="h-12 w-12 text-purple-400" />
+                                        </div>
+                                        <p className="text-gray-600 font-medium">{view === 'inbox' ? 'No hay emails recibidos' : 'No hay emails enviados'}</p>
+                                        <p className="text-sm text-gray-400 mt-1">Los emails aparecerán aquí</p>
                                     </div>
                                 ) : (
                                     threads.filter(t => {
@@ -214,18 +225,23 @@ export default function EmailInboxPage() {
                                         <button
                                             key={thread.id}
                                             onClick={() => loadThread(thread.id)}
-                                            className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${selectedThread?.id === thread.id ? 'bg-purple-50' : ''
-                                                } ${thread.unreadCount > 0 ? 'bg-blue-50' : ''}`}
+                                            className={`w-full p-4 text-left border-b border-purple-50 transition-all hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent group ${selectedThread?.id === thread.id
+                                                    ? 'bg-gradient-to-r from-purple-100/70 to-purple-50/30 border-l-4 border-l-purple-500'
+                                                    : thread.unreadCount > 0
+                                                        ? 'bg-blue-50/30'
+                                                        : ''
+                                                }`}
                                         >
-                                            <div className="flex items-start justify-between mb-1">
-                                                <span className={`font-medium ${thread.unreadCount > 0 ? 'text-gray-900' : 'text-gray-700'}`}>
+                                            <div className="flex items-start justify-between mb-2">
+                                                <span className={`font-semibold ${thread.unreadCount > 0 ? 'text-gray-900' : 'text-gray-700'
+                                                    } group-hover:text-purple-700 transition-colors`}>
                                                     {thread.contactName}
                                                 </span>
-                                                <span className="text-xs text-gray-500">
+                                                <span className="text-xs text-gray-500 font-medium">
                                                     {formatDate(thread.lastMessageAt)}
                                                 </span>
                                             </div>
-                                            <div className="text-sm text-gray-600 mb-1 truncate">
+                                            <div className="text-sm font-medium text-gray-800 mb-1.5 truncate">
                                                 {thread.subject}
                                             </div>
                                             <div className="text-sm text-gray-500 truncate">
