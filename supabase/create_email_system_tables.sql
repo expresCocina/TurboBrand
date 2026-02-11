@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS email_threads (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
-    contact_id UUID REFERENCES leads(id) ON DELETE CASCADE,
+    contact_id UUID REFERENCES contacts(id) ON DELETE CASCADE,
     subject TEXT NOT NULL,
     last_message_at TIMESTAMP DEFAULT NOW(),
     total_messages INTEGER DEFAULT 0,

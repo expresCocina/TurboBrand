@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
         // Obtener información del contacto
         const { data: contact } = await supabase
-            .from('leads')
+            .from('contacts')
             .select('*')
             .eq('id', contactId)
             .single();

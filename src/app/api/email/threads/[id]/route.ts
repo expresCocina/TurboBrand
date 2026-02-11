@@ -14,7 +14,7 @@ export async function GET(
             .from('email_threads')
             .select(`
                 *,
-                contact:leads(id, name, email, phone)
+                contact:contacts(id, name, email, phone)
             `)
             .eq('id', id)
             .single();

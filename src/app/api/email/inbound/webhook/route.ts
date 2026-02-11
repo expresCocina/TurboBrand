@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 async function findOrCreateContact(email: string, name: string) {
     // Buscar contacto existente por email
     const { data: existingContact } = await supabase
-        .from('leads')
+        .from('contacts')
         .select('*')
         .eq('email', email)
         .single();
@@ -118,13 +118,13 @@ async function findOrCreateContact(email: string, name: string) {
     }
 
     const { data: newContact, error } = await supabase
-        .from('leads')
+        .from('contacts')
         .insert({
             organization_id: org.id,
             name: name,
             email: email,
             source: 'email_inbound',
-            status: 'new'
+            status: 'active'
         })
         .select()
         .single();

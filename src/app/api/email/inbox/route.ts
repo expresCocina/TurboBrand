@@ -28,7 +28,7 @@ export async function GET(req: Request) {
             .from('email_threads')
             .select(`
                 *,
-                contact:leads(id, name, email),
+                contact:contacts(id, name, email),
                 messages:email_messages(
                     id,
                     direction,
