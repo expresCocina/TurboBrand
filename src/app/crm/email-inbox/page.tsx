@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { Mail, Inbox, Send, Star, Trash2, Search, Plus, ArrowLeft } from 'lucide-react';
+import { Mail, Inbox, Send, Star, Trash2, Search, Plus, ArrowLeft, Eye, MousePointer, TrendingUp } from 'lucide-react';
 import EmailComposer from '@/components/email/EmailComposerNew';
+import MetricCard from '@/components/email/MetricCard';
 
 interface Thread {
     id: string;
@@ -16,6 +17,16 @@ interface Thread {
     unreadCount: number;
     preview: string;
     lastMessageDirection: 'inbound' | 'outbound';
+    // Métricas de tracking
+    opened_at?: string;
+    total_opens?: number;
+    clicked_at?: string;
+    total_clicks?: number;
+    contact?: {
+        name: string;
+        email: string;
+        id: string;
+    };
 }
 
 interface Message {
@@ -29,21 +40,36 @@ interface Message {
     textContent: string;
     createdAt: string;
     isRead: boolean;
-    opened: boolean;
-    clicked: boolean;
-    totalOpens: number;
-    totalClicks: number;
+    opened?: boolean;
+    clicked?: boolean;
+    totalOpens?: number;
+    totalClicks?: number;
+}
+
+interface Metrics {
+    totalSent: number;
+    totalOpened: number;
+    totalClicked: number;
+    openRate: number;
+    clickRate: number;
 }
 
 export default function EmailInboxPage() {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
     const [threads, setThreads] = useState<Thread[]>([]);
-    const [selectedThread, setSelectedThread] = useState<any>(null);
+    const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState<'inbox' | 'sent'>('inbox');
     const [showComposer, setShowComposer] = useState(false);
+    const [metrics, setMetrics] = useState<Metrics>({
+        totalSent: 0,
+        totalOpened: 0,
+        totalClicked: 0,
+        openRate: 0,
+        clickRate: 0
+    });
 
     useEffect(() => {
         checkUser();
@@ -74,6 +100,9 @@ export default function EmailInboxPage() {
             if (data.threads) {
                 setThreads(data.threads);
             }
+            if (data.metrics) {
+                setMetrics(data.metrics);
+            }
         } catch (error) {
             console.error('Error loading threads:', error);
         } finally {
@@ -98,7 +127,9 @@ export default function EmailInboxPage() {
                 });
 
                 // Actualizar lista de threads
-                loadThreads(user.id);
+                if (user) {
+                    loadThreads(user.id);
+                }
             }
         } catch (error) {
             console.error('Error loading thread:', error);
@@ -142,6 +173,39 @@ export default function EmailInboxPage() {
                             <Plus className="h-4 w-4" />
                             Nuevo Email
                         </button>
+                    </div>
+                </div>
+
+                {/* Métricas Header Dashboard */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-t border-purple-100/50">
+                    <div className="grid grid-cols-4 gap-4">
+                        <MetricCard
+                            icon={Send}
+                            label="Emails Enviados"
+                            value={metrics.totalSent}
+                            color="purple"
+                        />
+                        <MetricCard
+                            icon={Eye}
+                            label="Tasa de Apertura"
+                            value={`${metrics.openRate}%`}
+                            color="green"
+                            trend={`${metrics.totalOpened} de ${metrics.totalSent} abiertos`}
+                        />
+                        <MetricCard
+                            icon={MousePointer}
+                            label="Tasa de Clicks"
+                            value={`${metrics.clickRate}%`}
+                            color="blue"
+                            trend={`${metrics.totalClicked} de ${metrics.totalSent} con clicks`}
+                        />
+                        <MetricCard
+                            icon={TrendingUp}
+                            label="Engagement"
+                            value={`${Math.max(metrics.openRate, metrics.clickRate)}%`}
+                            color="orange"
+                            trend="Interacción total"
+                        />
                     </div>
                 </div>
             </div>
@@ -226,10 +290,10 @@ export default function EmailInboxPage() {
                                             key={thread.id}
                                             onClick={() => loadThread(thread.id)}
                                             className={`w-full p-4 text-left border-b border-purple-50 transition-all hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent group ${selectedThread?.id === thread.id
-                                                    ? 'bg-gradient-to-r from-purple-100/70 to-purple-50/30 border-l-4 border-l-purple-500'
-                                                    : thread.unreadCount > 0
-                                                        ? 'bg-blue-50/30'
-                                                        : ''
+                                                ? 'bg-gradient-to-r from-purple-100/70 to-purple-50/30 border-l-4 border-l-purple-500'
+                                                : thread.unreadCount > 0
+                                                    ? 'bg-blue-50/30'
+                                                    : ''
                                                 }`}
                                         >
                                             <div className="flex items-start justify-between mb-2">
@@ -244,9 +308,28 @@ export default function EmailInboxPage() {
                                             <div className="text-sm font-medium text-gray-800 mb-1.5 truncate">
                                                 {thread.subject}
                                             </div>
-                                            <div className="text-sm text-gray-500 truncate">
+                                            <div className="text-sm text-gray-500 truncate mb-2">
                                                 {thread.preview}
                                             </div>
+
+                                            {/* Badges de métricas en la lista */}
+                                            {thread.lastMessageDirection === 'outbound' && (
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    {thread.opened_at && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-medium border border-green-200">
+                                                            <Eye className="h-3 w-3" />
+                                                            {thread.total_opens}
+                                                        </span>
+                                                    )}
+                                                    {thread.clicked_at && (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-medium border border-blue-200">
+                                                            <MousePointer className="h-3 w-3" />
+                                                            {thread.total_clicks}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+
                                             {thread.unreadCount > 0 && (
                                                 <div className="mt-2">
                                                     <span className="inline-block bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
@@ -280,9 +363,9 @@ export default function EmailInboxPage() {
                                             </button>
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <span className="font-medium">{selectedThread.contact.name}</span>
+                                            <span className="font-medium">{selectedThread.contact?.name}</span>
                                             <span className="text-gray-400">•</span>
-                                            <span>{selectedThread.contact.email}</span>
+                                            <span>{selectedThread.contact?.email}</span>
                                         </div>
                                     </div>
 
@@ -306,17 +389,19 @@ export default function EmailInboxPage() {
                                                         className="text-sm text-gray-700 prose prose-sm max-w-none"
                                                         dangerouslySetInnerHTML={{ __html: message.htmlContent || message.textContent }}
                                                     />
+
+                                                    {/* Métricas detalladas por mensaje */}
                                                     {message.direction === 'outbound' && (
                                                         <div className="mt-3 pt-3 border-t border-purple-200 flex items-center gap-4 text-xs text-gray-600">
-                                                            {message.opened && (
-                                                                <span className="flex items-center gap-1">
-                                                                    ✓ Abierto {message.totalOpens > 1 && `(${message.totalOpens}x)`}
-                                                                </span>
-                                                            )}
+                                                            <div className={`flex items-center gap-1 ${message.opened ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
+                                                                <Eye className="h-3 w-3" />
+                                                                {message.opened ? `Abierto ${message.totalOpens && message.totalOpens > 1 ? `(${message.totalOpens} veces)` : ''}` : 'No leído aún'}
+                                                            </div>
                                                             {message.clicked && (
-                                                                <span className="flex items-center gap-1">
-                                                                    🔗 {message.totalClicks} click{message.totalClicks > 1 ? 's' : ''}
-                                                                </span>
+                                                                <div className="flex items-center gap-1 text-blue-600 font-medium">
+                                                                    <MousePointer className="h-3 w-3" />
+                                                                    {message.totalClicks} clicks en enlaces
+                                                                </div>
                                                             )}
                                                         </div>
                                                     )}
@@ -354,7 +439,9 @@ export default function EmailInboxPage() {
                 threadId={selectedThread?.id}
                 contactId={selectedThread?.contact?.id}
                 onSent={() => {
-                    loadThreads(user.id);
+                    if (user) {
+                        loadThreads(user.id);
+                    }
                     if (selectedThread) {
                         loadThread(selectedThread.id);
                     }

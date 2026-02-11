@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
-// GET: Obtener bandeja de entrada (threads)
+// GET: Obtener bandeja de entrada (threads) con métricas
 export async function GET(req: Request) {
     try {
         // Obtener token de autenticación
@@ -20,7 +20,6 @@ export async function GET(req: Request) {
         console.log('📧 Fetching inbox for user:', authUser.id);
 
         // Obtener todos los threads con información del contacto y mensajes
-        // Como usamos supabaseAdmin, no necesitamos filtrar por organization_id
         const { data: threads, error } = await supabaseAdmin
             .from('email_threads')
             .select(`
@@ -31,7 +30,11 @@ export async function GET(req: Request) {
                     direction,
                     from_name,
                     text_content,
-                    created_at
+                    created_at,
+                    opened_at,
+                    total_opens,
+                    clicked_at,
+                    total_clicks
                 )
             `)
             .order('last_message_at', { ascending: false });
@@ -43,10 +46,26 @@ export async function GET(req: Request) {
 
         console.log(`✅ Found ${threads?.length || 0} threads`);
 
-        // Formatear respuesta
+        // Calcular métricas globales
+        let totalSent = 0;
+        let totalOpened = 0;
+        let totalClicked = 0;
+
+        // Formatear respuesta con métricas por thread
         const formattedThreads = threads?.map(thread => {
             const lastMessage = thread.messages?.[thread.messages.length - 1];
             const preview = lastMessage?.text_content?.substring(0, 100) || '';
+
+            // Obtener métricas del último mensaje enviado (outbound)
+            const outboundMessages = thread.messages?.filter(m => m.direction === 'outbound') || [];
+            const lastOutbound = outboundMessages[outboundMessages.length - 1];
+
+            // Contar para métricas globales
+            if (lastMessage?.direction === 'outbound') {
+                totalSent++;
+                if (lastOutbound?.opened_at) totalOpened++;
+                if (lastOutbound?.clicked_at) totalClicked++;
+            }
 
             return {
                 id: thread.id,
@@ -58,11 +77,29 @@ export async function GET(req: Request) {
                 totalMessages: thread.total_messages,
                 unreadCount: thread.unread_count,
                 preview: preview,
-                lastMessageDirection: lastMessage?.direction
+                lastMessageDirection: lastMessage?.direction,
+                // Métricas de tracking
+                opened_at: lastOutbound?.opened_at,
+                total_opens: lastOutbound?.total_opens || 0,
+                clicked_at: lastOutbound?.clicked_at,
+                total_clicks: lastOutbound?.total_clicks || 0
             };
         }) || [];
 
-        return NextResponse.json({ threads: formattedThreads });
+        // Calcular tasas
+        const openRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0;
+        const clickRate = totalSent > 0 ? Math.round((totalClicked / totalSent) * 100) : 0;
+
+        return NextResponse.json({
+            threads: formattedThreads,
+            metrics: {
+                totalSent,
+                totalOpened,
+                totalClicked,
+                openRate,
+                clickRate
+            }
+        });
 
     } catch (error: any) {
         console.error('Error obteniendo inbox:', error);
