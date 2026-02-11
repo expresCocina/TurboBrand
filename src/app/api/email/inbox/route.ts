@@ -1,30 +1,38 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // GET: Obtener bandeja de entrada (threads)
 export async function GET(req: Request) {
     try {
-        const { searchParams } = new URL(req.url);
-        const userId = searchParams.get('userId');
-
-        if (!userId) {
-            return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+        // Obtener token de autenticación
+        const authHeader = req.headers.get('authorization');
+        if (!authHeader) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
         }
 
-        // Obtener organization_id del usuario
-        const { data: user } = await supabase
-            .from('crm_users')
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+        if (authError || !authUser) {
+            return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 });
+        }
+
+        // Obtener organization_id del primer contacto del usuario
+        // (asumiendo que todos los contactos pertenecen a la misma organización)
+        const { data: firstContact } = await supabaseAdmin
+            .from('contacts')
             .select('organization_id')
-            .eq('id', userId)
+            .limit(1)
             .single();
 
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        if (!firstContact) {
+            return NextResponse.json({ threads: [] }); // No hay contactos aún
         }
 
+        const organizationId = firstContact.organization_id;
+
         // Obtener threads con información del contacto y último mensaje
-        const { data: threads, error } = await supabase
+        const { data: threads, error } = await supabaseAdmin
             .from('email_threads')
             .select(`
                 *,
@@ -37,7 +45,7 @@ export async function GET(req: Request) {
                     created_at
                 )
             `)
-            .eq('organization_id', user.organization_id)
+            .eq('organization_id', organizationId)
             .order('last_message_at', { ascending: false });
 
         if (error) throw error;

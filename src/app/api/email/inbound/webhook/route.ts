@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // Webhook para recibir emails de Resend Inbound
 export async function POST(req: Request) {
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         }
 
         // 3. Guardar mensaje
-        const { data: message, error: messageError } = await supabase
+        const { data: message, error: messageError } = await supabaseAdmin
             .from('email_messages')
             .insert({
                 thread_id: thread.id,
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         }
 
         // 4. Actualizar thread
-        await supabase
+        await supabaseAdmin
             .from('email_threads')
             .update({
                 last_message_at: new Date().toISOString(),
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
 
 async function findOrCreateContact(email: string, name: string) {
     // Buscar contacto existente por email
-    const { data: existingContact } = await supabase
+    const { data: existingContact } = await supabaseAdmin
         .from('contacts')
         .select('*')
         .eq('email', email)
@@ -106,7 +106,7 @@ async function findOrCreateContact(email: string, name: string) {
 
     // Si no existe, crear nuevo contacto
     // Obtener la primera organización (puedes ajustar esta lógica)
-    const { data: org } = await supabase
+    const { data: org } = await supabaseAdmin
         .from('organizations')
         .select('id')
         .limit(1)
@@ -117,7 +117,7 @@ async function findOrCreateContact(email: string, name: string) {
         return null;
     }
 
-    const { data: newContact, error } = await supabase
+    const { data: newContact, error } = await supabaseAdmin
         .from('contacts')
         .insert({
             organization_id: org.id,
@@ -141,14 +141,14 @@ async function findOrCreateContact(email: string, name: string) {
 async function findOrCreateThread(contactId: string, organizationId: string, subject: string, inReplyTo: string | null) {
     // Si es una respuesta, buscar thread por in_reply_to
     if (inReplyTo) {
-        const { data: existingMessage } = await supabase
+        const { data: existingMessage } = await supabaseAdmin
             .from('email_messages')
             .select('thread_id')
             .eq('message_id', inReplyTo)
             .single();
 
         if (existingMessage) {
-            const { data: thread } = await supabase
+            const { data: thread } = await supabaseAdmin
                 .from('email_threads')
                 .select('*')
                 .eq('id', existingMessage.thread_id)
@@ -161,7 +161,7 @@ async function findOrCreateThread(contactId: string, organizationId: string, sub
     }
 
     // Buscar thread existente por contacto y asunto similar
-    const { data: existingThread } = await supabase
+    const { data: existingThread } = await supabaseAdmin
         .from('email_threads')
         .select('*')
         .eq('contact_id', contactId)
@@ -176,7 +176,7 @@ async function findOrCreateThread(contactId: string, organizationId: string, sub
     }
 
     // Crear nuevo thread
-    const { data: newThread, error } = await supabase
+    const { data: newThread, error } = await supabaseAdmin
         .from('email_threads')
         .insert({
             organization_id: organizationId,

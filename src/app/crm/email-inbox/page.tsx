@@ -62,7 +62,13 @@ export default function EmailInboxPage() {
     async function loadThreads(userId: string) {
         try {
             setLoading(true);
-            const response = await fetch(`/api/email/inbox?userId=${userId}`);
+            const { data: { session } } = await supabase.auth.getSession();
+
+            const response = await fetch(`/api/email/inbox`, {
+                headers: {
+                    'Authorization': `Bearer ${session?.access_token}`
+                }
+            });
             const data = await response.json();
 
             if (data.threads) {

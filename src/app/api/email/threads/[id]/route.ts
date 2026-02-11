@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 // GET: Obtener conversación completa (thread con todos los mensajes)
 export async function GET(
@@ -10,7 +10,7 @@ export async function GET(
         const { id } = await params;
 
         // Obtener thread
-        const { data: thread, error: threadError } = await supabase
+        const { data: thread, error: threadError } = await supabaseAdmin
             .from('email_threads')
             .select(`
                 *,
@@ -22,7 +22,7 @@ export async function GET(
         if (threadError) throw threadError;
 
         // Obtener todos los mensajes del thread
-        const { data: messages, error: messagesError } = await supabase
+        const { data: messages, error: messagesError } = await supabaseAdmin
             .from('email_messages')
             .select('*')
             .eq('thread_id', id)
@@ -79,7 +79,7 @@ export async function PATCH(
 
         if (body.action === 'mark_read') {
             // Marcar todos los mensajes no leídos del thread como leídos
-            const { error: updateError } = await supabase
+            const { error: updateError } = await supabaseAdmin
                 .from('email_messages')
                 .update({ is_read: true })
                 .eq('thread_id', id)
@@ -88,7 +88,7 @@ export async function PATCH(
             if (updateError) throw updateError;
 
             // Actualizar contador de no leídos en el thread
-            const { error: threadError } = await supabase
+            const { error: threadError } = await supabaseAdmin
                 .from('email_threads')
                 .update({ unread_count: 0 })
                 .eq('id', id);
