@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         let thread;
         if (threadId) {
             // Thread existente (es una respuesta)
-            const { data: existingThread } = await supabase
+            const { data: existingThread } = await supabaseAdmin
                 .from('email_threads')
                 .select('*')
                 .eq('id', threadId)
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
             thread = existingThread;
         } else {
             // Crear nuevo thread
-            const { data: newThread, error: threadError } = await supabase
+            const { data: newThread, error: threadError } = await supabaseAdmin
                 .from('email_threads')
                 .insert({
                     organization_id: organizationId,
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
         // Crear mensaje en base de datos primero (para obtener ID)
         const messageId = generateMessageId();
-        const { data: message, error: messageError } = await supabase
+        const { data: message, error: messageError } = await supabaseAdmin
             .from('email_messages')
             .insert({
                 thread_id: thread.id,
@@ -115,7 +115,7 @@ export async function POST(req: Request) {
         }
 
         // Actualizar thread
-        await supabase
+        await supabaseAdmin
             .from('email_threads')
             .update({
                 last_message_at: new Date().toISOString(),
