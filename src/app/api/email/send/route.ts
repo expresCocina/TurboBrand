@@ -8,19 +8,32 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { contactId, subject, content, userId, threadId } = body;
+        const { contactId, subject, content, threadId } = body;
 
-        if (!contactId || !subject || !content || !userId) {
+        if (!contactId || !subject || !content) {
             return NextResponse.json({
                 error: 'Missing required fields'
             }, { status: 400 });
+        }
+
+        // Obtener usuario autenticado
+        const authHeader = req.headers.get('authorization');
+        if (!authHeader) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+        }
+
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
+
+        if (authError || !authUser) {
+            return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 });
         }
 
         // Obtener información del usuario y organización
         const { data: user, error: userError } = await supabase
             .from('crm_users')
             .select('organization_id')
-            .eq('id', userId)
+            .eq('id', authUser.id)
             .single();
 
         if (!user || userError) {

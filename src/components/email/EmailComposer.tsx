@@ -76,12 +76,14 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
 
             const response = await fetch('/api/email/send', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+                },
                 body: JSON.stringify({
                     contactId: selectedContact,
                     subject,
                     content,
-                    userId: user.id,
                     threadId
                 })
             });
