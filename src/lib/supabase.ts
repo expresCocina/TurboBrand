@@ -9,6 +9,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Service role client for backend operations (bypasses RLS)
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+export const supabaseAdmin = supabaseServiceKey
+    ? createClient(supabaseUrl, supabaseServiceKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
+        }
+    })
+    : supabase; // Fallback to regular client if no service key
+
 // =============================================
 // TIPOS PARA ZONES (existente)
 // =============================================

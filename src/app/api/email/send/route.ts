@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -23,14 +23,14 @@ export async function POST(req: Request) {
         }
 
         const token = authHeader.replace('Bearer ', '');
-        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
+        const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
         if (authError || !authUser) {
             return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 });
         }
 
         // Obtener información del contacto primero
-        const { data: contact } = await supabase
+        const { data: contact } = await supabaseAdmin
             .from('contacts')
             .select('*, organization_id')
             .eq('id', contactId)
