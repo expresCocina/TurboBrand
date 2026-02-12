@@ -2,11 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Mail, CheckCircle, AlertCircle, Clock, MoreVertical, Edit, Trash2, FileText } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { Mail, CheckCircle, AlertCircle, Clock, MoreVertical, Edit, Trash2, FileText, Copy, RotateCw } from 'lucide-react';
 
 export default function CampaignRow({ campaign, onDelete }: { campaign: any; onDelete?: () => void }) {
+    const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isDuplicating, setIsDuplicating] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -20,6 +24,33 @@ export default function CampaignRow({ campaign, onDelete }: { campaign: any; onD
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    async function handleDuplicate() {
+        setIsDuplicating(true);
+        try {
+            const { data: newCampaign, error } = await supabase
+                .from('email_campaigns')
+                .insert([{
+                    name: `Copia - ${campaign.name}`,
+                    subject: campaign.subject,
+                    content: campaign.content,
+                    segment_id: campaign.segment_id,
+                    organization_id: campaign.organization_id,
+                    status: 'draft',
+                }])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // Redirigir a la página de edición de la nueva campaña
+            router.push(`/crm/email/editar/${newCampaign.id}`);
+        } catch (error) {
+            console.error('Error al duplicar:', error);
+            alert('Error al duplicar la campaña');
+            setIsDuplicating(false);
+        }
+    }
 
     async function handleDelete() {
         if (!confirm('¿Estás seguro de eliminar esta campaña? Esta acción no se puede deshacer.')) {
@@ -118,7 +149,8 @@ export default function CampaignRow({ campaign, onDelete }: { campaign: any; onD
                     </button>
 
                     {isMenuOpen && (
-                        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-10 py-1 animation-fade-in">
+                        <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-100 z-10 py-1 animation-fade-in">
+                            {/* Opciones de Edición */}
                             {(campaign.status === 'draft' || campaign.status === 'scheduled') && (
                                 <Link
                                     href={`/crm/email/editar/${campaign.id}`}
@@ -128,12 +160,24 @@ export default function CampaignRow({ campaign, onDelete }: { campaign: any; onD
                                     Editar Campaña
                                 </Link>
                             )}
-                            {/* Opciones futuras */}
+
+                            {/* Opción Reinviar/Duplicar */}
+                            <button
+                                onClick={handleDuplicate}
+                                disabled={isDuplicating}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors text-left"
+                            >
+                                <RotateCw className={`h-4 w-4 ${isDuplicating ? 'animate-spin' : ''}`} />
+                                {isDuplicating ? 'Creando copia...' : 'Reenviar (Duplicar)'}
+                            </button>
+
                             <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors text-left">
                                 <FileText className="h-4 w-4" />
                                 Ver Detalles
                             </button>
+
                             <div className="h-px bg-gray-100 my-1"></div>
+
                             <button
                                 onClick={handleDelete}
                                 disabled={isDeleting}
