@@ -175,8 +175,8 @@ export default function NuevaCampanaPage() {
                     failedCount++;
                 }
 
-                // Pequeña pausa entre envíos para evitar saturar el servidor
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Pausa de 2 segundos entre envíos para evitar rate limits de Resend
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
 
             const successMessage = sendMode === 'now'
