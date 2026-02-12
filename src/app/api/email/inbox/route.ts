@@ -20,6 +20,7 @@ export async function GET(req: Request) {
         console.log('📧 Fetching inbox for user:', authUser.id);
 
         // Obtener todos los threads con información del contacto y mensajes
+        console.log('🔍 Step 1: Querying database...');
         const { data: threads, error } = await supabaseAdmin
             .from('email_threads')
             .select(`
@@ -44,7 +45,24 @@ export async function GET(req: Request) {
             throw error;
         }
 
-        console.log(`✅ Found ${threads?.length || 0} threads`);
+        console.log(`✅ Step 2: Found ${threads?.length || 0} threads`);
+
+        if (!threads || threads.length === 0) {
+            console.log('⚠️ No threads found in database');
+            return NextResponse.json({
+                threads: [],
+                metrics: {
+                    totalSent: 0,
+                    totalOpened: 0,
+                    totalClicked: 0,
+                    openRate: 0,
+                    clickRate: 0
+                }
+            });
+        }
+
+        console.log('🔍 Step 3: Processing threads...');
+        console.log('First thread sample:', JSON.stringify(threads[0], null, 2));
 
         // Calcular métricas globales
         let totalSent = 0;
@@ -52,10 +70,13 @@ export async function GET(req: Request) {
         let totalClicked = 0;
 
         // Formatear respuesta con métricas por thread
-        const formattedThreads = (threads || []).map(thread => {
+        const formattedThreads = (threads || []).map((thread, index) => {
             try {
+                console.log(`🔄 Processing thread ${index + 1}/${threads.length}: ${thread.id}`);
+
                 // Obtener mensajes de forma segura
                 const messages = Array.isArray(thread.messages) ? thread.messages : [];
+                console.log(`  - Messages count: ${messages.length}`);
 
                 // Ordenar mensajes por fecha de forma segura
                 const sortedMessages = [...messages].sort((a, b) => {
@@ -75,6 +96,9 @@ export async function GET(req: Request) {
                 const outboundMessages = sortedMessages.filter(m => m.direction === 'outbound');
                 const lastOutbound = outboundMessages[outboundMessages.length - 1];
 
+                console.log(`  - Last message direction: ${lastMessage?.direction || 'none'}`);
+                console.log(`  - Outbound messages: ${outboundMessages.length}`);
+
                 // Sumar a métricas globales
                 outboundMessages.forEach(msg => {
                     totalSent++;
@@ -82,7 +106,7 @@ export async function GET(req: Request) {
                     if (msg.clicked_at || (msg.total_clicks && msg.total_clicks > 0)) totalClicked++;
                 });
 
-                return {
+                const formatted = {
                     id: thread.id,
                     contactId: thread.contact?.id,
                     contactName: thread.contact?.name || 'Sin nombre',
@@ -99,8 +123,12 @@ export async function GET(req: Request) {
                     clicked_at: lastOutbound?.clicked_at,
                     total_clicks: lastOutbound?.total_clicks || 0
                 };
+
+                console.log(`  ✅ Thread ${index + 1} processed successfully`);
+                return formatted;
+
             } catch (threadError) {
-                console.error('Error processing thread:', thread.id, threadError);
+                console.error(`❌ Error processing thread ${index + 1}:`, thread.id, threadError);
                 // Retornar thread básico en caso de error
                 return {
                     id: thread.id,
@@ -120,6 +148,8 @@ export async function GET(req: Request) {
                 };
             }
         });
+
+        console.log(`✅ Step 4: All threads processed. Total formatted: ${formattedThreads.length}`);
 
         // Calcular tasas
         const openRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0;
