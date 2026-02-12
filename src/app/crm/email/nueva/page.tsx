@@ -125,7 +125,7 @@ export default function NuevaCampanaPage() {
         }
 
         const confirmMessage = sendMode === 'now'
-            ? `¿Estás seguro de enviar esta campaña a ${selectedSegments.length} segmento(s) AHORA?\n\nSe creará una campaña separada para cada segmento.`
+            ? `¿Estás seguro de enviar esta campaña a ${selectedSegments.length} segmento(s)?\\n\\nSe enviará UNA campaña a la vez para evitar errores de límite de velocidad.\\n\\nEsto tomará aproximadamente ${selectedSegments.length * 5} segundos.`
             : `¿Programar esta campaña para ${selectedSegments.length} segmento(s) el ${new Date(`${scheduledDate}T${scheduledTime}`).toLocaleString('es-ES')}?`;
 
         if (!confirm(confirmMessage)) return;
@@ -135,14 +135,21 @@ export default function NuevaCampanaPage() {
             let endpoint = '/api/email/campaigns/send';
             let successCount = 0;
             let failedCount = 0;
+            const failedSegments: string[] = [];
 
             if (sendMode === 'scheduled') {
                 endpoint = '/api/email/campaigns/schedule';
             }
 
-            // Enviar una campaña por cada segmento seleccionado
-            for (const segmentId of selectedSegments) {
+            // Enviar campañas SECUENCIALMENTE (una a la vez) con delay de 5 segundos entre cada una
+            for (let i = 0; i < selectedSegments.length; i++) {
+                const segmentId = selectedSegments[i];
                 const segmentName = segments.find(s => s.id === segmentId)?.name || 'Segmento';
+
+                // Actualizar el estado de loading con progreso
+                const progress = `Enviando campaña ${i + 1} de ${selectedSegments.length}: ${segmentName}...`;
+                console.log(progress);
+
                 const body: any = {
                     name: `${formData.name || 'Campaña'} - ${segmentName}`,
                     subject: formData.subject,
@@ -167,21 +174,31 @@ export default function NuevaCampanaPage() {
                     if (!response.ok) {
                         console.error(`Error en segmento ${segmentName}:`, result.error);
                         failedCount++;
+                        failedSegments.push(segmentName);
                     } else {
                         successCount++;
+                        console.log(`✅ Campaña ${i + 1}/${selectedSegments.length} enviada: ${segmentName}`);
                     }
                 } catch (error: any) {
                     console.error(`Error en segmento ${segmentName}:`, error);
                     failedCount++;
+                    failedSegments.push(segmentName);
                 }
 
-                // Pausa de 2 segundos entre envíos para evitar rate limits de Resend
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Esperar 5 segundos antes de enviar la siguiente campaña (excepto la última)
+                if (i < selectedSegments.length - 1) {
+                    console.log(`⏳ Esperando 5 segundos antes de la siguiente campaña...`);
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                }
             }
 
-            const successMessage = sendMode === 'now'
-                ? `✅ ${successCount} campaña(s) enviada(s) exitosamente${failedCount > 0 ? `\n⚠️ ${failedCount} campaña(s) fallaron` : ''}`
-                : `✅ ${successCount} campaña(s) programada(s) exitosamente${failedCount > 0 ? `\n⚠️ ${failedCount} campaña(s) fallaron` : ''}`;
+            let successMessage = sendMode === 'now'
+                ? `✅ ${successCount} campaña(s) enviada(s) exitosamente`
+                : `✅ ${successCount} campaña(s) programada(s) exitosamente`;
+
+            if (failedCount > 0) {
+                successMessage += `\\n\\n⚠️ ${failedCount} campaña(s) fallaron:\\n${failedSegments.join(', ')}`;
+            }
 
             alert(successMessage);
             router.push('/crm/email');
