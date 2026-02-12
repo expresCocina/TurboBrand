@@ -173,30 +173,62 @@ export async function POST(req: Request) {
         // Resend soporta Batch Sending de hasta 100 emails por request. Usemos eso.
         // Mapeamos contactos al formato de Resend Batch
 
-        const emailBatch = contactsToSend.map(contact => {
-            // Reemplazo simple de variables
-            let personalizedHtml = campaignData.content
-                .replace(/{{nombre}}/g, contact.name || 'Cliente')
-                .replace(/{{email}}/g, contact.email)
-                .replace(/{{empresa}}/g, contact.company || 'su empresa'); // Asumiendo que el contacto puede tener empresa, si no fallback
+        const emailBatch = contactsToSend
+            .map(contact => {
+                // Limpiar email: Si tiene espacios, comas o punto y coma, tomar el primero
+                let cleanEmail = contact.email ? contact.email.trim() : '';
 
-            let personalizedSubject = campaignData.subject
-                .replace(/{{nombre}}/g, contact.name || 'Cliente');
+                // Si parece tener múltiples emails separados por espacio, coma o punto y coma
+                if (cleanEmail && (cleanEmail.includes(' ') || cleanEmail.includes(',') || cleanEmail.includes(';'))) {
+                    // Separar por cualquiera de estos caracteres
+                    const emails = cleanEmail.split(/[\s,;]+/);
+                    // Tomar el primero que parezca un email válido (tiene @)
+                    const validEmail = emails.find(e => e.includes('@'));
+                    if (validEmail) {
+                        console.log(`🧹 Email limpio: "${contact.email}" -> "${validEmail}"`);
+                        cleanEmail = validEmail;
+                    }
+                }
 
-            return {
-                from: 'Turbo Brand <crm@turbobrandcol.com>',
-                replyTo: 'gerencia@turbobrandcol.com', // Respuestas van a gerencia
-                to: contact.email,
-                subject: personalizedSubject,
-                html: personalizedHtml,
-                headers: {
-                    'X-Priority': '3', // Prioridad normal para campañas
-                    'X-Mailer': 'Turbo Brand CRM',
-                    'List-Unsubscribe': '<mailto:gerencia@turbobrandcol.com?subject=unsubscribe>',
-                    'Precedence': 'bulk',
-                },
-            };
-        });
+                // Validación básica final
+                if (!cleanEmail || !cleanEmail.includes('@')) {
+                    console.warn(`⚠️ Email inválido omitido: "${contact.email}"`);
+                    return null;
+                }
+
+                return {
+                    ...contact,
+                    email: cleanEmail // Usar el email limpio
+                };
+            })
+            .filter(c => c !== null) // Eliminar nulos
+            .map(contact => {
+                // Casting seguro porque ya filtramos nulos
+                const safeContact = contact as { email: string; name: string; company?: string };
+
+                // Reemplazo simple de variables
+                let personalizedHtml = campaignData.content
+                    .replace(/{{nombre}}/g, safeContact.name || 'Cliente')
+                    .replace(/{{email}}/g, safeContact.email)
+                    .replace(/{{empresa}}/g, safeContact.company || 'su empresa');
+
+                let personalizedSubject = campaignData.subject
+                    .replace(/{{nombre}}/g, safeContact.name || 'Cliente');
+
+                return {
+                    from: 'Turbo Brand <crm@turbobrandcol.com>',
+                    replyTo: 'gerencia@turbobrandcol.com',
+                    to: safeContact.email,
+                    subject: personalizedSubject,
+                    html: personalizedHtml,
+                    headers: {
+                        'X-Priority': '3',
+                        'X-Mailer': 'Turbo Brand CRM',
+                        'List-Unsubscribe': '<mailto:gerencia@turbobrandcol.com?subject=unsubscribe>',
+                        'Precedence': 'bulk',
+                    },
+                };
+            });
 
         // Enviar en lotes de 50 emails (Resend limita a 100 por batch)
         const BATCH_SIZE = 50;
