@@ -30,7 +30,10 @@ export default function NuevaCampanaPage() {
     });
 
     const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
-    const [recipientMode, setRecipientMode] = useState<'segments' | 'all'>('segments'); // segments o all contacts
+    const [recipientMode, setRecipientMode] = useState<'segments' | 'all' | 'contacts'>('segments'); // segments, all contacts, o contactos individuales
+    const [selectedContacts, setSelectedContacts] = useState<string[]>([]); // IDs de contactos seleccionados
+    const [contacts, setContacts] = useState<any[]>([]); // Lista de todos los contactos
+    const [contactSearch, setContactSearch] = useState(''); // Búsqueda de contactos
 
     const [sendMode, setSendMode] = useState<'now' | 'scheduled'>('now');
     const [scheduledDate, setScheduledDate] = useState('');
@@ -81,7 +84,16 @@ export default function NuevaCampanaPage() {
 
                 setSegments(segmentsData || []);
 
-                // 4. Cargar número total de contactos (GLOBAL)
+                // 4. Cargar TODOS los contactos para selección individual
+                const { data: contactsData } = await supabase
+                    .from('contacts')
+                    .select('id, name, email, company')
+                    .not('email', 'is', null)
+                    .order('name');
+
+                setContacts(contactsData || []);
+
+                // 5. Cargar número total de contactos (GLOBAL)
                 // Eliminamos filtro de orgId y aseguramos que tenga email
                 const { count } = await supabase
                     .from('contacts')
@@ -114,6 +126,11 @@ export default function NuevaCampanaPage() {
             return;
         }
 
+        if (recipientMode === 'contacts' && selectedContacts.length === 0) {
+            alert('Por favor selecciona al menos un contacto para enviar');
+            return;
+        }
+
         // Validar fecha programada si está en modo scheduled
         if (sendMode === 'scheduled') {
             if (!scheduledDate || !scheduledTime) {
@@ -130,13 +147,22 @@ export default function NuevaCampanaPage() {
             }
         }
 
-        const recipientCount = recipientMode === 'all' ? stats.totalContacts : selectedSegments.length;
+        const recipientCount = recipientMode === 'all' ? stats.totalContacts :
+            recipientMode === 'contacts' ? selectedContacts.length :
+                selectedSegments.length;
+
         const recipientText = recipientMode === 'all'
             ? `${stats.totalContacts} contacto(s)`
-            : `${selectedSegments.length} segmento(s)`;
+            : recipientMode === 'contacts'
+                ? `${selectedContacts.length} contacto(s) seleccionado(s)`
+                : `${selectedSegments.length} segmento(s)`;
+
+        const estimatedTime = recipientMode === 'all' ? Math.ceil(stats.totalContacts / 30) * 3 :
+            recipientMode === 'contacts' ? Math.ceil(selectedContacts.length / 30) * 3 :
+                selectedSegments.length * 5;
 
         const confirmMessage = sendMode === 'now'
-            ? `¿Estás seguro de enviar esta campaña a ${recipientText}?\n\nSe enviará de forma controlada para evitar errores de límite de velocidad.\n\nEsto tomará aproximadamente ${recipientMode === 'all' ? Math.ceil(stats.totalContacts / 30) * 3 : selectedSegments.length * 5} segundos.`
+            ? `¿Estás seguro de enviar esta campaña a ${recipientText}?\n\nSe enviará de forma controlada para evitar errores de límite de velocidad.\n\nEsto tomará aproximadamente ${estimatedTime} segundos.`
             : `¿Programar esta campaña para ${recipientText} el ${new Date(`${scheduledDate}T${scheduledTime}`).toLocaleString('es-ES')}?`;
 
         if (!confirm(confirmMessage)) return;
@@ -183,6 +209,43 @@ export default function NuevaCampanaPage() {
                     } else {
                         successCount = 1;
                         console.log('✅ Campaña enviada a todos los contactos');
+                    }
+                } catch (error: any) {
+                    console.error('Error al enviar campaña:', error);
+                    failedCount = 1;
+                }
+            } else if (recipientMode === 'contacts') {
+                // Modo: Enviar a CONTACTOS SELECCIONADOS
+                console.log(`Enviando a ${selectedContacts.length} contactos seleccionados...`);
+
+                const body: any = {
+                    name: formData.name || `Campaña ${new Date().toLocaleDateString()}`,
+                    subject: formData.subject,
+                    content: formData.content,
+                    segment_id: null, // null porque enviaremos a IDs específicos
+                    contact_ids: selectedContacts, // Array de IDs de contactos seleccionados
+                    organization_id: orgId
+                };
+
+                if (sendMode === 'scheduled') {
+                    body.scheduled_at = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
+                }
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        console.error('Error al enviar campaña:', result.error);
+                        throw new Error(result.error);
+                    } else {
+                        successCount = 1;
+                        console.log(`✅ Campaña enviada a ${selectedContacts.length} contactos`);
                     }
                 } catch (error: any) {
                     console.error('Error al enviar campaña:', error);
@@ -305,29 +368,131 @@ export default function NuevaCampanaPage() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Destinatarios</label>
 
-                            {/* Toggle entre Segmentos y Todos los Contactos */}
-                            <div className="flex gap-2 mb-4">
+                            {/* Toggle entre Segmentos, Todos los Contactos y Contactos Individuales */}
+                            <div className="grid grid-cols-3 gap-2 mb-4">
                                 <button
                                     type="button"
                                     onClick={() => setRecipientMode('segments')}
-                                    className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all ${recipientMode === 'segments'
+                                    className={`px-3 py-2.5 rounded-lg font-medium text-sm transition-all ${recipientMode === 'segments'
                                         ? 'bg-purple-600 text-white shadow-md'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
-                                    📋 Por Segmentos
+                                    📋 Segmentos
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setRecipientMode('contacts')}
+                                    className={`px-3 py-2.5 rounded-lg font-medium text-sm transition-all ${recipientMode === 'contacts'
+                                        ? 'bg-purple-600 text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    ✅ Seleccionar ({selectedContacts.length})
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setRecipientMode('all')}
-                                    className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all ${recipientMode === 'all'
+                                    className={`px-3 py-2.5 rounded-lg font-medium text-sm transition-all ${recipientMode === 'all'
                                         ? 'bg-purple-600 text-white shadow-md'
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
-                                    👥 Todos los Contactos ({stats.totalContacts})
+                                    👥 Todos ({stats.totalContacts})
                                 </button>
                             </div>
+
+                            {recipientMode === 'contacts' && (
+                                <div className="mb-4">
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+                                        <p className="text-sm text-blue-800">
+                                            <strong>ℹ️ Selección Individual</strong><br />
+                                            Selecciona los contactos específicos a los que quieres enviar esta campaña.
+                                        </p>
+                                    </div>
+
+                                    {/* Búsqueda de contactos */}
+                                    <input
+                                        type="text"
+                                        placeholder="🔍 Buscar por nombre, email o empresa..."
+                                        value={contactSearch}
+                                        onChange={(e) => setContactSearch(e.target.value)}
+                                        className="w-full px-4 py-2.5 mb-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+                                    />
+
+                                    {/* Botón seleccionar/deseleccionar todos */}
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm text-gray-600">
+                                            {selectedContacts.length} de {contacts.filter(c =>
+                                                c.name?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                c.email?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                c.company?.toLowerCase().includes(contactSearch.toLowerCase())
+                                            ).length} contactos seleccionados
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const filteredContacts = contacts.filter(c =>
+                                                    c.name?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                    c.email?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                    c.company?.toLowerCase().includes(contactSearch.toLowerCase())
+                                                );
+                                                if (selectedContacts.length === filteredContacts.length) {
+                                                    setSelectedContacts([]);
+                                                } else {
+                                                    setSelectedContacts(filteredContacts.map(c => c.id));
+                                                }
+                                            }}
+                                            className="text-xs text-purple-600 hover:text-purple-700 font-medium"
+                                        >
+                                            {selectedContacts.length === contacts.filter(c =>
+                                                c.name?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                c.email?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                c.company?.toLowerCase().includes(contactSearch.toLowerCase())
+                                            ).length ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                                        </button>
+                                    </div>
+
+                                    {/* Lista de contactos con checkboxes */}
+                                    <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-white">
+                                        {contacts
+                                            .filter(contact =>
+                                                contact.name?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                contact.email?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                                contact.company?.toLowerCase().includes(contactSearch.toLowerCase())
+                                            )
+                                            .map((contact) => (
+                                                <label key={contact.id} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedContacts.includes(contact.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setSelectedContacts([...selectedContacts, contact.id]);
+                                                            } else {
+                                                                setSelectedContacts(selectedContacts.filter(id => id !== contact.id));
+                                                            }
+                                                        }}
+                                                        className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                                    />
+                                                    <div className="flex-1">
+                                                        <div className="text-sm font-medium text-gray-900">{contact.name || 'Sin nombre'}</div>
+                                                        <div className="text-xs text-gray-500">{contact.email}</div>
+                                                        {contact.company && <div className="text-xs text-gray-400">{contact.company}</div>}
+                                                    </div>
+                                                </label>
+                                            ))
+                                        }
+                                        {contacts.filter(c =>
+                                            c.name?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                            c.email?.toLowerCase().includes(contactSearch.toLowerCase()) ||
+                                            c.company?.toLowerCase().includes(contactSearch.toLowerCase())
+                                        ).length === 0 && (
+                                                <p className="text-sm text-gray-500 text-center py-4">No se encontraron contactos</p>
+                                            )}
+                                    </div>
+                                </div>
+                            )}
 
                             {recipientMode === 'segments' && (
                                 <>
