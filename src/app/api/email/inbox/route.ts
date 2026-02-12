@@ -83,14 +83,13 @@ export async function GET(req: Request) {
                 totalMessages: thread.total_messages,
                 unreadCount: thread.unread_count,
                 preview: preview,
-                lastMessageDirection: lastMessage?.direction,
+                lastMessageDirection: lastMessage?.direction || 'inbound', // Fallback to 'inbound' if no messages
                 // Métricas de tracking (usamos datos del último mensaje enviado para el badge del thread)
                 opened_at: lastOutbound?.opened_at,
                 total_opens: lastOutbound?.total_opens || 0,
                 clicked_at: lastOutbound?.clicked_at,
                 total_clicks: lastOutbound?.total_clicks || 0,
-                // Devolvemos los mensajes ordenados para el frontend
-                messages: sortedMessages
+                // NO devolvemos messages aquí para evitar payload grande
             };
         }) || [];
 
