@@ -231,8 +231,8 @@ export async function POST(req: Request) {
                 };
             });
 
-        // Enviar en lotes de 50 emails (Resend limita a 100 por batch)
-        const BATCH_SIZE = 50;
+        // Enviar en lotes de 30 emails para evitar rate limits (Resend: 2 req/seg)
+        const BATCH_SIZE = 30;
         const batches = [];
 
         for (let i = 0; i < emailBatch.length; i += BATCH_SIZE) {
@@ -264,9 +264,9 @@ export async function POST(req: Request) {
                 sentCount += batchData.data.length;
             }
 
-            // Pausa de 2.5 segundos entre lotes para evitar rate limiting (Resend: 2 req/seg)
+            // Pausa de 3 segundos entre lotes para evitar rate limiting (Resend: 2 req/seg)
             if (batchIndex < batches.length) {
-                await new Promise(resolve => setTimeout(resolve, 2500));
+                await new Promise(resolve => setTimeout(resolve, 3000));
             }
         }
 
