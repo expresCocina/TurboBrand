@@ -30,6 +30,7 @@ export default function NuevaCampanaPage() {
     });
 
     const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
+    const [recipientMode, setRecipientMode] = useState<'segments' | 'all'>('segments'); // segments o all contacts
 
     const [sendMode, setSendMode] = useState<'now' | 'scheduled'>('now');
     const [scheduledDate, setScheduledDate] = useState('');
@@ -102,9 +103,14 @@ export default function NuevaCampanaPage() {
             return;
         }
 
-        // Validar que haya al menos un segmento seleccionado
-        if (selectedSegments.length === 0) {
+        // Validar según el modo de destinatarios
+        if (recipientMode === 'segments' && selectedSegments.length === 0) {
             alert('Por favor selecciona al menos un segmento para enviar');
+            return;
+        }
+
+        if (recipientMode === 'all' && stats.totalContacts === 0) {
+            alert('No hay contactos disponibles para enviar');
             return;
         }
 
@@ -124,9 +130,14 @@ export default function NuevaCampanaPage() {
             }
         }
 
+        const recipientCount = recipientMode === 'all' ? stats.totalContacts : selectedSegments.length;
+        const recipientText = recipientMode === 'all'
+            ? `${stats.totalContacts} contacto(s)`
+            : `${selectedSegments.length} segmento(s)`;
+
         const confirmMessage = sendMode === 'now'
-            ? `¿Estás seguro de enviar esta campaña a ${selectedSegments.length} segmento(s)?\n\nSe enviará UNA campaña a la vez para evitar errores de límite de velocidad.\n\nEsto tomará aproximadamente ${selectedSegments.length * 5} segundos.`
-            : `¿Programar esta campaña para ${selectedSegments.length} segmento(s) el ${new Date(`${scheduledDate}T${scheduledTime}`).toLocaleString('es-ES')}?`;
+            ? `¿Estás seguro de enviar esta campaña a ${recipientText}?\n\nSe enviará de forma controlada para evitar errores de límite de velocidad.\n\nEsto tomará aproximadamente ${recipientMode === 'all' ? Math.ceil(stats.totalContacts / 30) * 3 : selectedSegments.length * 5} segundos.`
+            : `¿Programar esta campaña para ${recipientText} el ${new Date(`${scheduledDate}T${scheduledTime}`).toLocaleString('es-ES')}?`;
 
         if (!confirm(confirmMessage)) return;
 
@@ -141,20 +152,15 @@ export default function NuevaCampanaPage() {
                 endpoint = '/api/email/campaigns/schedule';
             }
 
-            // Enviar campañas SECUENCIALMENTE (una a la vez) con delay de 5 segundos entre cada una
-            for (let i = 0; i < selectedSegments.length; i++) {
-                const segmentId = selectedSegments[i];
-                const segmentName = segments.find(s => s.id === segmentId)?.name || 'Segmento';
-
-                // Actualizar el estado de loading con progreso
-                const progress = `Enviando campaña ${i + 1} de ${selectedSegments.length}: ${segmentName}...`;
-                console.log(progress);
+            if (recipientMode === 'all') {
+                // Modo: Enviar a TODOS los contactos (sin segmentos)
+                console.log('Enviando a todos los contactos...');
 
                 const body: any = {
-                    name: `${formData.name || 'Campaña'} - ${segmentName}`,
+                    name: formData.name || `Campaña ${new Date().toLocaleDateString()}`,
                     subject: formData.subject,
                     content: formData.content,
-                    segment_id: segmentId,
+                    segment_id: null, // null = todos los contactos
                     organization_id: orgId
                 };
 
@@ -172,23 +178,67 @@ export default function NuevaCampanaPage() {
                     const result = await response.json();
 
                     if (!response.ok) {
-                        console.error(`Error en segmento ${segmentName}:`, result.error);
-                        failedCount++;
-                        failedSegments.push(segmentName);
+                        console.error('Error al enviar campaña:', result.error);
+                        throw new Error(result.error);
                     } else {
-                        successCount++;
-                        console.log(`✅ Campaña ${i + 1}/${selectedSegments.length} enviada: ${segmentName}`);
+                        successCount = 1;
+                        console.log('✅ Campaña enviada a todos los contactos');
                     }
                 } catch (error: any) {
-                    console.error(`Error en segmento ${segmentName}:`, error);
-                    failedCount++;
-                    failedSegments.push(segmentName);
+                    console.error('Error al enviar campaña:', error);
+                    failedCount = 1;
                 }
+            } else {
+                // Modo: Enviar por SEGMENTOS (una campaña por segmento)
+                // Enviar campañas SECUENCIALMENTE (una a la vez) con delay de 5 segundos entre cada una
+                for (let i = 0; i < selectedSegments.length; i++) {
+                    const segmentId = selectedSegments[i];
+                    const segmentName = segments.find(s => s.id === segmentId)?.name || 'Segmento';
 
-                // Esperar 5 segundos antes de enviar la siguiente campaña (excepto la última)
-                if (i < selectedSegments.length - 1) {
-                    console.log(`⏳ Esperando 5 segundos antes de la siguiente campaña...`);
-                    await new Promise(resolve => setTimeout(resolve, 5000));
+                    // Actualizar el estado de loading con progreso
+                    const progress = `Enviando campaña ${i + 1} de ${selectedSegments.length}: ${segmentName}...`;
+                    console.log(progress);
+
+                    const body: any = {
+                        name: `${formData.name || 'Campaña'} - ${segmentName}`,
+                        subject: formData.subject,
+                        content: formData.content,
+                        segment_id: segmentId,
+                        organization_id: orgId
+                    };
+
+                    if (sendMode === 'scheduled') {
+                        body.scheduled_at = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
+                    }
+
+                    try {
+                        const response = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(body)
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok) {
+                            console.error(`Error en segmento ${segmentName}:`, result.error);
+                            failedCount++;
+                            failedSegments.push(segmentName);
+                        } else {
+                            successCount++;
+                            console.log(`✅ Campaña ${i + 1}/${selectedSegments.length} enviada: ${segmentName}`);
+                        }
+                    } catch (error: any) {
+                        console.error(`Error en segmento ${segmentName}:`, error);
+                        failedCount++;
+                        failedSegments.push(segmentName);
+                    }
+
+                    // Esperar 5 segundos antes de enviar la siguiente campaña (excepto la última)
+                    if (i < selectedSegments.length - 1) {
+                        console.log(`⏳ Esperando 5 segundos antes de la siguiente campaña...`);
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                    }
                 }
             }
 
@@ -253,55 +303,115 @@ export default function NuevaCampanaPage() {
                         </div>
 
                         <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <label className="block text-sm font-medium text-gray-700">Segmentos de Contactos</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Destinatarios</label>
+
+                            {/* Toggle entre Segmentos y Todos los Contactos */}
+                            <div className="flex gap-2 mb-4">
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        if (selectedSegments.length === segments.length) {
-                                            setSelectedSegments([]);
-                                        } else {
-                                            setSelectedSegments(segments.map(s => s.id));
-                                        }
-                                    }}
-                                    className="text-xs text-purple-600 hover:text-purple-700 font-medium"
+                                    onClick={() => setRecipientMode('segments')}
+                                    className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all ${recipientMode === 'segments'
+                                        ? 'bg-purple-600 text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
                                 >
-                                    {selectedSegments.length === segments.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                                    📋 Por Segmentos
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setRecipientMode('all')}
+                                    className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-all ${recipientMode === 'all'
+                                        ? 'bg-purple-600 text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    👥 Todos los Contactos ({stats.totalContacts})
                                 </button>
                             </div>
-                            <div className="max-h-64 overflow-y-auto bg-white border border-gray-300 rounded-lg p-3 space-y-2">
-                                {segments.length === 0 ? (
-                                    <p className="text-sm text-gray-500 text-center py-4">No hay segmentos disponibles</p>
-                                ) : (
-                                    segments.map((segment) => (
-                                        <label
-                                            key={segment.id}
-                                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+
+                            {recipientMode === 'segments' && (
+                                <>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <label className="block text-sm font-medium text-gray-700">Segmentos de Contactos</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (selectedSegments.length === segments.length) {
+                                                    setSelectedSegments([]);
+                                                } else {
+                                                    setSelectedSegments(segments.map(s => s.id));
+                                                }
+                                            }}
+                                            className="text-xs text-purple-600 hover:text-purple-700 font-medium"
                                         >
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedSegments.includes(segment.id)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setSelectedSegments([...selectedSegments, segment.id]);
-                                                    } else {
-                                                        setSelectedSegments(selectedSegments.filter(id => id !== segment.id));
-                                                    }
-                                                }}
-                                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                                            />
-                                            <span className="text-sm text-gray-900 font-medium">{segment.name}</span>
-                                        </label>
-                                    ))
-                                )}
-                            </div>
-                            <p className="text-xs text-gray-500 mt-2">
-                                {selectedSegments.length === 0
-                                    ? 'Selecciona uno o más segmentos para enviar'
-                                    : `${selectedSegments.length} segmento(s) seleccionado(s) - Se creará una campaña separada para cada uno`
-                                }
-                            </p>
+                                            {selectedSegments.length === segments.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+
+                            {recipientMode === 'all' && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                    <p className="text-sm text-blue-800">
+                                        <strong>ℹ️ Modo: Todos los Contactos</strong><br />
+                                        Se enviará a todos los {stats.totalContacts} contactos activos en la base de datos.
+                                    </p>
+                                </div>
+                            )}
                         </div>
+
+                        {recipientMode === 'segments' && (
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="block text-sm font-medium text-gray-700">Segmentos de Contactos</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (selectedSegments.length === segments.length) {
+                                                setSelectedSegments([]);
+                                            } else {
+                                                setSelectedSegments(segments.map(s => s.id));
+                                            }
+                                        }}
+                                        className="text-xs text-purple-600 hover:text-purple-700 font-medium"
+                                    >
+                                        {selectedSegments.length === segments.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                                    </button>
+                                </div>
+                                <div className="max-h-64 overflow-y-auto bg-white border border-gray-300 rounded-lg p-3 space-y-2">
+                                    {segments.length === 0 ? (
+                                        <p className="text-sm text-gray-500 text-center py-4">No hay segmentos disponibles</p>
+                                    ) : (
+                                        segments.map((segment) => (
+                                            <label
+                                                key={segment.id}
+                                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedSegments.includes(segment.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedSegments([...selectedSegments, segment.id]);
+                                                        } else {
+                                                            setSelectedSegments(selectedSegments.filter(id => id !== segment.id));
+                                                        }
+                                                    }}
+                                                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                                />
+                                                <span className="text-sm text-gray-900 font-medium">{segment.name}</span>
+                                            </label>
+                                        ))
+                                    )}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2">
+                                    {selectedSegments.length === 0
+                                        ? 'Selecciona uno o más segmentos para enviar'
+                                        : `${selectedSegments.length} segmento(s) seleccionado(s) - Se creará una campaña separada para cada uno`
+                                    }
+                                </p>
+                            </div>
+                        )}
 
                         {/* Modo de Envío */}
                         <div>
