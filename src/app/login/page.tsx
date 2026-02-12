@@ -26,7 +26,7 @@ export default function LoginPage() {
 
             if (error) throw error;
 
-            router.push('/crm');
+            router.push('/admin/zones');
             router.refresh();
         } catch (err: any) {
             setError(err.message || 'Error al iniciar sesión');
@@ -46,7 +46,7 @@ export default function LoginPage() {
                             className="h-full w-auto object-contain"
                         />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900">Turbo Brand CRM</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Turbo Brand Admin</h1>
                     <p className="text-gray-500 mt-2">Acceso exclusivo para administradores</p>
                 </div>
 

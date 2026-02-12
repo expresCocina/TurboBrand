@@ -113,13 +113,6 @@ export default function Navbar() {
             </Link>
           ))}
           <Link
-            href="/crm"
-            className={styles.link}
-            style={{ color: '#9E0060', fontWeight: 600 }}
-          >
-            🚀 CRM
-          </Link>
-          <Link
             href="#contacto"
             onClick={handleAnchor("#contacto")}
             className={styles.cta}

@@ -9,15 +9,15 @@ import { AuthProvider } from '@/contexts/AuthContext';
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const isCRM = pathname?.startsWith('/crm');
     const isLogin = pathname?.startsWith('/login');
+    const isAdmin = pathname?.startsWith('/admin');
 
     return (
         <AuthProvider>
-            {!isCRM && !isLogin && <Navbar />}
+            {!isLogin && !isAdmin && <Navbar />}
             {children}
-            {!isCRM && !isLogin && <WhatsAppButton />}
-            {!isCRM && !isLogin && <Footer />}
+            {!isLogin && !isAdmin && <WhatsAppButton />}
+            {!isLogin && !isAdmin && <Footer />}
         </AuthProvider>
     );
 }
