@@ -98,11 +98,11 @@ export async function GET(req: Request) {
                 const contact = contactsMap.get(thread.contact_id);
 
                 const lastMessage = threadMessages[threadMessages.length - 1];
-                const outboundMessages = threadMessages.filter(m => m.direction === 'outbound');
+                const outboundMessages = threadMessages.filter((m: any) => m.direction === 'outbound');
                 const lastOutbound = outboundMessages[outboundMessages.length - 1];
 
                 // Sumar métricas
-                outboundMessages.forEach(msg => {
+                outboundMessages.forEach((msg: any) => {
                     totalSent++;
                     if (msg.opened_at || (msg.total_opens && msg.total_opens > 0)) totalOpened++;
                     if (msg.clicked_at || (msg.total_clicks && msg.total_clicks > 0)) totalClicked++;
