@@ -87,8 +87,8 @@ export default function EmailComposer({ isOpen, onClose, threadId, contactId, on
     }
 
     const filteredContacts = contacts.filter(contact =>
-        contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        contact.email.toLowerCase().includes(searchQuery.toLowerCase())
+        (contact.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (contact.email?.toLowerCase() || '').includes(searchQuery.toLowerCase())
     );
 
     function handleSelectContact(contact: Contact) {
