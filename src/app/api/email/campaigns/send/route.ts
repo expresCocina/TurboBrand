@@ -213,7 +213,8 @@ export async function POST(req: Request) {
                     .replace(/{{empresa}}/g, safeContact.company || 'su empresa');
 
                 let personalizedSubject = campaignData.subject
-                    .replace(/{{nombre}}/g, safeContact.name || 'Cliente');
+                    .replace(/{{nombre}}/g, safeContact.name || 'Cliente')
+                    .replace(/{{empresa}}/g, safeContact.company || 'su empresa');
 
                 return {
                     from: 'Turbo Brand <crm@turbobrandcol.com>',
