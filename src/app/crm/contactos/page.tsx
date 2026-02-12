@@ -261,7 +261,7 @@ export default function ContactosPage() {
                     columnMap.phone = index;
                 }
                 // Empresa
-                else if (h.includes('empresa') || h.includes('company') || h.includes('organizacion') || h.includes('negocio')) {
+                else if (h.includes('empresa') || h.includes('company') || h.includes('organizacion') || h.includes('negocio') || h.includes('nombre') && h.includes('empresa')) {
                     columnMap.company = index;
                 }
                 // Cargo
