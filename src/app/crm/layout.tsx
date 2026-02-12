@@ -24,7 +24,6 @@ const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/crm' },
     { icon: Users, label: 'Contactos', href: '/crm/contactos' },
     { icon: BarChart3, label: 'Pipeline', href: '/crm/ventas' },
-    { icon: Inbox, label: 'Email Inbox', href: '/crm/email-inbox' },
     { icon: Mail, label: 'Email Marketing', href: '/crm/email' },
     { icon: MessageSquare, label: 'WhatsApp', href: '/crm/whatsapp' },
     { icon: Workflow, label: 'Automatización', href: '/crm/automatizacion' },
