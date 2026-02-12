@@ -198,32 +198,52 @@ export async function POST(req: Request) {
             };
         });
 
-        // Enviar en lotes de 100 (aunque aquí enviamos todo de una si es menos de 100)
-        // Usamos el dominio de pruebas de Resend: onboarding@resend.dev 
-        // IMPORTANTE: En modo Test de Resend, SOLO se puede enviar al email con el que te registraste.
-        // Si intentas enviar a otros, fallará (o no llegará).
+        // Enviar en lotes de 50 emails (Resend limita a 100 por batch)
+        const BATCH_SIZE = 50;
+        const batches = [];
 
-        // Intentaremos enviar.
-        const { data: batchData, error: batchError } = await resend.batch.send(emailBatch);
-
-        if (batchError) {
-            console.error('Error Resend Batch:', batchError);
-            // Actualizar estado a fallido
-            await supabase
-                .from('email_campaigns')
-                .update({ status: 'failed' })
-                .eq('id', campaign.id);
-
-            throw batchError;
+        for (let i = 0; i < emailBatch.length; i += BATCH_SIZE) {
+            batches.push(emailBatch.slice(i, i + BATCH_SIZE));
         }
 
-        console.log('📧 [SEND] Respuesta de Resend Batch:', JSON.stringify(batchData, null, 2));
+        console.log(`📦 Dividiendo ${emailBatch.length} emails en ${batches.length} lotes de máximo ${BATCH_SIZE}`);
+
+        let allBatchResults: any[] = [];
+        let batchIndex = 0;
+
+        for (const batch of batches) {
+            batchIndex++;
+            console.log(`📧 Enviando lote ${batchIndex}/${batches.length} (${batch.length} emails)...`);
+
+            const { data: batchData, error: batchError } = await resend.batch.send(batch);
+
+            if (batchError) {
+                console.error(`❌ Error en lote ${batchIndex}:`, batchError);
+                // Continuar con los siguientes lotes en lugar de fallar completamente
+                failedCount += batch.length;
+                continue;
+            }
+
+            console.log(`✅ Lote ${batchIndex} enviado exitosamente`);
+
+            if (batchData && batchData.data) {
+                allBatchResults = allBatchResults.concat(batchData.data);
+                sentCount += batchData.data.length;
+            }
+
+            // Pequeña pausa entre lotes para evitar rate limiting
+            if (batchIndex < batches.length) {
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 segundo
+            }
+        }
+
+        console.log(`📊 Resumen: ${sentCount} enviados, ${failedCount} fallidos`);
 
         // 4. Guardar cada email enviado en email_sends con su ID de Resend
-        if (batchData && batchData.data) {
-            console.log(`💾 [SEND] Guardando ${batchData.data.length} emails en email_sends...`);
+        if (allBatchResults.length > 0) {
+            console.log(`💾 [SEND] Guardando ${allBatchResults.length} emails en email_sends...`);
 
-            const emailSendsRecords = batchData.data.map((item: any, index: number) => {
+            const emailSendsRecords = allBatchResults.map((item: any, index: number) => {
                 const record = {
                     campaign_id: campaign.id,
                     contact_email: contactsToSend[index].email,
@@ -231,7 +251,6 @@ export async function POST(req: Request) {
                     status: 'sent',
                     sent_at: new Date().toISOString()
                 };
-                console.log(`📝 [SEND] Record ${index + 1}:`, JSON.stringify(record, null, 2));
                 return record;
             });
 
