@@ -174,6 +174,18 @@ export async function POST(req: Request) {
             throw emailError;
         }
 
+        console.log('✅ Email enviado via Resend:', emailData);
+
+        // Guardar el ID de Resend en el mensaje para tracking
+        if (emailData?.id) {
+            await supabaseAdmin
+                .from('email_messages')
+                .update({ resend_email_id: emailData.id })
+                .eq('id', message.id);
+
+            console.log('📝 Resend email ID guardado:', emailData.id);
+        }
+
         // Actualizar thread
         await supabaseAdmin
             .from('email_threads')
@@ -183,7 +195,7 @@ export async function POST(req: Request) {
             })
             .eq('id', thread.id);
 
-        console.log('✅ Email enviado exitosamente:', emailData);
+        console.log('✅ Email enviado exitosamente');
 
         return NextResponse.json({
             success: true,

@@ -152,9 +152,79 @@ Este email fue reenviado automáticamente desde ${to}
             return NextResponse.json({ received: true, error: 'db_error' }, { status: 200 });
         }
 
+        // Si no se encuentra en email_sends, buscar en email_messages (inbox)
         if (!emailSend) {
-            console.warn(`⚠️ [WEBHOOK] No se encontró email_send para resend_id: ${resendEmailId}`);
-            return NextResponse.json({ received: true, warning: 'email_not_found' }, { status: 200 });
+            console.log(`🔍 [WEBHOOK] No encontrado en email_sends, buscando en email_messages...`);
+
+            const { data: emailMessage, error: messageError } = await supabase
+                .from('email_messages')
+                .select('id, thread_id')
+                .eq('resend_email_id', resendEmailId)
+                .single();
+
+            if (messageError || !emailMessage) {
+                console.warn(`⚠️ [WEBHOOK] No se encontró email para resend_id: ${resendEmailId}`);
+                return NextResponse.json({ received: true, warning: 'email_not_found' }, { status: 200 });
+            }
+
+            console.log(`📧 [WEBHOOK] Email de inbox encontrado: ${emailMessage.id}`);
+
+            // Actualizar email_messages según el evento
+            let updateData: any = {};
+
+            switch (type) {
+                case 'email.delivered':
+                    updateData.delivered_at = new Date().toISOString();
+                    break;
+                case 'email.opened':
+                    // Si es la primera apertura, guardar timestamp
+                    const { data: currentMessage } = await supabase
+                        .from('email_messages')
+                        .select('opened_at, total_opens')
+                        .eq('id', emailMessage.id)
+                        .single();
+
+                    if (currentMessage && !currentMessage.opened_at) {
+                        updateData.opened_at = new Date().toISOString();
+                    }
+                    updateData.total_opens = (currentMessage?.total_opens || 0) + 1;
+                    break;
+                case 'email.clicked':
+                    // Si es el primer click, guardar timestamp
+                    const { data: currentMsg } = await supabase
+                        .from('email_messages')
+                        .select('clicked_at, total_clicks')
+                        .eq('id', emailMessage.id)
+                        .single();
+
+                    if (currentMsg && !currentMsg.clicked_at) {
+                        updateData.clicked_at = new Date().toISOString();
+                    }
+                    updateData.total_clicks = (currentMsg?.total_clicks || 0) + 1;
+                    break;
+                case 'email.bounced':
+                    updateData.bounced_at = new Date().toISOString();
+                    break;
+                default:
+                    console.log(`ℹ️ [WEBHOOK] Evento no rastreado para inbox: ${type}`);
+                    return NextResponse.json({ received: true, info: 'event_not_tracked' }, { status: 200 });
+            }
+
+            if (Object.keys(updateData).length > 0) {
+                const { error: updateError } = await supabase
+                    .from('email_messages')
+                    .update(updateData)
+                    .eq('id', emailMessage.id);
+
+                if (updateError) {
+                    console.error(`❌ [WEBHOOK] Error actualizando email_message:`, updateError);
+                    return NextResponse.json({ received: true, error: 'update_failed' }, { status: 200 });
+                }
+
+                console.log(`✅ [WEBHOOK] Email de inbox actualizado:`, updateData);
+            }
+
+            return NextResponse.json({ received: true, success: true, type: 'inbox_email' }, { status: 200 });
         }
 
         const campaignId = emailSend.campaign_id;
