@@ -8,9 +8,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { contactId, subject, content, threadId } = body;
+        let { contactId, subject, content, threadId, manualEmail, manualName } = body;
 
-        if (!contactId || !subject || !content) {
+        // Validar campos requeridos mínimos
+        if ((!contactId && !manualEmail) || !subject || !content) {
             return NextResponse.json({
                 error: 'Missing required fields'
             }, { status: 400 });
@@ -29,7 +30,53 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid authentication' }, { status: 401 });
         }
 
-        // Obtener información del contacto primero
+        // Si es envío manual, buscar o crear contacto
+        if (!contactId && manualEmail) {
+            // Verificar si el contacto ya existe por email
+            const { data: existingContact } = await supabaseAdmin
+                .from('contacts')
+                .select('id')
+                .eq('email', manualEmail)
+                .single();
+
+            if (existingContact) {
+                contactId = existingContact.id;
+            } else {
+                // Crear nuevo contacto
+                // Necesitamos un organization_id, usaremos el del primer usuario encontrado (temporal simplificado) o null
+                // En un caso real, deberíamos obtener la organización del usuario autenticado
+                const { data: userData } = await supabaseAdmin
+                    .from('crm_users')
+                    .select('organization_id')
+                    .eq('id', authUser.id)
+                    .single();
+
+                const orgId = userData?.organization_id;
+
+                if (orgId) {
+                    const { data: newContact, error: createError } = await supabaseAdmin
+                        .from('contacts')
+                        .insert({
+                            organization_id: orgId,
+                            name: manualName || manualEmail.split('@')[0],
+                            email: manualEmail,
+                            status: 'lead' // Default status
+                        })
+                        .select()
+                        .single();
+
+                    if (createError) {
+                        console.error('Error creating contact:', createError);
+                        return NextResponse.json({ error: 'Error creating contact' }, { status: 500 });
+                    }
+                    contactId = newContact.id;
+                } else {
+                    return NextResponse.json({ error: 'User organization not found' }, { status: 400 });
+                }
+            }
+        }
+
+        // Obtener información del contacto (ya sea el enviado o el encontrado/creado)
         const { data: contact } = await supabaseAdmin
             .from('contacts')
             .select('*, organization_id')
@@ -54,21 +101,34 @@ export async function POST(req: Request) {
                 .single();
             thread = existingThread;
         } else {
-            // Crear nuevo thread
-            const { data: newThread, error: threadError } = await supabaseAdmin
+            // Verificar si ya existe un thread con este contacto para agruparlo
+            const { data: existingThreadWithContact } = await supabaseAdmin
                 .from('email_threads')
-                .insert({
-                    organization_id: organizationId,
-                    contact_id: contactId,
-                    subject: subject,
-                    total_messages: 0,
-                    unread_count: 0
-                })
-                .select()
+                .select('*')
+                .eq('contact_id', contactId)
+                .order('last_message_at', { ascending: false })
+                .limit(1)
                 .single();
 
-            if (threadError) throw threadError;
-            thread = newThread;
+            if (existingThreadWithContact) {
+                thread = existingThreadWithContact;
+            } else {
+                // Crear nuevo thread
+                const { data: newThread, error: threadError } = await supabaseAdmin
+                    .from('email_threads')
+                    .insert({
+                        organization_id: organizationId,
+                        contact_id: contactId,
+                        subject: subject,
+                        total_messages: 0,
+                        unread_count: 0
+                    })
+                    .select()
+                    .single();
+
+                if (threadError) throw threadError;
+                thread = newThread;
+            }
         }
 
         // Crear mensaje en base de datos primero (para obtener ID)
