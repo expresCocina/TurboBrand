@@ -14,7 +14,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { campaign_id, name, subject, content, organization_id, segment_id } = body;
+        const { campaign_id, name, subject, content, organization_id, segment_id, contact_ids } = body;
 
         let campaignData: any;
         let campaignId: string | null = campaign_id || null;
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
             campaignData = data;
         } else {
             // Envío inmediato, usar datos del body
-            campaignData = { name, subject, content, segment_id, organization_id };
+            campaignData = { name, subject, content, segment_id, organization_id, contact_ids };
         }
 
         if (!campaignData.subject || !campaignData.content) {
@@ -45,6 +45,7 @@ export async function POST(req: Request) {
         let contacts: { email: string; name: string; company?: string }[] = [];
 
         const segmentId = campaignData.segment_id || segment_id;
+        const contactIds = campaignData.contact_ids || contact_ids;
 
         if (segmentId) {
             // Si hay segmento, obtener solo contactos de ese segmento
@@ -58,8 +59,20 @@ export async function POST(req: Request) {
             contacts = (segmentMembers || [])
                 .map((sm: any) => sm.contacts)
                 .filter((c: any) => c && c.email) as { email: string; name: string; company?: string }[];
+        } else if (contactIds && Array.isArray(contactIds) && contactIds.length > 0) {
+            // Si hay contact_ids, obtener solo esos contactos específicos
+            console.log(`Obteniendo ${contactIds.length} contactos específicos...`);
+            const { data: selectedContacts, error: contactsError } = await supabase
+                .from('contacts')
+                .select('email, name, company')
+                .in('id', contactIds)
+                .not('email', 'is', null);
+
+            if (contactsError) throw contactsError;
+            contacts = selectedContacts || [];
+            console.log(`✅ ${contacts.length} contactos obtenidos de ${contactIds.length} IDs solicitados`);
         } else {
-            // Si no hay segmento, obtener todos los contactos
+            // Si no hay segmento ni contact_ids, obtener todos los contactos
             const { data: allContacts, error: contactsError } = await supabase
                 .from('contacts')
                 .select('email, name, company')
