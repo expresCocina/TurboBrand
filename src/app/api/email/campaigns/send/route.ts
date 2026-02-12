@@ -267,9 +267,6 @@ export async function POST(req: Request) {
             } else {
                 console.log(`✅ [SEND] ${emailSendsRecords.length} emails guardados exitosamente en email_sends`);
             }
-        } else {
-            console.warn('⚠️ [SEND] batchData o batchData.data es null/undefined');
-            console.warn('⚠️ [SEND] batchData:', batchData);
         }
 
         // 5. Actualizar estado de campaña a 'sent' y contador total_sent
