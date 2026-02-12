@@ -26,9 +26,10 @@ export default function NuevaCampanaPage() {
         name: '',
         subject: '',
         content: '',
-        preview_text: '',
-        segment_id: '' // '' = todos los contactos
+        preview_text: ''
     });
+
+    const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
 
     const [sendMode, setSendMode] = useState<'now' | 'scheduled'>('now');
     const [scheduledDate, setScheduledDate] = useState('');
@@ -101,6 +102,12 @@ export default function NuevaCampanaPage() {
             return;
         }
 
+        // Validar que haya al menos un segmento seleccionado
+        if (selectedSegments.length === 0) {
+            alert('Por favor selecciona al menos un segmento para enviar');
+            return;
+        }
+
         // Validar fecha programada si está en modo scheduled
         if (sendMode === 'scheduled') {
             if (!scheduledDate || !scheduledTime) {
@@ -118,42 +125,65 @@ export default function NuevaCampanaPage() {
         }
 
         const confirmMessage = sendMode === 'now'
-            ? `¿Estás seguro de enviar esta campaña a ${stats.totalContacts} contactos AHORA?`
-            : `¿Programar esta campaña para ${new Date(`${scheduledDate}T${scheduledTime}`).toLocaleString('es-ES')}?`;
+            ? `¿Estás seguro de enviar esta campaña a ${selectedSegments.length} segmento(s) AHORA?\n\nSe creará una campaña separada para cada segmento.`
+            : `¿Programar esta campaña para ${selectedSegments.length} segmento(s) el ${new Date(`${scheduledDate}T${scheduledTime}`).toLocaleString('es-ES')}?`;
 
         if (!confirm(confirmMessage)) return;
 
         setLoading(true);
         try {
-            const body: any = {
-                name: formData.name || `Campaña ${new Date().toLocaleDateString()}`,
-                subject: formData.subject,
-                content: formData.content,
-                segment_id: formData.segment_id || null,
-                organization_id: orgId // Enviar organization_id para que se guarde correctamente
-            };
-
             let endpoint = '/api/email/campaigns/send';
-            let successMessage = '¡Campaña enviada exitosamente!';
+            let successCount = 0;
+            let failedCount = 0;
 
             if (sendMode === 'scheduled') {
-                // Programar envío
-                body.scheduled_at = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
                 endpoint = '/api/email/campaigns/schedule';
-                successMessage = '¡Campaña programada exitosamente!';
             }
 
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
+            // Enviar una campaña por cada segmento seleccionado
+            for (const segmentId of selectedSegments) {
+                const segmentName = segments.find(s => s.id === segmentId)?.name || 'Segmento';
+                const body: any = {
+                    name: `${formData.name || 'Campaña'} - ${segmentName}`,
+                    subject: formData.subject,
+                    content: formData.content,
+                    segment_id: segmentId,
+                    organization_id: orgId
+                };
 
-            const result = await response.json();
+                if (sendMode === 'scheduled') {
+                    body.scheduled_at = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
+                }
 
-            if (!response.ok) throw new Error(result.error);
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
 
-            alert(result.message || successMessage);
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        console.error(`Error en segmento ${segmentName}:`, result.error);
+                        failedCount++;
+                    } else {
+                        successCount++;
+                    }
+                } catch (error: any) {
+                    console.error(`Error en segmento ${segmentName}:`, error);
+                    failedCount++;
+                }
+
+                // Pequeña pausa entre envíos para evitar saturar el servidor
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            const successMessage = sendMode === 'now'
+                ? `✅ ${successCount} campaña(s) enviada(s) exitosamente${failedCount > 0 ? `\n⚠️ ${failedCount} campaña(s) fallaron` : ''}`
+                : `✅ ${successCount} campaña(s) programada(s) exitosamente${failedCount > 0 ? `\n⚠️ ${failedCount} campaña(s) fallaron` : ''}`;
+
+            alert(successMessage);
             router.push('/crm/email');
 
         } catch (error: any) {
@@ -206,21 +236,53 @@ export default function NuevaCampanaPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Segmento de Contactos</label>
-                            <select
-                                value={formData.segment_id}
-                                onChange={(e) => setFormData({ ...formData, segment_id: e.target.value })}
-                                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                            >
-                                <option value="">Todos los contactos</option>
-                                {segments.map((segment) => (
-                                    <option key={segment.id} value={segment.id}>
-                                        {segment.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <p className="text-xs text-gray-500 mt-1">
-                                Selecciona un segmento específico o envía a todos los contactos
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="block text-sm font-medium text-gray-700">Segmentos de Contactos</label>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (selectedSegments.length === segments.length) {
+                                            setSelectedSegments([]);
+                                        } else {
+                                            setSelectedSegments(segments.map(s => s.id));
+                                        }
+                                    }}
+                                    className="text-xs text-purple-600 hover:text-purple-700 font-medium"
+                                >
+                                    {selectedSegments.length === segments.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                                </button>
+                            </div>
+                            <div className="max-h-64 overflow-y-auto bg-white border border-gray-300 rounded-lg p-3 space-y-2">
+                                {segments.length === 0 ? (
+                                    <p className="text-sm text-gray-500 text-center py-4">No hay segmentos disponibles</p>
+                                ) : (
+                                    segments.map((segment) => (
+                                        <label
+                                            key={segment.id}
+                                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedSegments.includes(segment.id)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedSegments([...selectedSegments, segment.id]);
+                                                    } else {
+                                                        setSelectedSegments(selectedSegments.filter(id => id !== segment.id));
+                                                    }
+                                                }}
+                                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                            />
+                                            <span className="text-sm text-gray-900 font-medium">{segment.name}</span>
+                                        </label>
+                                    ))
+                                )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                                {selectedSegments.length === 0
+                                    ? 'Selecciona uno o más segmentos para enviar'
+                                    : `${selectedSegments.length} segmento(s) seleccionado(s) - Se creará una campaña separada para cada uno`
+                                }
                             </p>
                         </div>
 
