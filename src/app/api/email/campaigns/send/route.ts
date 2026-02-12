@@ -264,9 +264,9 @@ export async function POST(req: Request) {
                 sentCount += batchData.data.length;
             }
 
-            // Pequeña pausa entre lotes para evitar rate limiting
+            // Pausa de 2.5 segundos entre lotes para evitar rate limiting (Resend: 2 req/seg)
             if (batchIndex < batches.length) {
-                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 segundo
+                await new Promise(resolve => setTimeout(resolve, 2500));
             }
         }
 
