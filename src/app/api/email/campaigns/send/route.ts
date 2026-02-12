@@ -175,12 +175,12 @@ export async function POST(req: Request) {
 
         const emailBatch = contactsToSend.map(contact => {
             // Reemplazo simple de variables
-            let personalizedHtml = content
+            let personalizedHtml = campaignData.content
                 .replace(/{{nombre}}/g, contact.name || 'Cliente')
                 .replace(/{{email}}/g, contact.email)
                 .replace(/{{empresa}}/g, contact.company || 'su empresa'); // Asumiendo que el contacto puede tener empresa, si no fallback
 
-            let personalizedSubject = subject
+            let personalizedSubject = campaignData.subject
                 .replace(/{{nombre}}/g, contact.name || 'Cliente');
 
             return {
