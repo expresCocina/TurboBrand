@@ -125,7 +125,7 @@ export default function NuevaCampanaPage() {
         }
 
         const confirmMessage = sendMode === 'now'
-            ? `¿Estás seguro de enviar esta campaña a ${selectedSegments.length} segmento(s)?\\n\\nSe enviará UNA campaña a la vez para evitar errores de límite de velocidad.\\n\\nEsto tomará aproximadamente ${selectedSegments.length * 5} segundos.`
+            ? `¿Estás seguro de enviar esta campaña a ${selectedSegments.length} segmento(s)?\n\nSe enviará UNA campaña a la vez para evitar errores de límite de velocidad.\n\nEsto tomará aproximadamente ${selectedSegments.length * 5} segundos.`
             : `¿Programar esta campaña para ${selectedSegments.length} segmento(s) el ${new Date(`${scheduledDate}T${scheduledTime}`).toLocaleString('es-ES')}?`;
 
         if (!confirm(confirmMessage)) return;
@@ -197,7 +197,7 @@ export default function NuevaCampanaPage() {
                 : `✅ ${successCount} campaña(s) programada(s) exitosamente`;
 
             if (failedCount > 0) {
-                successMessage += `\\n\\n⚠️ ${failedCount} campaña(s) fallaron:\\n${failedSegments.join(', ')}`;
+                successMessage += `\n\n⚠️ ${failedCount} campaña(s) fallaron:\n${failedSegments.join(', ')}`;
             }
 
             alert(successMessage);
