@@ -243,6 +243,8 @@ export default function Clientes() {
                                         alt={study.company}
                                         width={120}
                                         height={48}
+                                        loading="lazy"
+                                        sizes="(max-width: 768px) 100px, 120px"
                                         className={styles.companyLogo}
                                     />
                                 </div>

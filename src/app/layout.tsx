@@ -126,8 +126,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <body>
+    <html lang="es" className={outfit.variable}>
+      <head>
+        {/* Resource Hints for Performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+      </head>
+      <body className={outfit.className}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -157,7 +165,7 @@ export default function RootLayout({
         />
         <Script
           id="button-tracking"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               // Automatic Button Click Tracking for GA4 and Facebook Pixel
@@ -226,7 +234,7 @@ export default function RootLayout({
         <Script
           id="waas-lock"
           src="https://amcagencyweb.com/waas-lock.js?domain=https://www.turbobrandcol.com/"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
       </body>
     </html>
