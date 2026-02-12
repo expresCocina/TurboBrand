@@ -280,9 +280,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json({
             success: true,
-            message: `Campaña enviada a ${contactsToSend.length} contactos.`,
+            message: `Campaña enviada a ${sentCount} de ${contactsToSend.length} contactos.`,
             campaignId: campaign.id,
-            resendData: batchData
+            sent: sentCount,
+            failed: failedCount
         });
 
     } catch (error: any) {
