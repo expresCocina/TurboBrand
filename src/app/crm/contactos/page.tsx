@@ -296,6 +296,7 @@ export default function ContactosPage() {
 
             const newContacts = [];
             let skipped = 0;
+            let emailsCleaned = 0;
 
             // Procesar cada fila (empezando desde fila 2)
             for (let i = 1; i < jsonData.length; i++) {
@@ -307,11 +308,36 @@ export default function ContactosPage() {
 
                 const name = getValue(columnMap.name);
                 const phone = getValue(columnMap.phone);
-                const email = getValue(columnMap.email);
+                let email = getValue(columnMap.email);
+
+                // Limpiar email si tiene múltiples direcciones
+                if (email && (email.includes(' ') || email.includes(',') || email.includes(';'))) {
+                    const emails = email.split(/[\s,;]+/);
+                    const validEmail = emails.find(e => e.includes('@'));
+                    if (validEmail) {
+                        console.log(`🧹 Email limpiado en importación: "${email}" -> "${validEmail}"`);
+                        email = validEmail;
+                        emailsCleaned++;
+                    }
+                }
+
+                // Validar email básico
+                if (email && !email.includes('@')) {
+                    console.warn(`⚠️ Email inválido omitido en fila ${i + 1}: "${email}"`);
+                    email = null;
+                }
 
                 if (!name && !phone && !email) {
                     skipped++;
                     continue;
+                }
+
+                // Obtener company con logging
+                const company = getValue(columnMap.company);
+
+                // Log para debugging (solo primeras 5 filas)
+                if (i <= 5) {
+                    console.log(`📝 Fila ${i}: name="${name}", email="${email}", company="${company}"`);
                 }
 
                 // Crear contacto
@@ -322,7 +348,7 @@ export default function ContactosPage() {
                     name: name || phone || email || 'Sin Nombre',
                     email: email,
                     phone: phone,
-                    company: getValue(columnMap.company),
+                    company: company,
                     position: getValue(columnMap.position),
                     sector: getValue(columnMap.sector),
                     city: getValue(columnMap.city),
@@ -339,6 +365,22 @@ export default function ContactosPage() {
             }
 
             console.log(`📊 Importando ${newContacts.length} contactos...`);
+            if (emailsCleaned > 0) {
+                console.log(`🧹 Se limpiaron ${emailsCleaned} emails con múltiples direcciones`);
+            }
+
+            // Mostrar advertencia si no se detectó columna de empresa
+            if (columnMap.company === undefined) {
+                const confirmImport = confirm(
+                    `⚠️ No se detectó una columna de "Empresa" o "Company" en el CSV.\n\n` +
+                    `Columnas detectadas: ${headers.join(', ')}\n\n` +
+                    `¿Deseas continuar con la importación de todas formas?`
+                );
+                if (!confirmImport) {
+                    setLoading(false);
+                    return;
+                }
+            }
 
             // Insertar en lotes de 100
             const batchSize = 100;
@@ -359,7 +401,9 @@ export default function ContactosPage() {
                 console.log(`✅ Importados ${imported}/${newContacts.length}`);
             }
 
-            const message = `✅ ${newContacts.length} contactos importados exitosamente${skipped > 0 ? `\n⚠️ ${skipped} filas omitidas` : ''}`;
+            const message = `✅ ${newContacts.length} contactos importados exitosamente` +
+                (skipped > 0 ? `\n⚠️ ${skipped} filas omitidas` : '') +
+                (emailsCleaned > 0 ? `\n🧹 ${emailsCleaned} emails limpiados` : '');
             alert(message);
             loadContactsAndTasks();
         } catch (error: any) {
