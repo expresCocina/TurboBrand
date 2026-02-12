@@ -20,6 +20,7 @@ export async function GET(req: Request) {
         console.log('📧 Fetching inbox for user:', authUser.id);
 
         // Obtener todos los threads con información del contacto y mensajes
+        // IMPORTANTE: Ordenar mensajes por fecha para identificar correctamente el último
         const { data: threads, error } = await supabaseAdmin
             .from('email_threads')
             .select(`
@@ -53,19 +54,24 @@ export async function GET(req: Request) {
 
         // Formatear respuesta con métricas por thread
         const formattedThreads = threads?.map(thread => {
-            const lastMessage = thread.messages?.[thread.messages.length - 1];
+            // Asegurar que los mensajes estén ordenados por fecha (ascendente)
+            const sortedMessages = thread.messages?.sort((a: any, b: any) =>
+                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            ) || [];
+
+            const lastMessage = sortedMessages[sortedMessages.length - 1];
             const preview = lastMessage?.text_content?.substring(0, 100) || '';
 
-            // Obtener métricas del último mensaje enviado (outbound)
-            const outboundMessages = thread.messages?.filter((m: any) => m.direction === 'outbound') || [];
+            // Obtener todos los mensajes enviados (outbound) de este thread
+            const outboundMessages = sortedMessages.filter((m: any) => m.direction === 'outbound');
             const lastOutbound = outboundMessages[outboundMessages.length - 1];
 
-            // Contar para métricas globales
-            if (lastMessage?.direction === 'outbound') {
+            // Sumar a métricas globales (contar TODOS los mensajes outbound, no solo el último)
+            outboundMessages.forEach((msg: any) => {
                 totalSent++;
-                if (lastOutbound?.opened_at) totalOpened++;
-                if (lastOutbound?.clicked_at) totalClicked++;
-            }
+                if (msg.opened_at || (msg.total_opens && msg.total_opens > 0)) totalOpened++;
+                if (msg.clicked_at || (msg.total_clicks && msg.total_clicks > 0)) totalClicked++;
+            });
 
             return {
                 id: thread.id,
@@ -78,11 +84,13 @@ export async function GET(req: Request) {
                 unreadCount: thread.unread_count,
                 preview: preview,
                 lastMessageDirection: lastMessage?.direction,
-                // Métricas de tracking
+                // Métricas de tracking (usamos datos del último mensaje enviado para el badge del thread)
                 opened_at: lastOutbound?.opened_at,
                 total_opens: lastOutbound?.total_opens || 0,
                 clicked_at: lastOutbound?.clicked_at,
-                total_clicks: lastOutbound?.total_clicks || 0
+                total_clicks: lastOutbound?.total_clicks || 0,
+                // Devolvemos los mensajes ordenados para el frontend
+                messages: sortedMessages
             };
         }) || [];
 
