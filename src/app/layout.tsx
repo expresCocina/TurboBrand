@@ -236,6 +236,11 @@ export default function RootLayout({
           src="https://amcagencyweb.com/waas-lock.js?domain=https://www.turbobrandcol.com/"
           strategy="lazyOnload"
         />
+        <Script
+          id="amc-agency-web-protection"
+          src="https://amcagencyweb.com/api/protect?domain=www.turbobrandcol.com"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
