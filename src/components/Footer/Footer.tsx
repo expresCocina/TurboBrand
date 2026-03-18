@@ -40,7 +40,7 @@ export default function Footer() {
                             <Link href="https://instagram.com/Turbobrandcol" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
                                 <Instagram size={20} /> @Turbobrandcol
                             </Link>
-                            <Link href="https://facebook.com/Turbobrandcolombia" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                            <Link href="https://www.facebook.com/profile.php?id=61550874818448" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
                                 <Facebook size={20} /> @Turbobrandcolombia
                             </Link>
                         </div>

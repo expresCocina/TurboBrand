@@ -115,7 +115,7 @@ const jsonLd = {
   },
   sameAs: [
     'https://www.instagram.com/turbobrandcol',
-    'https://www.facebook.com/turbobrandcolombia'
+    'https://www.facebook.com/profile.php?id=61550874818448'
   ],
   priceRange: '$$'
 };
