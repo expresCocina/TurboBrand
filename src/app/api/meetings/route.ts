@@ -360,3 +360,21 @@ export async function GET() {
     return NextResponse.json({ error: 'Error interno del servidor.' }, { status: 500 });
   }
 }
+
+// ─── DELETE /api/meetings ────────────────────────────────────────────────────
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
+
+    const { error } = await supabaseAdmin.from('meetings').delete().eq('id', id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('[meetings] DELETE error:', err);
+    return NextResponse.json({ error: 'Error interno del servidor.' }, { status: 500 });
+  }
+}

@@ -440,6 +440,12 @@
     color: #25d366;
 }
 
+.deleteBtn:hover {
+    background: rgba(255, 80, 80, 0.15);
+    border-color: rgba(255, 80, 80, 0.3);
+    color: #ff5050;
+}
+
 .byAdmin {
     display: inline-block;
     padding: 3px 10px;

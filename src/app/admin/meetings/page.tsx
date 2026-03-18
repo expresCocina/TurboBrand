@@ -181,6 +181,18 @@ function AdminMeetingsPage() {
     }
   };
 
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`¿Estás seguro de que quieres BORRAR definitivamente la reunión de ${name}? Esta acción NO se puede deshacer.`)) return;
+    try {
+      const res = await fetch(`/api/meetings?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error en el servidor al intentar borrar.');
+      await loadMeetings();
+    } catch (e) {
+      console.error('Error deleting meeting:', e);
+      alert('Hubo un error al borrar la reunión.');
+    }
+  };
+
   const filteredMeetings = meetings
     .filter((m) => {
       if (filterStatus !== 'all' && m.status !== filterStatus) return false;
@@ -398,6 +410,9 @@ function AdminMeetingsPage() {
                     >
                       💬 WA
                     </a>
+                    <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDelete(m.id, m.name)} title="Borrar reunión">
+                      🗑️ Borrar
+                    </button>
                   </div>
                 </td>
               </tr>
