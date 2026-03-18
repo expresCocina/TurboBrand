@@ -70,6 +70,14 @@ export default function Navbar() {
 
   const handleAnchor = (href: string) => (e: React.MouseEvent) => {
     if (!href.startsWith("#")) return;
+    
+    // Si no estamos en el index de la web, deja que <Link href="/#id"> haga la navegación normal
+    if (pathname && pathname !== "/") {
+      setMobileOpen(false);
+      return;
+    }
+
+    // Si estamos en el home, hacemos scroll suave local
     e.preventDefault();
     scrollToAnchor(href);
   };
@@ -87,7 +95,7 @@ export default function Navbar() {
     >
       <div className={styles.navContainer}>
         <Link
-          href="#home"
+          href={pathname === "/" ? "#home" : "/"}
           onClick={handleAnchor("#home")}
           className={styles.logoWrapper}
           aria-label="Ir al inicio"
@@ -103,18 +111,22 @@ export default function Navbar() {
         </Link>
 
         <div className={styles.links} aria-label="Navegación principal">
-          {items.map((it) => (
-            <Link
-              key={it.href}
-              href={it.href}
-              onClick={handleAnchor(it.href)}
-              className={styles.link}
-            >
-              {it.label}
-            </Link>
-          ))}
+          {items.map((it) => {
+            const isAnchor = it.href.startsWith("#");
+            const finalHref = isAnchor && pathname !== "/" ? `/${it.href}` : it.href;
+            return (
+              <Link
+                key={it.href}
+                href={finalHref}
+                onClick={handleAnchor(it.href)}
+                className={styles.link}
+              >
+                {it.label}
+              </Link>
+            );
+          })}
           <Link
-            href="#contacto"
+            href={pathname === "/" ? "#contacto" : "/#contacto"}
             onClick={handleAnchor("#contacto")}
             className={styles.cta}
           >
