@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import styles from './page.module.css';
@@ -176,6 +177,13 @@ function AdminZonesPage() {
                     >
                         ➕ Agregar Zona
                     </button>
+                    <Link
+                        href="/admin/meetings"
+                        className={styles.logoutBtn}
+                        style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                    >
+                        🗓️ Reuniones
+                    </Link>
                     <button
                         className={styles.logoutBtn}
                         onClick={handleLogout}

@@ -22,7 +22,7 @@ export async function GET() {
           <p><strong>Configuración:</strong></p>
           <ul>
             <li>Dominio: turbobrandcol.com</li>
-            <li>Email: noreply@turbobrandcol.com</li>
+            <li>Email: noreply@send.turbobrandcol.com</li>
             <li>Estado: ✅ Activo</li>
           </ul>
           <p>Ya puedes enviar emails desde el CRM.</p>

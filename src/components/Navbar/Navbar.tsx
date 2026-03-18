@@ -19,6 +19,7 @@ export default function Navbar() {
       { label: "Servicios", href: "#servicios" },
       { label: "Clientes", href: "#clientes" },
       { label: "Tu Local Digital", href: "#tu-local-digital" },
+      { label: "Agendar Reunión", href: "/agenda" },
     ],
     []
   );
