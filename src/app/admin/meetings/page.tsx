@@ -56,6 +56,7 @@ interface Meeting {
   time: string;
   status: string;
   scheduled_by: string;
+  meet_link?: string;
   created_at: string;
 }
 
@@ -165,6 +166,18 @@ function AdminMeetingsPage() {
       setFormError('Error de conexión. Intenta nuevamente.');
     } finally {
       setFormLoading(false);
+    }
+  };
+
+  const handleManualConfirm = async (id: string) => {
+    if (!confirm('¿Seguro que quieres confirmar esta cita y enviar el correo al cliente?')) return;
+    try {
+      // Re-use the existing confirm route which updates DB and sends emails
+      await fetch(`/api/meetings/confirm?id=${id}`);
+      await loadMeetings();
+    } catch (e) {
+      console.error('Error confirming meeting:', e);
+      alert('Hubo un error al confirmar la reunión.');
     }
   };
 
@@ -341,6 +354,7 @@ function AdminMeetingsPage() {
               <th>Agendado por</th>
               <th>Estado</th>
               <th>Registro</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -363,6 +377,29 @@ function AdminMeetingsPage() {
                   </span>
                 </td>
                 <td className={styles.dateCell}>{formatDate(m.created_at.split('T')[0])}</td>
+                <td>
+                  <div className={styles.actions}>
+                    {m.status === 'pending' && (
+                      <button className={styles.actionBtn} onClick={() => handleManualConfirm(m.id)} title="Confirmar manualmente">
+                        ✅ Confirmar
+                      </button>
+                    )}
+                    {m.meet_link && (
+                      <a href={m.meet_link} target="_blank" rel="noopener noreferrer" className={`${styles.actionBtn} ${styles.meetBtn}`} title="Abrir Google Meet">
+                        🎥 Meet
+                      </a>
+                    )}
+                    <a 
+                      href={`https://wa.me/${m.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${m.name}, te escribimos de Turbo Brand respecto a tu reunión de ${m.meeting_type}.`)}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className={`${styles.actionBtn} ${styles.waBtn}`}
+                      title="Contactar por WhatsApp"
+                    >
+                      💬 WA
+                    </a>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
