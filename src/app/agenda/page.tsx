@@ -135,9 +135,9 @@ export default function AgendaPage() {
 
   return (
     <main className={styles.page}>
-        {/* Hero */}
-        <section className={styles.hero}>
-          <div className={styles.heroGlow} />
+      <div className={styles.splitContainer}>
+        {/* Left Column: Hero + Info */}
+        <section className={styles.leftCol}>
           <div className={styles.heroContent}>
             <span className={styles.badge}>📅 Agenda tu reunión</span>
             <h1 className={styles.heroTitle}>
@@ -147,16 +147,45 @@ export default function AgendaPage() {
             <p className={styles.heroSub}>
               Reserva una sesión gratuita con nuestro equipo. Analizamos tu negocio y te presentamos una estrategia personalizada.
             </p>
-            <div className={styles.heroFeatures}>
-              <span>✅ Sin costo inicial</span>
-              <span>✅ Solo 1 hora</span>
-              <span>✅ 100% online</span>
-            </div>
           </div>
+
+          <aside className={styles.sideInfo}>
+            <h3>¿Por qué reunirte con nosotros?</h3>
+            <ul className={styles.benefitList}>
+              <li>
+                <span className={styles.benefitIcon}>🚀</span>
+                <div>
+                  <strong>Estrategia personalizada</strong>
+                  <p>Analizamos tu negocio y te damos un plan de acción claro.</p>
+                </div>
+              </li>
+              <li>
+                <span className={styles.benefitIcon}>📊</span>
+                <div>
+                  <strong>Expertos en Marketing 5.0</strong>
+                  <p>IA + creatividad para escalar marcas en Colombia.</p>
+                </div>
+              </li>
+              <li>
+                <span className={styles.benefitIcon}>🎯</span>
+                <div>
+                  <strong>Resultados comprobados</strong>
+                  <p>Clientes con crecimiento real en ventas y reconocimiento.</p>
+                </div>
+              </li>
+              <li>
+                <span className={styles.benefitIcon}>💬</span>
+                <div>
+                  <strong>Sin compromisos</strong>
+                  <p>La primera sesión es completamente gratuita.</p>
+                </div>
+              </li>
+            </ul>
+          </aside>
         </section>
 
-        {/* Form section */}
-        <section className={styles.formSection}>
+        {/* Right Column: Form */}
+        <section className={styles.rightCol}>
           <div className={styles.formCard}>
             {success ? (
               <div className={styles.successState}>
@@ -344,42 +373,8 @@ export default function AgendaPage() {
               </>
             )}
           </div>
-
-          {/* Side info */}
-          <aside className={styles.sideInfo}>
-            <h3>¿Por qué reunirte con nosotros?</h3>
-            <ul className={styles.benefitList}>
-              <li>
-                <span className={styles.benefitIcon}>🚀</span>
-                <div>
-                  <strong>Estrategia personalizada</strong>
-                  <p>Analizamos tu negocio y te damos un plan de acción claro.</p>
-                </div>
-              </li>
-              <li>
-                <span className={styles.benefitIcon}>📊</span>
-                <div>
-                  <strong>Expertos en Marketing 5.0</strong>
-                  <p>IA + creatividad para escalar marcas en Colombia.</p>
-                </div>
-              </li>
-              <li>
-                <span className={styles.benefitIcon}>🎯</span>
-                <div>
-                  <strong>Resultados comprobados</strong>
-                  <p>Clientes con crecimiento real en ventas y reconocimiento.</p>
-                </div>
-              </li>
-              <li>
-                <span className={styles.benefitIcon}>💬</span>
-                <div>
-                  <strong>Sin compromisos</strong>
-                  <p>La primera sesión es completamente gratuita.</p>
-                </div>
-              </li>
-            </ul>
-          </aside>
         </section>
+      </div>
     </main>
   );
 }
