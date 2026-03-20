@@ -40,7 +40,7 @@
 }
 
 .textContainer h2 {
-    font-family: "DanubeBold", sans-serif;
+    font-weight: 800;
     font-size: clamp(2rem, 4vw, 3rem);
     color: var(--white);
     margin-bottom: 1rem;
@@ -284,7 +284,7 @@
 }
 
 .successContainer h2 {
-    font-family: "DanubeBold", sans-serif;
+    font-weight: 800;
     font-size: 2.5rem;
     color: #9E0060;
     margin-bottom: 1rem;

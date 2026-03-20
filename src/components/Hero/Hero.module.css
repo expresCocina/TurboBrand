@@ -26,9 +26,14 @@
 @media (min-width: 901px) {
   .heroImage {
     width: 70% !important;
-    /* Forzar ancho visual */
     left: 30% !important;
-    /* Mover a la derecha */
+  }
+}
+
+/* Hide background image on mobile entirely to save 2.7MB LCP */
+@media (max-width: 768px) {
+  .hideOnMobile {
+    display: none !important;
   }
 }
 
@@ -86,7 +91,7 @@
 }
 
 .headline {
-  font-family: "DanubeBold", sans-serif;
+  font-weight: 800;
   font-size: clamp(2.2rem, 4.5vw, 3.8rem);
   line-height: 1.05;
   color: var(--white);
@@ -123,10 +128,24 @@
 
 
 
-/* Estilo para el cursor de escritura */
-.typewriterWrapper :global(.Typewriter__cursor) {
-  color: #9E0060;
+.typewriter {
+  color: var(--brand);
+  position: relative;
+  display: inline-block;
+}
+
+.typewriter::after {
+  content: '|';
+  position: absolute;
+  right: -10px;
+  color: var(--brand);
   font-weight: 200;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* Texto SSR oculto visualmente para SEO (solo lo leen crawlers y lectores de pantalla) */

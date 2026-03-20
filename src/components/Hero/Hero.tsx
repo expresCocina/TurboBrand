@@ -1,14 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Typewriter from 'typewriter-effect';
 import styles from "./Hero.module.css";
 import HeroCards from "../HeroCards/HeroCards";
 
 export default function Hero() {
     return (
         <section id="home" className={styles.hero}>
-            <div className={styles.imageBackground}>
+            <div className={`${styles.imageBackground} ${styles.hideOnMobile}`}>
                 <Image
                     src="/fondohero.png"
                     alt="Background Turbo Brand"
@@ -28,22 +27,7 @@ export default function Hero() {
                         <p className={styles.eyebrow}>AGENCIA DE MARKETING 5.0</p>
 
                         <h1 className={styles.headline}>
-                            {/* SSR-visible text for SEO (hidden visually, read by crawlers) */}
-                            <span className={styles.srOnly}>¡Somos Turbo Brand!</span>
-                            <Typewriter
-                                onInit={(typewriter) => {
-                                    typewriter
-                                        .typeString('¡Somos Turbo <br /> Brand!')
-                                        .start();
-                                }}
-                                options={{
-                                    autoStart: true,
-                                    loop: false,
-                                    delay: 30,
-                                    cursor: "|",
-                                    wrapperClassName: styles.typewriterWrapper,
-                                }}
-                            />
+                            ¡Somos Turbo <br /> <span className={styles.typewriter}>Brand!</span>
                         </h1>
 
                         <p className={styles.lead}>
