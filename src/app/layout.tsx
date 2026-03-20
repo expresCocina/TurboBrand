@@ -133,13 +133,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        {/* LCP preload: hero image */}
-        <link
-          rel="preload"
-          as="image"
-          href="/fondohero.png"
-          imageSizes="100vw"
-          fetchPriority="high" />
       </head>
       <body className={outfit.className}>
         <script
