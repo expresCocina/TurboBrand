@@ -11,7 +11,7 @@ export default function HeroCards() {
         </div>
 
         <div className={styles.card}>
-          <span className={styles.tag}>GROWING TOGETHER</span>
+          <span className={styles.tag}>FAST RESULTS</span>
           <h3>Posiciona tu marca en canales digitales</h3>
         </div>
       </div>
