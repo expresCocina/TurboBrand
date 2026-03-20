@@ -91,6 +91,7 @@
   line-height: 1.05;
   color: var(--white);
   margin-bottom: 12px;
+  /* No min-height to avoid CLS */
 }
 
 .lead {
@@ -120,16 +121,7 @@
   height: 56px;
 }
 
-.headline {
-  font-family: "DanubeBold", sans-serif;
-  font-size: clamp(2.5rem, 5vw, 4.8rem);
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--white);
-  margin-bottom: 24px;
-  min-height: 120px;
-  /* Prevents layout shift */
-}
+
 
 /* Estilo para el cursor de escritura */
 .typewriterWrapper :global(.Typewriter__cursor) {

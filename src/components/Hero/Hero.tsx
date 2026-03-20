@@ -14,9 +14,11 @@ export default function Hero() {
                     alt="Background Turbo Brand"
                     fill
                     priority
-                    quality={80} /* Optimización sin tocar la foto original */
+                    fetchPriority="high"
+                    quality={75}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                     className={styles.heroImage}
+                    placeholder="empty"
                 />
             </div>
             <div className={styles.overlay} />

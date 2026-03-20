@@ -131,9 +131,15 @@ export default function RootLayout({
         {/* Resource Hints for Performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        {/* LCP preload: hero image */}
+        <link
+          rel="preload"
+          as="image"
+          href="/fondohero.png"
+          imageSizes="100vw"
+          fetchPriority="high" />
       </head>
       <body className={outfit.className}>
         <script
@@ -144,7 +150,6 @@ export default function RootLayout({
           {children}
         </LayoutWrapper>
         <GoogleAnalytics gaId="G-X8N3PJJCF8" />
-        <GoogleTagManager gtmId="GTM-XYZ12345" />
         <Script
           id="fb-pixel"
           strategy="lazyOnload"
