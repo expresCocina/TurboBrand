@@ -17,7 +17,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   metadataBase: new URL('https://turbobrandcol.com'),
   title: {
-    default: 'Turbo Brand | Agencia de Marketing Digital & Growth',
+    default: 'Turbo Brand | Agencia de Marketing Digital en Medellín, Colombia',
     template: '%s | Turbo Brand'
   },
   description: 'Agencia de Marketing 5.0 en Medellín. Especialistas en Pauta Digital, SEO, Diseño Web y Growth Hacking. Escalamos marcas con Inteligencia Artificial.',
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'Turbo Brand | Agencia de Marketing Digital & Growth',
-    description: 'Transformamos tu negocio con estrategias de marketing digital de alto impacto e inteligencia artificial. ¡Resultados reales!',
+    title: 'Turbo Brand | Agencia de Marketing Digital en Medellín',
+    description: 'Agencia de marketing 5.0 en Medellín. Escalamos marcas con Meta Ads, Google Ads, SEO local y automatización. Resultados reales desde el primer mes.',
     url: 'https://turbobrandcol.com',
     siteName: 'Turbo Brand',
     locale: 'es_CO',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Turbo Brand | Marketing Digital 5.0',
+    title: 'Turbo Brand | Marketing Digital Medellín',
     description: 'Agencia líder en crecimiento digital en Medellín. Descubre el poder del Marketing 5.0.',
     images: ['/LogoTurboBrand.webp'],
     creator: '@turbobrandcol',

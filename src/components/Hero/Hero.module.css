@@ -137,6 +137,19 @@
   font-weight: 200;
 }
 
+/* Texto SSR oculto visualmente para SEO (solo lo leen crawlers y lectores de pantalla) */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Tablet (max-width: 900px) */
 @media (max-width: 900px) {
   .container {

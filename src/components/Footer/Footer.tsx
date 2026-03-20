@@ -65,9 +65,6 @@ export default function Footer() {
                         <Link href="/politicas" className={styles.adminLink}>
                             Políticas y Términos
                         </Link>
-                        <Link href="/admin/login" className={styles.adminLink}>
-                            🔐 Admin
-                        </Link>
                     </div>
                 </div>
             </div>

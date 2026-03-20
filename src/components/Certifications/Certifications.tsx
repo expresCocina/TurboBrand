@@ -36,11 +36,11 @@ export default function Certifications() {
                     ))}
                     {/* Segunda copia para loop infinito */}
                     {certifications.map((cert, index) => (
-                        <div key={`cert-2-${index}`} className={styles.logoItem}>
+                        <div key={`cert-2-${index}`} className={styles.logoItem} aria-hidden="true">
                             <div className={styles.logoBox}>
                                 <Image
                                     src={cert.logo}
-                                    alt={cert.name}
+                                    alt=""
                                     fill
                                     className={styles.logoImage}
                                     style={{ objectFit: 'contain' }}
@@ -50,11 +50,11 @@ export default function Certifications() {
                     ))}
                     {/* Tercera copia para pantallas muy anchas */}
                     {certifications.map((cert, index) => (
-                        <div key={`cert-3-${index}`} className={styles.logoItem}>
+                        <div key={`cert-3-${index}`} className={styles.logoItem} aria-hidden="true">
                             <div className={styles.logoBox}>
                                 <Image
                                     src={cert.logo}
-                                    alt={cert.name}
+                                    alt=""
                                     fill
                                     className={styles.logoImage}
                                     style={{ objectFit: 'contain' }}

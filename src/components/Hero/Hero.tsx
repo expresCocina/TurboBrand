@@ -27,6 +27,8 @@ export default function Hero() {
                         <p className={styles.eyebrow}>AGENCIA DE MARKETING 5.0</p>
 
                         <h1 className={styles.headline}>
+                            {/* SSR-visible text for SEO (hidden visually, read by crawlers) */}
+                            <span className={styles.srOnly}>¡Somos Turbo Brand!</span>
                             <Typewriter
                                 onInit={(typewriter) => {
                                     typewriter

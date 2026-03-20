@@ -1,14 +1,12 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = 'https://turbobrandcol.com';
-
-    return {
-        rules: {
-            userAgent: '*',
-            allow: '/',
-            disallow: ['/admin/', '/api/'],
-        },
-        sitemap: `${baseUrl}/sitemap.xml`,
-    };
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/admin/', '/api/'],
+    },
+    sitemap: 'https://www.turbobrandcol.com/sitemap.xml',
+  };
 }
