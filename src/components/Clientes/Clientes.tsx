@@ -136,7 +136,7 @@ export default function Clientes() {
         );
     };
 
-    // Intersection Observer for counter animation
+    // Intersection Observer for counter animation con requestAnimationFrame (más eficiente que setInterval)
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -145,37 +145,42 @@ export default function Clientes() {
                         setHasAnimated(true);
 
                         const duration = 2000;
-                        const steps = 60;
-                        const interval = duration / steps;
+                        const startTime = performance.now();
 
-                        let currentStep = 0;
-                        const timer = setInterval(() => {
-                            currentStep++;
-                            const progress = currentStep / steps;
+                        const animate = (currentTime: number) => {
+                            const elapsed = currentTime - startTime;
+                            const progress = Math.min(elapsed / duration, 1);
+                            // Easing cuadrático — más suave
+                            const eased = progress < 0.5
+                                ? 2 * progress * progress
+                                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
                             setCounters({
-                                clients: Math.floor(30 * progress),
-                                roi: parseFloat((5.5 * progress).toFixed(1)),
-                                years: Math.floor(8 * progress),
-                                projects: Math.floor(200 * progress),
-                                investment: Math.floor(1000 * progress)
+                                clients: Math.floor(30 * eased),
+                                roi: parseFloat((5.5 * eased).toFixed(1)),
+                                years: Math.floor(8 * eased),
+                                projects: Math.floor(200 * eased),
+                                investment: Math.floor(1000 * eased),
                             });
 
-                            if (currentStep >= steps) {
-                                clearInterval(timer);
+                            if (progress < 1) {
+                                requestAnimationFrame(animate);
+                            } else {
                                 setCounters({
                                     clients: 30,
                                     roi: 5.5,
                                     years: 8,
                                     projects: 200,
-                                    investment: 1000
+                                    investment: 1000,
                                 });
                             }
-                        }, interval);
+                        };
+
+                        requestAnimationFrame(animate);
                     }
                 });
             },
-            { threshold: 0.1 } // Faster trigger
+            { threshold: 0.1 }
         );
 
         if (statsRef.current) {
@@ -318,7 +323,7 @@ export default function Clientes() {
 
                 {/* Categories */}
                 <div className={styles.categories}>
-                    <h4 className={styles.catTitle}>Servicios Implementados:</h4>
+                    <h3 className={styles.catTitle}>Servicios Implementados:</h3>
                     <p className={styles.catList}>
                         Pauta Digital • Estrategia • Contenido UGC • SEO • Automatización • Email Marketing • Branding • Analytics
                     </p>

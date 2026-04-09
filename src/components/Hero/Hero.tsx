@@ -9,13 +9,13 @@ export default function Hero() {
         <section id="home" className={styles.hero}>
             <div className={`${styles.imageBackground} ${styles.hideOnMobile}`}>
                 <Image
-                    src="/fondohero.png"
+                    src="/fondohero.webp"
                     alt="Background Turbo Brand"
                     fill
                     priority
                     fetchPriority="high"
-                    quality={75}
-                    sizes="(max-width: 768px) 100vw, 100vw"
+                    quality={90}
+                    sizes="(max-width: 768px) 0px, (max-width: 1200px) 100vw, 100vw"
                     className={styles.heroImage}
                 />
             </div>

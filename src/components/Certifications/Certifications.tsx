@@ -15,7 +15,7 @@ export default function Certifications() {
     return (
         <section className={styles.certificationsSection}>
             <div className={styles.container}>
-                <h3 className={styles.title}>Certificados y Partners Oficiales</h3>
+                <h2 className={styles.title}>Certificados y Partners Oficiales</h2>
             </div>
 
             <div className={styles.marqueeWrapper}>
@@ -28,8 +28,10 @@ export default function Certifications() {
                                     src={cert.logo}
                                     alt={cert.name}
                                     fill
+                                    sizes="(max-width: 640px) 120px, 160px"
                                     className={styles.logoImage}
                                     style={{ objectFit: 'contain' }}
+                                    loading="eager"
                                 />
                             </div>
                         </div>
@@ -42,8 +44,10 @@ export default function Certifications() {
                                     src={cert.logo}
                                     alt=""
                                     fill
+                                    sizes="(max-width: 640px) 120px, 160px"
                                     className={styles.logoImage}
                                     style={{ objectFit: 'contain' }}
+                                    loading="lazy"
                                 />
                             </div>
                         </div>
@@ -56,8 +60,10 @@ export default function Certifications() {
                                     src={cert.logo}
                                     alt=""
                                     fill
+                                    sizes="(max-width: 640px) 120px, 160px"
                                     className={styles.logoImage}
                                     style={{ objectFit: 'contain' }}
+                                    loading="lazy"
                                 />
                             </div>
                         </div>

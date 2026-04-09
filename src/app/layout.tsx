@@ -128,17 +128,29 @@ export default function RootLayout({
   return (
     <html lang="es" className={outfit.variable}>
       <head>
-        {/* Resource Hints for Performance */}
+        {/* Resource Hints — mejoran LCP y TTFB */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://amcagencyweb.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-      </head>
-      <body className={outfit.className}>
+        <link rel="dns-prefetch" href="https://amcagencyweb.com" />
+        {/* Preload hero image — WebP optimizado (188KB vs 2.7MB PNG original) */}
+        <link
+          rel="preload"
+          href="/fondohero.webp"
+          as="image"
+          type="image/webp"
+          media="(min-width: 769px)"
+        />
+        {/* JSON-LD Schema en head para mejor indexación */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+      </head>
+      <body className={outfit.className}>
         <LayoutWrapper>
           {children}
         </LayoutWrapper>
