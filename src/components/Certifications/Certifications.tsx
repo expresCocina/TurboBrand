@@ -4,9 +4,9 @@ import Image from 'next/image';
 import styles from './Certifications.module.css';
 
 const certifications = [
-    { name: 'Google Ads', logo: '/certifications/google-ads.png' },
-    { name: 'Meta Business Partner', logo: '/certifications/meta.png' },
-    { name: 'TikTok Ads', logo: '/certifications/tiktok-ads.png' },
+    { name: 'Google Ads', logo: '/certifications/google-ads.webp' },
+    { name: 'Meta Business Partner', logo: '/certifications/meta.webp' },
+    { name: 'TikTok Ads', logo: '/certifications/tiktok-ads.webp' },
     { name: 'Google Partner', logo: '/certifications/google-partner.svg' },
     { name: 'Agency Partner', logo: '/certifications/agency-partner.svg' },
 ];

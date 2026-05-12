@@ -128,22 +128,11 @@ export default function RootLayout({
   return (
     <html lang="es" className={outfit.variable}>
       <head>
-        {/* Resource Hints — mejoran LCP y TTFB */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* Resource Hints */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://amcagencyweb.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        <link rel="dns-prefetch" href="https://amcagencyweb.com" />
-        {/* Preload hero image — WebP optimizado (188KB vs 2.7MB PNG original) */}
-        <link
-          rel="preload"
-          href="/fondohero.webp"
-          as="image"
-          type="image/webp"
-          media="(min-width: 769px)"
-        />
         {/* JSON-LD Schema en head para mejor indexación */}
         <script
           type="application/ld+json"
@@ -178,15 +167,12 @@ export default function RootLayout({
           strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
-              // Automatic Button Click Tracking for GA4 and Facebook Pixel
               (function() {
                 function trackButtonClick(button) {
                   var buttonText = button.innerText || button.textContent || button.value || 'Unknown Button';
                   var buttonId = button.id || 'no-id';
                   var buttonClass = button.className || 'no-class';
                   var buttonHref = button.href || button.getAttribute('href') || '';
-                  
-                  // Track with Google Analytics 4
                   if (typeof gtag !== 'undefined') {
                     gtag('event', 'button_click', {
                       'event_category': 'Button',
@@ -196,8 +182,6 @@ export default function RootLayout({
                       'button_href': buttonHref
                     });
                   }
-                  
-                  // Track with Facebook Pixel
                   if (typeof fbq !== 'undefined') {
                     fbq('trackCustom', 'ButtonClick', {
                       button_text: buttonText,
@@ -206,32 +190,19 @@ export default function RootLayout({
                       button_href: buttonHref
                     });
                   }
-                  
-                  console.log('📊 Button tracked:', buttonText);
                 }
-                
-                // Wait for DOM to be ready
                 function initTracking() {
-                  // Track all buttons
                   document.addEventListener('click', function(e) {
                     var target = e.target;
-                    
-                    // Find the closest button or link
                     while (target && target !== document) {
-                      if (target.tagName === 'BUTTON' || 
-                          target.tagName === 'A' || 
-                          target.getAttribute('role') === 'button') {
+                      if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.getAttribute('role') === 'button') {
                         trackButtonClick(target);
                         break;
                       }
                       target = target.parentElement;
                     }
                   }, true);
-                  
-                  console.log('✅ Button tracking initialized');
                 }
-                
-                // Initialize when DOM is ready
                 if (document.readyState === 'loading') {
                   document.addEventListener('DOMContentLoaded', initTracking);
                 } else {

@@ -1,25 +1,38 @@
 "use client";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { ReactNode } from "react";
 import styles from "./SectionWrapper.module.css";
 
 interface Props {
     id: string;
     children: ReactNode;
-    className?: string; // Allow passing extra classes if needed
+    className?: string;
 }
 
 export default function SectionWrapper({ id, children, className = "" }: Props) {
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    el.classList.add(styles.visible);
+                    observer.disconnect();
+                }
+            },
+            { threshold: 0.2 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
     return (
         <section id={id} className={`${styles.section} ${className}`}>
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-            >
+            <div ref={ref} className={styles.fadeIn}>
                 {children}
-            </motion.div>
+            </div>
         </section>
     );
 }

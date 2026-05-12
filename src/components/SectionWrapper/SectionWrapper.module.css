@@ -7,3 +7,23 @@
 .section:not(:last-child) {
     margin-bottom: 0;
 }
+
+.fadeIn {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    will-change: opacity, transform;
+}
+
+.fadeIn.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fadeIn {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
