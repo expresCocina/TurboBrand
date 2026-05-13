@@ -101,10 +101,10 @@ export default function Navbar() {
           aria-label="Ir al inicio"
         >
           <Image
-            src="/LogoTurboBrand.webp"
+            src="/LogoTurboBrand-opt.webp"
             alt="Turbo Brand Logo"
-            width={180}
-            height={60}
+            width={55}
+            height={55}
             priority
             className={styles.logoImage}
           />

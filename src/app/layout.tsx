@@ -125,21 +125,21 @@ export default function RootLayout({
   return (
     <html lang="es" className={outfit.variable}>
       <head>
-        {/* Preconnect solo a dominios críticos de renderizado — ELIMINA 600ms de render-blocking */}
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* DNS prefetch para terceros que se cargarán después del load */}
+        {/*
+          next/font/google descarga y auto-hostea la fuente en producción.
+          NO necesitamos preconnect a fonts.gstatic.com — sería redundante.
+          Solo dns-prefetch para terceros que cargan después del load.
+        */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
 
-        {/* Preload imagen hero desktop — reduce LCP en desktop */}
+        {/* Preload imagen hero SOLO en desktop — reduce LCP desktop */}
         <link
           rel="preload"
           as="image"
           href="/fondohero.webp"
           type="image/webp"
           media="(min-width: 769px)"
-          fetchPriority="high"
         />
 
         {/* JSON-LD Schema */}

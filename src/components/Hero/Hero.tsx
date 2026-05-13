@@ -1,5 +1,13 @@
-"use client";
-
+/**
+ * Hero — Server Component (sin "use client")
+ *
+ * Razón crítica: El <h1> es el LCP en móvil.
+ * Si Hero fuera Client Component, el browser tendría que
+ * descargar + ejecutar JS antes de mostrarlo → LCP alto.
+ * Como Server Component, el <h1> está en el HTML inicial → LCP rápido.
+ *
+ * La animación del cursor (typewriter::after) es puro CSS → no necesita JS.
+ */
 import Image from "next/image";
 import styles from "./Hero.module.css";
 import HeroCards from "../HeroCards/HeroCards";
@@ -9,9 +17,8 @@ export default function Hero() {
         <section id="home" className={styles.hero}>
             {/*
               Imagen de fondo solo en desktop (≥769px).
-              En móvil NO se renderiza el nodo → evitamos que el
-              browser la descargue aunque esté "oculta" con CSS.
-              Esto elimina el LCP de 4.6s en móvil.
+              En móvil el nodo no se renderiza → no se descarga la imagen.
+              Esto elimina el LCP image de 192KB en móvil.
             */}
             <div className={`${styles.imageBackground} ${styles.desktopOnly}`}>
                 <Image
@@ -32,7 +39,11 @@ export default function Hero() {
                     <div className={styles.textWrapper}>
                         <p className={styles.eyebrow}>AGENCIA DE MARKETING 5.0</p>
 
-                        {/* h1 es el LCP real en móvil — se renderiza en SSR sin JS */}
+                        {/*
+                          h1 = LCP en móvil.
+                          Al ser Server Component, está en el HTML inicial del servidor.
+                          El browser lo pinta inmediatamente sin esperar JS.
+                        */}
                         <h1 className={styles.headline}>
                             ¡Somos Turbo <br /> <span className={styles.typewriter}>Brand!</span>
                         </h1>
@@ -55,7 +66,7 @@ export default function Hero() {
             <div className={styles.divider}>
                 <svg viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
                     <path
-                        d="M1200 120L0 120 0 0 24 0 48 40 72 0 96 40 120 0 144 40 168 0 192 40 216 0 240 40 264 0 288 40 312 0 336 40 360 0 384 40 408 0 432 40 456 0 480 40 504 0 528 40 552 0 576 40 600 0 624 40 648 0 672 40 696 0 720 40 744 0 768 40 792 0 816 40 840 0 864 40 888 0 912 40 936 0 960 40 984 0 1008 40 1032 0 1056 40 1080 0 1104 40 1128 0 1152 40 1176 0 1200 45V120z"
+                        d="M1200 120L0 120 0 0 24 0 48 40 72 0 96 40 120 0 144 40 168 0 192 40 216 0 240 40 264 0 288 40 312 0 336 40 360 0 384 40 408 0 432 40 456 0 480 40 504 0 528 40 552 0 576 40 600 0 624 40 648 0 672 40 696 0 720 40 744 0 768 40 792 0 816 40 840 0 864 40 888 0 912 40 936 0 960 40 984 0 1008 40 1032 0 1056 40 1080 0 1104 40 1128 0 1200 45V120z"
                         fill="#484343"
                     />
                 </svg>

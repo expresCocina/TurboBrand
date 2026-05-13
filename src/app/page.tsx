@@ -3,10 +3,10 @@ import Hero from '@/components/Hero/Hero';
 import SectionWrapper from '@/components/SectionWrapper/SectionWrapper';
 
 /*
- * Lazy load de secciones below-the-fold.
- * NOTE: No se puede usar ssr:false en Server Components (page.tsx).
- * El ssr:false solo aplica para el mapa Leaflet dentro de TuLocalDigital.tsx.
- * Los placeholders con minHeight fijos previenen CLS.
+ * Hero: Server Component — el h1 (LCP móvil) está en el HTML inicial.
+ *
+ * Below-the-fold: dynamic import con placeholders de altura fija
+ * para evitar CLS cuando los componentes se montan en cliente.
  */
 const Nosotros = dynamic(() => import('@/components/Nosotros/Nosotros'), {
     loading: () => <div style={{ minHeight: '500px' }} aria-hidden="true" />,
@@ -30,7 +30,7 @@ const ContactoForm = dynamic(() => import('@/components/ContactoForm/ContactoFor
 export default function Home() {
     return (
         <main>
-            {/* Hero se renderiza en SSR — es el LCP element */}
+            {/* Hero: Server Component — h1 en HTML inicial → LCP rápido en móvil */}
             <Hero />
 
             <SectionWrapper id="nosotros">

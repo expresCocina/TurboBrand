@@ -12,7 +12,6 @@
   --text-primary: #FFFFFF;
   --text-secondary: #CCCCCC;
   --overlay: rgba(37, 37, 37, 0.95);
-  /* Slightly darker for better contrast */
   --brand-alpha: rgba(158, 0, 96, 0.15);
 
   /* Spacing & Radius */
@@ -23,20 +22,22 @@
   --header-height: 80px;
 }
 
+html {
+  /* Mejora la renderización de fuentes */
+  text-rendering: optimizeSpeed;
+}
+
 body {
   font-family: var(--font-outfit), sans-serif;
   background: var(--bg);
   color: var(--text-primary);
   overflow-x: hidden;
-  /* Prevent mobile viewport resize */
   position: relative;
   min-height: 100vh;
   min-height: -webkit-fill-available;
-  /* Applied explicitly to whole site as requested */
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-
-/* ... existing media query ... */
 
 h1,
 h2,
@@ -55,6 +56,7 @@ h6 {
   padding: 0 1.5rem;
 }
 
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -68,24 +70,14 @@ h6 {
   border-radius: 4px;
 }
 
-/* content-visibility: reduce renderizado inicial de secciones fuera del viewport.
-   Equivale a no pintar esas secciones hasta que el usuario hace scroll — reduce LCP y TBT. */
-#nosotros,
-#servicios,
-#clientes,
-#tu-local-digital,
-#contacto {
-  content-visibility: auto;
-  /* contain-intrinsic-size previene saltos de layout (CLS) al reservar espacio estimado */
-  contain-intrinsic-size: 0 600px;
-}
-
-/* Permite que las animaciones CSS corran en GPU sin causar repaints en el main thread */
+/* Elimina el tap highlight en móvil */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Mejora la renderización de fuentes */
-html {
-  text-rendering: optimizeSpeed;
-}
+/*
+ * NOTA: content-visibility:auto fue ELIMINADO.
+ * Causaba "Redistribución forzada" en Lighthouse/PageSpeed porque
+ * al hacer scroll el browser recalcula el layout real de cada sección.
+ * Con dynamic imports ya tenemos lazy loading suficiente.
+ */
