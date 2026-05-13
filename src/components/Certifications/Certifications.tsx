@@ -31,7 +31,7 @@ export default function Certifications() {
                                     sizes="(max-width: 640px) 120px, 160px"
                                     className={styles.logoImage}
                                     style={{ objectFit: 'contain' }}
-                                    loading="eager"
+                                    loading="lazy"
                                 />
                             </div>
                         </div>

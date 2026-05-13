@@ -37,14 +37,14 @@
 /* 🔑 TARJETA AMIGABLE */
 .card {
   background: #ffffff;
-  /* Fondo blanco para que los iconos resalten */
   border-radius: 30px;
   padding: 40px;
-  transition: all 0.4s ease;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  /* Efecto de flotación */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   animation: cardFloat 6s ease-in-out infinite;
+  will-change: transform;
+  /* GPU compositor para flotación */
 }
 
 .card:nth-child(1) {
@@ -227,5 +227,21 @@
     width: 100%;
     justify-content: center;
     padding: 12px 20px;
+  }
+}
+
+/* En móvil desactivamos la flotación (reduce TBT en dispositivos lentos) */
+@media (max-width: 768px) {
+  .card {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+/* Respetamos la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+    will-change: auto;
   }
 }

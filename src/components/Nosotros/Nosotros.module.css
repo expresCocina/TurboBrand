@@ -249,7 +249,7 @@
     z-index: 1;
 }
 
-/* Formas geométricas animadas */
+/* Formas geométricas — solo transform para GPU compositor, sin filter:blur (evita repaints) */
 .shape1,
 .shape2,
 .shape3,
@@ -257,124 +257,70 @@
 .shape5 {
     position: absolute;
     border-radius: 50%;
-    opacity: 0.08;
-    filter: blur(60px);
+    opacity: 0.06;
+    will-change: transform;
+    /* Delegamos al compositor del GPU */
 }
 
 .shape1 {
     width: 400px;
     height: 400px;
-    background: linear-gradient(135deg, #9E0060, #ff0080);
+    background: radial-gradient(circle, #9E0060 0%, transparent 70%);
     top: -100px;
     left: -100px;
-    animation: float1 20s ease-in-out infinite;
+    animation: floatA 20s ease-in-out infinite;
 }
 
 .shape2 {
     width: 300px;
     height: 300px;
-    background: linear-gradient(135deg, #9E0060, #c9006f);
+    background: radial-gradient(circle, #9E0060 0%, transparent 70%);
     top: 50%;
     right: -50px;
-    animation: float2 25s ease-in-out infinite;
+    animation: floatB 25s ease-in-out infinite;
 }
 
 .shape3 {
     width: 250px;
     height: 250px;
-    background: linear-gradient(135deg, #ff0080, #9E0060);
+    background: radial-gradient(circle, #ff0080 0%, transparent 70%);
     bottom: 10%;
     left: 20%;
-    animation: float3 18s ease-in-out infinite;
+    animation: floatA 18s ease-in-out infinite reverse;
 }
 
 .shape4 {
     width: 350px;
     height: 350px;
-    background: linear-gradient(135deg, #c9006f, #9E0060);
+    background: radial-gradient(circle, #c9006f 0%, transparent 70%);
     top: 30%;
     left: 50%;
-    animation: float4 22s ease-in-out infinite;
+    animation: floatB 22s ease-in-out infinite reverse;
 }
 
 .shape5 {
     width: 200px;
     height: 200px;
-    background: linear-gradient(135deg, #9E0060, #ff0080);
+    background: radial-gradient(circle, #9E0060 0%, transparent 70%);
     bottom: -50px;
     right: 30%;
-    animation: float5 16s ease-in-out infinite;
+    animation: floatA 16s ease-in-out infinite;
 }
 
-/* Animaciones de flotación */
-@keyframes float1 {
-
-    0%,
-    100% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-
-    33% {
-        transform: translate(30px, -30px) rotate(120deg);
-    }
-
-    66% {
-        transform: translate(-20px, 20px) rotate(240deg);
-    }
+/* Animaciones — SOLO translate (compositor-safe, sin rotate ni scale) */
+@keyframes floatA {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, -30px); }
 }
 
-@keyframes float2 {
-
-    0%,
-    100% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-
-    33% {
-        transform: translate(-40px, 30px) rotate(-120deg);
-    }
-
-    66% {
-        transform: translate(20px, -40px) rotate(-240deg);
-    }
+@keyframes floatB {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-30px, 25px); }
 }
 
-@keyframes float3 {
-
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    50% {
-        transform: translate(40px, -40px) scale(1.1);
-    }
-}
-
-@keyframes float4 {
-
-    0%,
-    100% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
-
-    50% {
-        transform: translate(-30px, 30px) rotate(180deg) scale(0.9);
-    }
-}
-
-@keyframes float5 {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    33% {
-        transform: translate(25px, 25px);
-    }
-
-    66% {
-        transform: translate(-25px, -15px);
+/* Reduce movimiento si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+    .shape1, .shape2, .shape3, .shape4, .shape5 {
+        animation: none;
     }
 }

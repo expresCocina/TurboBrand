@@ -1,8 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import Navbar from '@/components/Navbar/Navbar';
-import Footer from '@/components/Footer/Footer';
-import WhatsAppButton from '@/components/WhatsAppButton/WhatsAppButton';
-import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import Script from 'next/script';
 import { Outfit } from 'next/font/google';
 import './globals.css';
@@ -12,6 +8,7 @@ const outfit = Outfit({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-outfit',
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -128,12 +125,24 @@ export default function RootLayout({
   return (
     <html lang="es" className={outfit.variable}>
       <head>
-        {/* Resource Hints */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://amcagencyweb.com" />
+        {/* Preconnect solo a dominios críticos de renderizado — ELIMINA 600ms de render-blocking */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* DNS prefetch para terceros que se cargarán después del load */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        {/* JSON-LD Schema en head para mejor indexación */}
+
+        {/* Preload imagen hero desktop — reduce LCP en desktop */}
+        <link
+          rel="preload"
+          as="image"
+          href="/fondohero.webp"
+          type="image/webp"
+          media="(min-width: 769px)"
+          fetchPriority="high"
+        />
+
+        {/* JSON-LD Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -143,7 +152,27 @@ export default function RootLayout({
         <LayoutWrapper>
           {children}
         </LayoutWrapper>
-        <GoogleAnalytics gaId="G-X8N3PJJCF8" />
+
+        {/* Google Analytics — afterInteractive: se carga DESPUÉS de que la página es interactiva */}
+        <Script
+          id="ga-load"
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-X8N3PJJCF8"
+        />
+        <Script
+          id="ga-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-X8N3PJJCF8', { send_page_view: true });
+            `,
+          }}
+        />
+
+        {/* FB Pixel — lazyOnload: SOLO carga si el usuario hace scroll o espera */}
         <Script
           id="fb-pixel"
           strategy="lazyOnload"
@@ -157,11 +186,13 @@ export default function RootLayout({
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
+              fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID || ""}');
               fbq('track', 'PageView');
             `,
           }}
         />
+
+        {/* Button tracking — lazyOnload */}
         <Script
           id="button-tracking"
           strategy="lazyOnload"
@@ -171,14 +202,12 @@ export default function RootLayout({
                 function trackButtonClick(button) {
                   var buttonText = button.innerText || button.textContent || button.value || 'Unknown Button';
                   var buttonId = button.id || 'no-id';
-                  var buttonClass = button.className || 'no-class';
                   var buttonHref = button.href || button.getAttribute('href') || '';
                   if (typeof gtag !== 'undefined') {
                     gtag('event', 'button_click', {
                       'event_category': 'Button',
                       'event_label': buttonText,
                       'button_id': buttonId,
-                      'button_class': buttonClass,
                       'button_href': buttonHref
                     });
                   }
@@ -186,41 +215,23 @@ export default function RootLayout({
                     fbq('trackCustom', 'ButtonClick', {
                       button_text: buttonText,
                       button_id: buttonId,
-                      button_class: buttonClass,
                       button_href: buttonHref
                     });
                   }
                 }
-                function initTracking() {
-                  document.addEventListener('click', function(e) {
-                    var target = e.target;
-                    while (target && target !== document) {
-                      if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.getAttribute('role') === 'button') {
-                        trackButtonClick(target);
-                        break;
-                      }
-                      target = target.parentElement;
+                document.addEventListener('click', function(e) {
+                  var target = e.target;
+                  while (target && target !== document) {
+                    if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.getAttribute('role') === 'button') {
+                      trackButtonClick(target);
+                      break;
                     }
-                  }, true);
-                }
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', initTracking);
-                } else {
-                  initTracking();
-                }
+                    target = target.parentElement;
+                  }
+                }, true);
               })();
             `,
           }}
-        />
-        <Script
-          id="waas-lock"
-          src="https://amcagencyweb.com/waas-lock.js?domain=https://www.turbobrandcol.com/"
-          strategy="lazyOnload"
-        />
-        <Script
-          id="amc-agency-web-protection"
-          src="https://amcagencyweb.com/api/protect?domain=www.turbobrandcol.com"
-          strategy="lazyOnload"
         />
       </body>
     </html>

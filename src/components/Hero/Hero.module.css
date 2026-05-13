@@ -4,6 +4,8 @@
   overflow: hidden;
   background: var(--bg);
   --zigzag-color: var(--bg);
+  /* Contiene los repaints dentro de esta sección */
+  contain: layout style;
 }
 
 /* Imagen fondo */
@@ -30,9 +32,10 @@
   }
 }
 
-/* Hide background image on mobile entirely to save 2.7MB LCP */
+/* desktopOnly — solo se muestra en pantallas ≥769px
+   El nodo Image se monta solo en desktop desde el JSX para no descargar la imagen en móvil */
 @media (max-width: 768px) {
-  .hideOnMobile {
+  .desktopOnly {
     display: none !important;
   }
 }

@@ -3,9 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 31536000, // 1 año — máximo caché para imágenes optimizadas
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 31536000,
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -26,10 +26,15 @@ const nextConfig: NextConfig = {
       'recharts',
     ],
   },
-  // Headers HTTP de caché largo plazo — soluciona "Use efficient cache policy" de Lighthouse
+  // Turbopack config (Next.js 16+ usa Turbopack por defecto)
+  turbopack: {},
+  // Headers HTTP de caché a largo plazo — soluciona "Use efficient cache policy"
   async headers() {
     const longCache = [
       { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+    ];
+    const shortCache = [
+      { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
     ];
     const securityHeaders = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -39,11 +44,11 @@ const nextConfig: NextConfig = {
     ];
 
     return [
-      // Assets JS/CSS del build de Next.js — hash en filename, inmutables
+      // Assets estáticos del build — inmutables (hash en nombre)
       { source: '/_next/static/:path*', headers: longCache },
-      // Imágenes optimizadas por Next Image
-      { source: '/_next/image', headers: longCache },
-      // Assets del /public — separados por extensión (Next.js no soporta grupos de captura)
+      // Imágenes optimizadas
+      { source: '/_next/image', headers: shortCache },
+      // Assets públicos por extensión
       { source: '/:path*.jpg', headers: longCache },
       { source: '/:path*.jpeg', headers: longCache },
       { source: '/:path*.png', headers: longCache },
@@ -56,7 +61,7 @@ const nextConfig: NextConfig = {
       { source: '/:path*.woff2', headers: longCache },
       { source: '/:path*.ttf', headers: longCache },
       { source: '/:path*.otf', headers: longCache },
-      // Páginas — headers de seguridad
+      // Páginas HTML — security headers
       { source: '/(.*)', headers: securityHeaders },
     ];
   },

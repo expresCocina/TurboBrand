@@ -55,7 +55,6 @@ h6 {
   padding: 0 1.5rem;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -68,3 +67,25 @@ h6 {
   background: var(--brand);
   border-radius: 4px;
 }
+
+/* content-visibility: reduce renderizado inicial de secciones fuera del viewport.
+   Equivale a no pintar esas secciones hasta que el usuario hace scroll — reduce LCP y TBT. */
+#nosotros,
+#servicios,
+#clientes,
+#tu-local-digital,
+#contacto {
+  content-visibility: auto;
+  /* contain-intrinsic-size previene saltos de layout (CLS) al reservar espacio estimado */
+  contain-intrinsic-size: 0 600px;
+}
+
+/* Permite que las animaciones CSS corran en GPU sin causar repaints en el main thread */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mejora la renderización de fuentes */
+html {
+  text-rendering: optimizeSpeed;
+}
