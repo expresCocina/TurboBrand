@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { Resend } from 'resend';
 import { google } from 'googleapis';
+import { getGoogleBusyIntervals, isSlotBusy } from '@/lib/googleCalendar';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -87,7 +88,7 @@ function clientEmailHtml(data: {
               Si no solicitaste esta reunión, ignora este correo. Si necesitas ayuda contáctanos por WhatsApp.
             </p>
             <div style="text-align:center;">
-              <a href="https://wa.me/573138537261" style="display:inline-block;padding:12px 28px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;border:1px solid rgba(255,255,255,0.12);">
+              <a href="https://wa.me/573007543238" style="display:inline-block;padding:12px 28px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;border:1px solid rgba(255,255,255,0.12);">
                 Contactar por WhatsApp
               </a>
             </div>
@@ -214,6 +215,15 @@ export async function POST(req: NextRequest) {
       .limit(1);
 
     if (existing && existing.length > 0) {
+      return NextResponse.json({
+        error: 'Este horario ya está reservado. Por favor elige otra fecha u hora.',
+        code: 'SLOT_TAKEN',
+      }, { status: 409 });
+    }
+
+    // ── Verificar contra Google Calendar (eventos creados manualmente) ──────────
+    const busyIntervals = await getGoogleBusyIntervals(date);
+    if (isSlotBusy(date, time, busyIntervals)) {
       return NextResponse.json({
         error: 'Este horario ya está reservado. Por favor elige otra fecha u hora.',
         code: 'SLOT_TAKEN',

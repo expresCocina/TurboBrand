@@ -32,7 +32,7 @@ export default function Footer() {
                     </div>
 
                     <div className={styles.infoCol}>
-                        <h4>Contacto</h4>
+                        <p className={styles.footerColLabel}>Contacto</p>
                         <p>Carrera 43 A # 16 sur 245, piso 3, Poblado</p>
                         <p>Medellín, Colombia</p>
 
@@ -50,7 +50,7 @@ export default function Footer() {
                 <div className={styles.madeBy}>
                     Hecho con ❤️ por{' '}
                     <Link
-                        href="https://wa.me/573138537261"
+                        href="https://wa.me/573007543238"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.agencyLink}

@@ -9,14 +9,30 @@
     border-radius: 50%;
     text-align: center;
     font-size: 30px;
-    box-shadow: 2px 2px 3px #999;
+    /* box-shadow estático: NO en la animación — no bloquea compositor */
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.25);
     z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    animation: pulse 2s infinite;
+    /* Solo transform en hover — propiedad compuesta */
+    transition: transform 0.3s ease, background-color 0.3s ease;
     text-decoration: none;
+}
+
+/* Anillo de pulso: pseudo-elemento separado del botón.
+   Anima SOLO transform y opacity → compositor GPU, hilo principal libre. */
+.floatBtn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: #25d366;
+    opacity: 0.7;
+    /* will-change le dice al navegador que prepare una capa de composición */
+    will-change: transform, opacity;
+    animation: pulse 2s ease-out infinite;
+    pointer-events: none;
 }
 
 .floatBtn:hover {
@@ -24,17 +40,19 @@
     transform: scale(1.1);
 }
 
+/* Solo transform + opacity → 100 % compositable en GPU */
 @keyframes pulse {
     0% {
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+        transform: scale(1);
+        opacity: 0.7;
     }
-
     70% {
-        box-shadow: 0 0 0 20px rgba(37, 211, 102, 0);
+        transform: scale(1.6);
+        opacity: 0;
     }
-
     100% {
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+        transform: scale(1.6);
+        opacity: 0;
     }
 }
 

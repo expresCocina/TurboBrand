@@ -1,0 +1,15 @@
+# Target modern browsers only — elimina ~26 KB de legacy JS polyfills (Lighthouse audit)
+# Next.js lee este archivo en el build para decidir qué transformaciones de Babel/SWC aplicar.
+[production]
+Chrome >= 90
+Firefox >= 90
+Safari >= 14
+Edge >= 90
+Opera >= 76
+not dead
+not IE 11
+
+[development]
+last 1 chrome version
+last 1 firefox version
+last 1 safari version

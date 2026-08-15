@@ -75,7 +75,7 @@
     text-align: right;
 }
 
-.infoCol h4 {
+.infoCol .footerColLabel {
     font-size: 1.2rem;
     margin-bottom: 1rem;
     color: var(--brand);
@@ -250,7 +250,7 @@
         justify-content: center;
     }
 
-    .infoCol h4 {
+    .infoCol .footerColLabel {
         font-size: 0.75rem;
         margin-bottom: 0.6rem;
         text-transform: uppercase;

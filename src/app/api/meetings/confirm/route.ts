@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
           </a>
         </div>` : ''}
         <div style="text-align:center;">
-          <a href="https://wa.me/573138537261" style="display:inline-block;padding:12px 28px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.75);text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;border:1px solid rgba(255,255,255,0.12);">
+          <a href="https://wa.me/573007543238" style="display:inline-block;padding:12px 28px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.75);text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;border:1px solid rgba(255,255,255,0.12);">
             📲 Contactar por WhatsApp
           </a>
         </div>

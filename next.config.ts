@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizeCss: true,
+    // false = un solo chunk de CSS → menos solicitudes bloqueantes de render
+    cssChunking: false,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',

@@ -7,12 +7,12 @@ export default function HeroCards() {
       <div className={styles.left}>
         <div className={styles.card}>
           <span className={styles.tag}>GROWING TOGETHER</span>
-          <h3>Aumenta las ventas de tu tienda en línea</h3>
+          <h2>Aumenta las ventas de tu tienda en línea</h2>
         </div>
 
         <div className={styles.card}>
           <span className={styles.tag}>FAST RESULTS</span>
-          <h3>Posiciona tu marca en canales digitales</h3>
+          <h2>Posiciona tu marca en canales digitales</h2>
         </div>
       </div>
 
@@ -20,7 +20,7 @@ export default function HeroCards() {
       <div className={styles.right}>
         <div className={`${styles.card} ${styles.highlight}`}>
           <span className={styles.tag}>SOCIAL MEDIA</span>
-          <h3>Crea una comunidad digital</h3>
+          <h2>Crea una comunidad digital</h2>
         </div>
       </div>
     </div>

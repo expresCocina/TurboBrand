@@ -130,8 +130,9 @@ export default function RootLayout({
           NO necesitamos preconnect a fonts.gstatic.com — sería redundante.
           Solo dns-prefetch para terceros que cargan después del load.
         */}
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        {/* preconnect: abre TCP+TLS antes de que se necesite — ahorra ~200ms por dominio */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
 
         {/* Preload imagen hero SOLO en desktop — reduce LCP desktop */}
         <link
@@ -153,15 +154,16 @@ export default function RootLayout({
           {children}
         </LayoutWrapper>
 
-        {/* Google Analytics — afterInteractive: se carga DESPUÉS de que la página es interactiva */}
+        {/* Google Analytics — lazyOnload: se carga solo cuando el browser está idle.
+            Reduce TBT y JS no usado en carga inicial (~161 KiB menos bloqueantes). */}
         <Script
           id="ga-load"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src="https://www.googletagmanager.com/gtag/js?id=G-X8N3PJJCF8"
         />
         <Script
           id="ga-init"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];

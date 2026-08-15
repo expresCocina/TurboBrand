@@ -74,7 +74,7 @@ function ConfirmedContent() {
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "center" }}>
           <a
-            href="https://wa.me/573138537261"
+            href="https://wa.me/573007543238"
             style={{
               display: "inline-block",
               padding: "0.85rem 2rem",

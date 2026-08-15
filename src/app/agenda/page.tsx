@@ -197,7 +197,7 @@ export default function AgendaPage() {
                 </p>
                 <div className={styles.successActions}>
                   <a
-                    href="https://wa.me/573138537261"
+                    href="https://wa.me/573007543238"
                     className={styles.whatsappBtn}
                     target="_blank"
                     rel="noopener noreferrer"
